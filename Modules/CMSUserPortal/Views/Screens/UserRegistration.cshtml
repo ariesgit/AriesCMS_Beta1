@@ -1,0 +1,44 @@
+﻿@{
+    if (ViewBag.MasterLayout != null)
+    {
+        //Layout = ViewBag.MasterLayout;
+        Layout = "~/Modules/CMSUserPortal/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+    else
+    {
+        Layout = "~/Modules/CMSUserPortal/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+}
+
+      
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 toppadding">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12">
+            <div class="col-lg-11 col-md-11 col-xs-11">
+
+                @if ((ViewBag.bLoggedIn != null) && (ViewBag.bLoggedIn == true))
+                {
+                    <a href="/portal">You are already registered, please click here to enter your portal</a>
+                }
+                else
+                {
+                    Html.RenderPartial("~/Modules/CMSUserPortal/Views/Forms/UserRegistration.cshtml");
+                }
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

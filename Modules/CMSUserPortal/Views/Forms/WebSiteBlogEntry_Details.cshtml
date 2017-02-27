@@ -1,0 +1,181 @@
+@model AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject
+
+
+
+
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        keep_styles: true,
+        browser_spellcheck: true,
+        plugins: ["advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks code fullscreen",
+                "insertdatetime media table contextmenu paste moxiemanager"],
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+    });
+
+</script>
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Blog Entry</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.sSubject</h2>
+            }
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+            {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>            
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>                
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "WebSiteBlogEntry_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+            @using (Html.BeginForm("WebSiteBlogEntry_AddUpdate", "", FormMethod.Post))
+            {
+
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.ID)
+                @Html.HiddenFor(model => model.iParentID)
+                @Html.HiddenFor(model => model.sParentID)
+                @Html.HiddenFor(model => model.sControl)
+                @Html.HiddenFor(model => model.dtDateCreated)
+                @Html.HiddenFor(model => model.dtLastUpdated)
+                @Html.HiddenFor(model => model.iCreatedByID)
+                @Html.HiddenFor(model => model.sCreatedByID)
+                @Html.HiddenFor(model => model.iUpdatedByID)
+                @Html.HiddenFor(model => model.sUpdatedByID)
+                @Html.HiddenFor(model => model.dtStart)
+                @Html.HiddenFor(model => model.dtEnd)
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div style="width:100%;float:left;">
+                        <label for="sTitle">Title :</label>
+                        @Html.TextBoxFor(model => model.sTitle, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sTitle, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="sSubject">Subject :</label>
+                        @Html.TextBoxFor(model => model.sSubject, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sSubject, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="sImageURL">Image URL :</label>
+                        @Html.TextBoxFor(model => model.sImageURL, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sImageURL, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="sKeyWords"> Key words :</label>
+                        @Html.TextBoxFor(model => model.sKeyWords, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sKeyWords, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="sContent">Content :</label>
+                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control", @style = "height:400px !important;" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sContent, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="bOpenToComments">Open to comments :</label>
+                        @Html.CheckBoxFor(model => model.bOpenToComments, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.bOpenToComments, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="bMustBeLoggedInToComment">Log in required to comment :</label>
+                        @Html.CheckBoxFor(model => model.bMustBeLoggedInToComment, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.bMustBeLoggedInToComment, "*Required!")
+                        }
+                    </div>
+
+                    <div style="width:100%;float:left;">
+                        <label for="bIsLive">Is live :</label>
+                        @Html.CheckBoxFor(model => model.bIsLive, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.bIsLive, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bArchived">Archive :</label>
+                        @Html.CheckBoxFor(model => model.bArchived, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.bArchived, "*Required!")
+                        }
+                    </div>
+
+
+                </fieldset>
+
+
+                <div class="form-group">
+                    <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+

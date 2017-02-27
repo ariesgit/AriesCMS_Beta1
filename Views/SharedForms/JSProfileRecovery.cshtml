@@ -1,0 +1,254 @@
+﻿
+<script type="text/javascript">
+    function Show_SuccessDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oSuccessDiv");
+            oDiv_Object.style.display = 'inline';
+
+        }
+        catch (e) {
+        }
+    }
+    function Hide_SuccessDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oSuccessDiv");
+            oDiv_Object.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function Show_FormDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oFormDiv");
+            oDiv_Object.style.display = 'inline';
+
+        }
+        catch (e) {
+        }
+    }
+    function Hide_FormDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oFormDiv");
+            oDiv_Object.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function Show_ErrorDiv()
+    {
+        try {
+            var oDiv_Error = document.getElementById("oErrorDiv");
+            oDiv_Error.style.display = 'inline';
+
+        }
+        catch(e) {
+        }
+    }
+    function Hide_ErrorDiv() {
+        try {
+            var oDiv_Error = document.getElementById("oErrorDiv");
+            oDiv_Error.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function SetErrorText(_Value) {
+        try {
+            var oDiv_ErrorMessage = document.getElementById("oErrorMessage");
+            oDiv_ErrorMessage.innerHTML = _Value;
+        }
+        catch (e) {
+        }
+    }
+
+
+    function Submit_Form()
+    {
+        try{
+            var _FullName = "";
+            var _Email = "";
+
+            var txt_oFullName = document.getElementById('FullName');
+            var txt_oEmail = document.getElementById('Email');
+
+
+            _FullName = txt_oFullName.value;
+            _Email = txt_oEmail.value;
+
+            var oMydata = { "_EMail": _Email, "_FullName": _FullName, "_FirstName": "", "_LastName": "" };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Content("/RestService/RecoverProfile")',
+                data: oMydata,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                },
+                success: function (data) {
+
+                    if (data.RESPONSE == 'true') {
+                        Hide_FormDiv();
+                        Show_SuccessDiv();
+                        alert("Success!");
+                    }
+                    else {
+                        SetErrorText();
+                        Show_ErrorDiv(data.MESSAGE);
+                    }
+                }
+            });
+
+        }
+        catch(e){
+
+        }
+    }
+
+    function Validate_Form()
+    {
+        try{
+
+            var txt_oFullName = document.getElementById('FullName');
+            var txt_oEmail = document.getElementById('Email');
+
+            var bResponse = true;
+
+            if (txt_oFullName != null) {
+                if ((!txt_oFullName.value) || (!txt_oFullName)) {
+                    txt_oFullName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oFullName.value == '') {
+                    txt_oFullName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oEmail != null) {
+                if ((!txt_oEmail.value) || (!txt_oEmail)) {
+                    txt_oEmail.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oEmail.value == '') {
+                    txt_oEmail.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+
+
+            return bResponse;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+
+    function onSubmit_Click()
+    {
+        try {
+            if(Validate_Form())
+            {
+                Submit_Form();
+            }
+        }
+        catch (e) {
+
+        }
+    }
+
+
+</script>
+
+
+<div class="container">
+    <div id="secondary" class="widget-area left-sidebar">
+        <h4 class="pull-top">Get in <strong>touch</strong></h4>
+        <p>Contact us and let's connect so that we can find the best path to move forward with your needs.</p>
+
+        <hr />
+
+        <h4>The <strong>Office</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
+            <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
+            <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
+        </ul>
+
+        <hr />
+
+        <h4>Business <strong>Hours</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
+            <li><i class="icon-time"></i> Saturday - Closed</li>
+            <li><i class="icon-time"></i> Sunday - Closed</li>
+        </ul>
+
+    </div>
+    <div id="primary" class="site-content-left">
+        <div class="entry-content">
+            <div id="oErrorDiv" style="display:none;">
+                <h2 class="strip-title alignleft-text"><strong>Error!</strong> There was an error sending your message.</h2><br />
+                <span id="oErrorMessage"></span>
+            </div>
+            <div class="entry-content">
+                <div style="width:660px !important; float:left;">
+                    <div id="oFormDiv">
+                        <!--/forms/RecoverProfile-->
+                        <form action="#" method="post">
+
+                            <input type="hidden" name="_ViewToLoad" id="_ViewToLoad" value="~/lostpassword" />
+                            <input type="hidden" name="_ViewConfirmation" id="_ViewConfirmation" value="~/lostpassword" />
+                            <input type="hidden" name="_ViewError" id="_ViewError" value="~/lostpassword" />
+
+                            <fieldset>
+                                <legend></legend>
+
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Your name *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        <input type="text" class="TextBox2" placeholder="Full Name" name="FullName" id="FullName" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Your email address *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="EMail" name="Email" id="Email" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div style="float:right; padding-top:12px;">
+                                <a href="javascript:onSubmit_Click();" class="orange-btn button medium left">Send</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="oSuccessDiv" style="display:none;">
+                        <h2 class="strip-title alignleft-text">
+                            <strong>Success!</strong> We found your profile. <br />
+                            <p class="lead">
+                                We sent you an email, to the email on record, with instructions on how to recover your profile.
+                            </p>
+                            <br />
+                            <a href="~/" class="btn btn-large btn-primary pull-top">Look around our site</a>
+                        </h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

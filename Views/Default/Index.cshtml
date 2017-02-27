@@ -1,0 +1,157 @@
+﻿@model ACMSDBView.WebSitePageViewModel
+
+@{
+    if (ViewBag.MasterLayout != null)
+    {
+        Layout = ViewBag.MasterLayout;
+    }
+}
+@section MetaTage{
+    @Html.Raw(Model.MetaTags)
+}
+
+@section Classification{
+    <meta name="classification" content="@Model.Classification" />
+}
+
+@section Description{
+    <meta name="description" content="@Model.PageDescription" />
+}
+
+@section Keywords{
+    <meta name="keywords" content="@Model.KeyWords" />
+}
+
+@if (Model != null)
+{
+    if (Model.PageBody != null)
+    {
+        @*if (Model.CanEditPages)
+            {
+                <div id="dseditbutton" style="float:left; width:100%;z-index:999999999999999999999; position: fixed; width:34px;  display:none;">
+                    <a href="javascript:EnableEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /></a>
+                </div>
+            }*@
+
+
+        @*if (Model.AuthenticatedUser == true)
+            {
+                <script type="text/javascript">
+                    SetUserIsLoggedIn('@Model.UserPortalURL');
+                </script>
+                <div id="dsUploadFile" style="float:right; width:100%;z-index:999999999999999999999; position: fixed; width:120px; right:0px; display:none;">
+                    <a href="javascript:ShowRUpload();"><img src="~/Themes/Upload1.png" border="0" alt="Click to Upload" /></a>
+                </div>
+            }
+            else
+            {
+                <div id="dsloggin" style="float:right; width:100%;z-index:999999999999999999999; position: fixed; width:120px; right:0px; display:none;">
+                    <a href="javascript:ShowLogIn();"><img src="~/Themes/Security.png" border="0" alt="Click to log in" /></a> or <a href="javascript:ShowRegistration();"><img src="~/Themes/Register1.png" border="0" alt="Click to Sign Up" /></a>
+                </div>
+            }*@
+
+
+
+foreach (CMSPartialPageBuilder.PageItems oPage in Model.PageContent)
+{
+    if (oPage.IsPartialView == false)
+    {
+        if (!String.IsNullOrEmpty(oPage.Conent))
+        {
+            @Html.Raw(oPage.Conent);
+        }
+    }
+    else if (!String.IsNullOrEmpty(oPage.PartialPageURI))
+    {
+        string sView = oPage.PartialPageURI;
+
+        <div>
+            @{
+                if (Model.DataModelsPrimary != null)
+                {
+                    Html.RenderPartial(sView.ToString(), Model.DataModelsPrimary);
+                }
+                else
+                {
+                    Html.RenderPartial(sView.ToString(), oPage);
+                }
+            }
+        </div>
+                        }
+                    }
+
+                }
+                else if (ViewBag.PartialPage != null)
+                {
+                    if (!String.IsNullOrEmpty(ViewBag.PartialPage))
+                    {
+                        string sView = ViewBag.PartialPage;
+
+                        <div>
+                            @{ Html.RenderPartial(sView.ToString()); }
+                        </div>
+                                        }
+                                    }
+                                }
+
+
+
+
+
+
+<script type="text/javascript">
+        function RecordPageView(PageOrContent)
+        {
+            try {
+                var oMydata = { "_Content": PageOrContent };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/PageView")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+        function RecordClickEvent(ClickValue) {
+            try {
+
+                var oMydata = { "_Content": ClickValue };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/ClicksEvent")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+
+
+    RecordPageView("@Model.WebSitePage.sPageName");
+
+    try {
+
+        CheckUserLoggedIn();
+    }
+    catch (e) {
+    }
+</script>
+
+

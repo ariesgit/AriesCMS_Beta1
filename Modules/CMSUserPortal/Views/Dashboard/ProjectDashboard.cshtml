@@ -1,0 +1,299 @@
+﻿@model DataView.ProjectsDBView
+
+<script type="text/javascript">
+    function On_NavRequest_ParentShowPleaseWait()
+    {
+        try{
+            parent.Show_PleaseWait();
+        }
+        catch (e) {
+
+        }
+    }
+</script>
+
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-lg-left text-md-left text-sm-left text-xs-left">
+            <h3 class="text-bold"><a href="javascript:ShowHelp('100');"><img src="~/Themes/acev1/images/buttons/SymbolHelp16.png" alt="Show Help" /></a> Project Overview</h3>
+
+            @if (ViewBag.bError == true)
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+                </div>
+            }
+            else if (ViewBag.bSaved == true)
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                    <p>Your request was processed successfully.</p>
+                </div>
+            }
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 text-lg-right text-md-right text-sm-right text-xs-right">
+            <a href="#" class="btn btn-outline-success">PROMOTE YOUR PROJECT</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    @using (Html.BeginForm("Projects_PRAddUpdate2", "", FormMethod.Post))
+    {
+        @Html.ValidationSummary(true);
+
+        @Html.HiddenFor(model => model.Projects.ID)
+        @Html.HiddenFor(model => model.Projects.sControl)
+        @Html.HiddenFor(model => model.Projects.sSync)
+        @Html.HiddenFor(model => model.Projects.dtCreated)
+        @Html.HiddenFor(model => model.Projects.dtUpdated)
+        @Html.HiddenFor(model => model.Projects.dtViewed)
+        @Html.HiddenFor(model => model.Projects.dtOpenned)
+        @Html.HiddenFor(model => model.Projects.sBuildBaseFolder)
+        @Html.HiddenFor(model => model.Projects.iConnectionTypeID)
+        @Html.HiddenFor(model => model.Projects.sConnectionTypeID)
+        @Html.HiddenFor(model => model.Projects.sConnectionString)
+        @Html.HiddenFor(model => model.Projects.sConnUserName)
+        @Html.HiddenFor(model => model.Projects.sConnUserPassword)
+        @Html.HiddenFor(model => model.Projects.sDBLocation)
+        @Html.HiddenFor(model => model.Projects.sSourceLocationForAutoUpdate)
+        @Html.HiddenFor(model => model.Projects.sFileLocation)
+        @Html.HiddenFor(model => model.Projects.iParentID)
+        @Html.HiddenFor(model => model.Projects.sParentID)
+        @Html.HiddenFor(model => model.Projects.iCreatedByID)
+        @Html.HiddenFor(model => model.Projects.sCreatedByID)
+        @Html.HiddenFor(model => model.Projects.iUpdatedByID)
+        @Html.HiddenFor(model => model.Projects.sUpdatedByID)
+        @Html.HiddenFor(model => model.Projects.iDomainID)
+        @Html.HiddenFor(model => model.Projects.sDomainID)
+        @Html.HiddenFor(model => model.Projects.dtLastBuild)
+
+
+        <fieldset>
+            <legend></legend>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <div class="form-group">
+                            <label for="Projects_sName">Name :</label>
+                            @Html.TextBoxFor(model => model.Projects.sName, new { @Class = "form-control" })
+                            @if (ViewBag.bError == true)
+                            {
+                                @Html.ValidationMessageFor(model => model.Projects.sName, "*Required!")
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <div class="form-group">
+                            <label for="Projects_sDefaultNameSpace">Default Name Space :</label>
+                            @Html.TextBoxFor(model => model.Projects.sDefaultNameSpace, new { @Class = "form-control" })
+                            @if (ViewBag.bError == true)
+                            {
+                                @Html.ValidationMessageFor(model => model.Projects.sDefaultNameSpace, "*Required!")
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <div class="form-group">
+                            <label for="Projects_sUINameSpace">UI Name Space :</label>
+                            @Html.TextBoxFor(model => model.Projects.sUINameSpace, new { @Class = "form-control" })
+                            @if (ViewBag.bError == true)
+                            {
+                                @Html.ValidationMessageFor(model => model.Projects.sUINameSpace, "*Required!")
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <div class="form-group">
+                        <label for="Projects_sDescription">Project Description :</label>
+                        @Html.TextAreaFor(model => model.Projects.sDescription, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Projects.sDescription, "*Required!")
+                        }
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-lg-left text-md-left text-sm-left text-xs-left">
+                &nbsp;
+            </div>
+            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-lg-right text-md-right text-sm-right text-xs-right">
+                <input type="submit" value="SAVE" name="submit" class="btn btn-outline-success" />
+            </div>
+        </div>
+
+    }
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left ">
+        &nbsp;
+    </div>
+</div>
+<div class="row">
+     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left border_bottom_solid_1x">
+        <h5>QUICK ACCESS TO YOUR PROJECT COMPONENTS</h5>
+     </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        &nbsp;
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 offset-lg-1 offset-md-1 offset-sm-1 offset-xs-1 text-lg-center text-md-center text-sm-center text-xs-center">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/Portal/Home/ProjectRequirements_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Requirements_Icon32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/Portal/Home/ProjectRequirements_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Requirements</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectProcess_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Process32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectProcess_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Process</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectUseCase_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/UseCases_Icon32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectUseCase_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Use Cases</a></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectDataBases_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/database_32_1.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectDataBases_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Data Schemas</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectDataBases_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/DataBases32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectDataBases_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Data Sets</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                &nbsp;
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectIntegrations_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/CloudFlow32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectIntegrations_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">API Definition</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectScreens_PRList?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Screen32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectScreens_PRList?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Screens</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectNavigation_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Navigation132.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectNavigation_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Navigation</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/ProjectOutPutFolders_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Folder1Configuration32.png" alt="" /></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/ProjectOutPutFolders_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">Code Groupings</a></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-lg-center text-md-center text-sm-center text-xs-center panle_rounded_border base_panelHeight2 padding_left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <a href="~/portal/home/Templates_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()"><img src="~/Themes/acev2/images/buttons/Systems32.png" alt="" /></a> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <span class="font-weight-bold text-smaller_2"><a href="~/portal/home/Templates_List?_iParentID=@Html.Raw(Model.Projects.ID)&_sParentID=@Html.Raw(Model.Projects.sName)" onclick="On_NavRequest_ParentShowPleaseWait()">AIPlates</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script type="text/javascript">
+    try {
+        parent.Hide_PleaseWait();
+    }
+    catch (e) {
+        alert(e);
+    }
+</script>

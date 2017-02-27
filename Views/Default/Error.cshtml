@@ -1,0 +1,209 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+    ViewBag.PageName = "Error";
+    //ViewBag.Keywords = "CMS, Content Management";
+    //ViewBag.Description = "";
+    //ViewBag.Classification = ""; 
+    Layout = "~/Views/Shared/_Default.cshtml";
+}
+
+
+
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div id="fullscreennav">
+            <div class="col-xs-2 text-xs-left">
+                <a href="~/"><img src="~/themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a>
+            </div>
+            <div class="col-xs-8 text-xs-center">
+                <h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Progrmmes</h3>
+                <ul class="list-inline">
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/">HOME</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/howitworks">LEARN MORE</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/signup?id=3">SIGN UP</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/faq">FAQ</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/videos">VIDEOS</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/blog">BLOG</a></li>
+                    <li class="list-inline-item text-xs-center"><a class="text-bold" href="~/contactus">CONTACT US</a></li>
+                </ul>
+            </div>
+            <div class="col-xs-2 text-xs-right">
+                <a href="tel:1-877-262-2830" class="text-bold">(877) 262-2830</a><br />
+                <a href="~/portal" class="text-bold">SIGN IN</a>
+                <!--<br/>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href=""><span class="fa fa-facebook">&nbsp;</span></a></li>
+                    <li class="list-inline-item"><a href=""><span class="fa fa-linkedin">&nbsp;</span></a></li>
+                    <li class="list-inline-item"><a href=""><span class="fa fa-twitter">&nbsp;</span></a></li>
+                </ul>-->
+            </div>
+        </div>
+        <div id="mobilenav">
+            <div class="row">
+                <div class="col-xs-12">
+                    <center><a href="#home"><img src="themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a></center>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="defaultNavbar1">
+                        <ul class="nav navbar-nav">
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/">HOME</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/howitworks">LEARN MORE</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/signup?id=3">SIGN UP</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/faq">FAQ</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/videos">VIDEOS</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/blog">BLOG</a></li>
+                            <li class="divider"></li>
+                            <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/contactus">CONTACT US</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 toppadding">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-xs-12 offset-lg-3 offset-md-3">
+            <center><h1 class="alert-danger">OOOPS! Something went wrong</h1></center>
+            
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <p>
+                    @ViewBag.ErrorMessage
+                </p>
+            }
+            else
+            {
+                <p>
+                    Ooops! Something went wrong, and we could not find the content you were looking for.  If you continue to experience issues please contact us and we will do our best to help.
+                </p>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+<footer class="footer">
+    <div class="row">
+        <div class="col-lg-7 col-md-7 col-xs-7 offset-lg-1 offset-md-1 offset-xs-1">
+            <span class="">
+                <a class="text-bold" href="~/">HOME</a>
+                <a class="text-bold" href="~/howitworks">LEARN MORE</a>
+                <a class="text-bold" href="~/signup?id=3">SIGN UP</a>
+                <a class="text-bold" href="~/faq">FAQ</a>
+                <a class="text-bold" href="~/blog">BLOG</a>
+                <a class="text-bold" href="~/contactus">CONTACT US</a>
+            </span>
+        </div>
+        <div class="col-lg-2 col-md-2 col-xs-2 offset-lg-2 offset-md-2 offset-xs-2 text-lg-center text-md-center text-xs-center">
+            <span class="">
+                <a class="" href="~/portal">SIGN IN</a>
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-xs-3 offset-lg-1 offset-md-1 offset-xs-1">
+            <span style="color:#9F9B9B; font-weight:bold; font-size:0.95em;">&copy; 2016-2017 Aries TCO, Inc.</span>
+        </div>
+        <div class="col-lg-3 col-md-3 col-xs-3offset-lg-3 offset-md-3 offset-xs-3">
+
+        </div>
+    </div>
+    <hr>
+</footer>
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+        function RecordPageView(PageOrContent)
+        {
+            try {
+                var oMydata = { "_Content": PageOrContent };
+                $.ajax({
+                    type: 'POST',
+                    url: '/RestService/PageView',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+        function RecordClickEvent(ClickValue) {
+            try {
+
+                var oMydata = { "_Content": ClickValue };
+                $.ajax({
+                    type: 'POST',
+                    url: '/RestService/ClicksEvent',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+
+
+        RecordPageView("Index");
+</script>
+
+
+
+
+
+
+
+
+

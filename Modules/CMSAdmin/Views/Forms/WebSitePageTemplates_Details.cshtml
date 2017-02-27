@@ -1,0 +1,137 @@
+@model ACMSDBView.WebSitePageTemplatesViewModel
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Themee</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.WebSitePageTemplates.sName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "WebSitePageTemplates_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list. </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("WebSitePageTemplates_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.WebSitePageTemplates.ID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.iParentID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sParentID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sControl)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sThumbNailImageURL)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.iLanguageID)
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sLanguageID)
+
+
+
+                @Html.HiddenFor(model => model.WebSitePageTemplates.sTemplateBody)
+
+
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplates_sName"> Name :</label>
+                        @Html.TextBoxFor(model => model.WebSitePageTemplates.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplates_sDescription"> Description :</label>
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sDescription, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sDescription, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplates_sVersion"> Version :</label>
+                        @Html.TextBoxFor(model => model.WebSitePageTemplates.sVersion, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sVersion, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplates_sLocationURL">Default view location (URL):</label>
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURL, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sLocationURL, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplates_sLocationURI">Default view location (URI) :</label>
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURI, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sLocationURI, "*Required!")
+                        }
+                    </div>
+
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

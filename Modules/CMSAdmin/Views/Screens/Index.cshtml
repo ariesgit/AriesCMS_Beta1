@@ -1,0 +1,54 @@
+﻿@model ACMSDBView.WebSitePageViewModel
+
+
+@{
+    if (ViewBag.MasterLayout != null)
+    {
+        //Layout = ViewBag.MasterLayout;
+        Layout = "~/Modules/CMSAdmin/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+    else
+    {
+        Layout = "~/Modules/CMSAdmin/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+}
+
+
+
+
+
+<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+    @{ Html.RenderPartial("~/Modules/CMSAdmin/Views/Shared/_MasterNavigation.cshtml", Model.DataModelsSub[0]); }
+</div>
+<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+    @if ((Model.PartialViewToLoad != null) && (Model.PartialViewToLoad != ""))
+    {
+        if ((Model.AuthenticatedUser != null) && (Model.AuthenticatedUser == true))
+        {
+            Html.RenderPartial(Model.PartialViewToLoad, Model.DataModelsPrimary);
+        }
+        else
+        {
+            <div>
+                @{  Html.RenderPartial("~/Modules/CMSAdmin/Views/Authentication/UserLogIn.cshtml", Model.DataModelsPrimary);  }
+            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div>
+                            @{  Html.RenderPartial("~/Modules/CMSAdmin/Views/Authentication/UserLogIn.cshtml", Model.DataModelsPrimary);  }
+                        </div>
+                                }
+</div>
+
+
+
+
+
+
+

@@ -1,0 +1,80 @@
+﻿@model ACMSDBView.UserAuthentication
+
+
+
+
+
+<!-- entry-content Div Starts here -->
+<div class="entry-content" style="padding:5px 25px 25px 25px;">
+    <h2 class="strip-title alignleft-text">
+        <span class="strip-inner">Sign Into Your Account (Log In)</span>
+    </h2>
+    <div id="ajax_message">
+        @if (ViewBag.bLoginError == true)
+        {
+            <span style="color:#F30;">
+                @ViewBag.sResponseMessage
+            </span>
+        }
+        else if (ViewBag.bLoggedIn == true)
+        {
+            <span style="font-size:1.4em">
+                Your have been successfully sing up! @Html.ActionLink("Click here", "EnterMyPortal") to enter your portal.
+            </span>
+        }
+    </div>
+    @if ((ViewBag.bLoggedIn == false) || (ViewBag.bLoggedIn == null))
+    {
+
+        <div class="entry-content">
+            <div style="width:360px !important; float:left;">
+                @using (Html.BeginForm("UserLogIn", "", FormMethod.Post))
+                {
+                    Html.ValidationSummary(true);
+                    <fieldset>
+                        <legend></legend>
+                        <div style="width:100%;float:left;">
+                            <div class="LabelDiv1Required">
+                                User name :
+                            </div>
+                            <div class="TextBoxDiv1">
+                                @Html.TextBoxFor(model => model.UserName, new { @Class = "TextBox2" })
+                            </div>
+                            <div class="LabelDiv1Error">
+                                @if (ViewBag.bLoginUserNameError == true)
+                                {
+                                    @ViewBag.sUserName
+                                }
+                            </div>
+                        </div>
+                        <div style="width:100%;float:left;">
+                            <div class="LabelDiv1Required">
+                                Password :
+                            </div>
+                            <div class="TextBoxDiv1">
+                                @Html.PasswordFor(model => model.Password, new { @Class = "TextBox2" })
+                            </div>
+                            <div class="LabelDiv1Error">
+                                @if (ViewBag.bLoginUserNameError == true)
+                                {
+                                    @ViewBag.sPassword
+                                }
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div style="float:right; padding-top:12px;">
+
+                        <input type="submit" name="submit" value="Log In" class="orange-btn button medium" />
+                    </div>
+                    <div style="float:left; padding-top:12px;">
+                        <span style="font-size:1.4em">
+                            Forgotten your credentials? <br />@Html.ActionLink("Click here", "ProfileRecovery") to start a process to recover them.
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+

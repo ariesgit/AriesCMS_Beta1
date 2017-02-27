@@ -1,0 +1,92 @@
+﻿
+
+<script type="text/javascript">
+
+    function SendFile()
+    {
+        try {
+            var oErrorDisplay = document.getElementById("oFormErrorMessages");
+            var oFileUploadProgress = document.getElementById("oFileUploadProgress");
+
+            var formData = new FormData();
+
+            var oFileUploads = $('input[type=file]:eq(0)');
+
+            var hid_CurrentFolder = document.getElementById("hlblCurrentFolderPath");
+            if (oFileUploads[0].files.length > 0)
+            {
+
+                for (var x = 0; x < oFileUploads[0].files.length; x++)
+                {
+                    formData.append("file" + x, oFileUploads[0].files[x]);
+                }
+
+                formData.append("hlblCurrentFolderPath", hid_CurrentFolder.value);
+
+                $.ajax({
+                    type: "POST",
+                    url: 'RestService/JFileUpload?Id=' + '0',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.RESPONSE === 'true') {
+                            oFileUploadProgress.innerHTML = "Success, Upload Completed!";
+                        }
+                        else {
+                            oErrorDisplay.innerHTML = "Server Upload error : " + data.MESSAGE;
+                            oErrorDisplay.style.display = 'inline';
+                        }
+                    },
+                    error: function (xhr, errorType, exception) {
+                        //alert("Log In error : " + reponse);
+                        oErrorDisplay.innerHTML = "System Upload error : " + errorType + " " + xhr + " " + exception;
+                        oErrorDisplay.style.display = 'inline';
+                    }
+                });
+            }
+            else
+            {
+                oErrorDisplay.innerHTML = "Please select a file to upload!";
+                oErrorDisplay.style.display = 'inline';
+            }
+        }
+        catch(e)
+        {
+        }
+    }
+
+</script>
+
+
+
+<div style="float:left; width:100%;">
+    <h3 class="titled-box-title">Upload a file</h3>
+    <div style="float:left; width:100%;">
+        <div id="oErrorMessage" style="display:none;"></div>
+    </div>
+    <div style="float:left; width:100%;">
+        <form id="frm_Uploader" action="#" method="post">
+            <input type="hidden" id="hlblCurrentFolderPath" name="hlblCurrentFolderPath" />
+
+            <div style="width:100%;float:left;">
+                <div class="LabelDiv1Required">
+
+                </div>
+                <div class="TextBoxDiv1">
+                    <input type="file" name="UploadFiles" id="UploadFiles" />
+                </div>
+                <div class="LabelDiv1Error">
+
+                </div>
+            </div>
+            <div style="float:left; padding-top:12px;">
+               <a href="javascript:Sendfile();">Upload file</a>
+            </div>
+        </form>
+    </div>
+    <div id="oFileUploadProgress">
+        Please wait <br/>
+        Uploading ....
+    </div>
+</div>

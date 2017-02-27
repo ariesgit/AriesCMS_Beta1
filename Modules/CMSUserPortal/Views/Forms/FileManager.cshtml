@@ -1,0 +1,391 @@
+﻿@model IEnumerable<AriesCMS.Models.FileManagerList>
+
+
+
+
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/tree/easytree/jquery.easytree.min.js")"></script>
+<link href="@Url.Content("~/Scripts/tree/easytree/skin-win8/ui.easytree.css")" rel="stylesheet" class="skins" type="text/css" />
+
+
+<div style="float:left; width:100%; color:red; font-weight:bold;">
+
+</div>
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            <h2>Upload a file</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.FileUploadResults != null)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <span>@Html.Raw(ViewBag.FileUploadResults)</span>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+            @using (Html.BeginForm("UploadFiles", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input type="hidden" id="hlblCurrentFolderPath" name="hlblCurrentFolderPath" />
+                <div style="width:660px !important; float:left;">
+
+                    <div class="form-group">
+                        <input type="file" name="UploadFiles" id="UploadFiles" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="chkOverright">Overwrite existing file:</label>
+                        <input id="chkOverright" name="chkOverright" type="checkbox" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" name="submit" value="Upload" class="btn btn-block btn-outline-primary" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-info">
+            <h2>File System (double click to open folder)</h2>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+            <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-xs-3 offset-lg-1 offset-md-1 ">
+            <div id="foldertree1">
+
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-8 col-xs-9">
+            <div id="filetree1">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    //http://www.easyjstree.com/Demos/ProgrammableAPI
+    function InitializeWithBaseData() {
+        try {
+            var url = "@Url.Content("~/portal/Home/GetFolderBase")";
+
+            $.ajax({
+                url: url,
+                data: {},
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    var oNodes = JSON.parse(data);
+                    if (oNodes != null) {
+                        for (i = 0; i < oNodes.length; i++) {
+                            var oNewNode = {};
+                            oNewNode.text = oNodes[i].sName;
+                            oNewNode.isFolder = oNodes[i].IsFolder;
+                            oNewNode.tooltip = oNodes[i].URI;
+                            oNewNode.isLazy = true;
+                            oNewNode.lazyUrl = '';
+                            oFolderTree.addNode(oNewNode);
+                        }
+                    }
+
+                    oFolderTree.rebuildTree();
+                },
+                error: function (reponse) {
+
+                }
+            });
+
+        }
+        catch (e) {
+        }
+    }
+    function openLazyNode(event, nodes, node, hasChildren) {
+        try {
+            if (hasChildren) {
+                return false;
+            }
+
+            //alert(node.tooltip);
+            var ohlblCurrentFolderPath = document.getElementById('hlblCurrentFolderPath');
+
+            if (ohlblCurrentFolderPath != null) {
+                ohlblCurrentFolderPath.innerHTML = node.tooltip;
+                ohlblCurrentFolderPath.value = node.tooltip;
+            }
+
+
+            var url = "@Url.Content("~/portal/Home/GetDirectoryChildItems")";
+
+
+
+            $.ajax({
+                url: url,
+                data: { _sPath: node.tooltip },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    var oNodes = JSON.parse(data);
+                    if (oNodes != null) {
+                        for (i = 0; i < oNodes.length; i++) {
+                            var oNewNode = {};
+                            oNewNode.text = oNodes[i].sName;
+                            oNewNode.isFolder = oNodes[i].IsFolder;
+                            oNewNode.tooltip = oNodes[i].URI;
+                            oNewNode.isLazy = true;
+                            oNewNode.lazyUrl = '';
+                            oFolderTree.addNode(oNewNode, node.id);
+                        }
+                    }
+
+                    oFolderTree.rebuildTree();
+                },
+                error: function (reponse) {
+
+                }
+            });
+
+        }
+        catch (e) {
+        }
+    }
+    function toggling(event, nodes, node) {
+        try {
+
+            var oDisplayDiv = document.getElementById("filetree1");
+            oDisplayDiv.innerHTML = "Loading...";
+            var url = "@Url.Content("~/portal/Home/GetDirectoryFiles")";
+
+            $.ajax({
+                url: url,
+                data: { _sPath: node.tooltip },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    var sNewFileList = "";
+                    sNewFileList += "<table>";
+                    sNewFileList += "<tr>";
+                    sNewFileList += "<th>File Name</th>";
+                    sNewFileList += "<th>File URL</th>";
+                    sNewFileList += "<th>Image Preview</th>";
+                    sNewFileList += "<th>";
+                    sNewFileList += " &nbsp;";
+                    sNewFileList += "</th>   ";
+                    sNewFileList += "</tr>";
+
+                    var oNodes = JSON.parse(data);
+                    if (oNodes != null) {
+
+                        for (i = 0; i < oNodes.length; i++) {
+
+                            var oNewNode = {};
+                            oNewNode.text = oNodes[i].sName;
+                            oNewNode.isFolder = oNodes[i].IsFolder;
+                            oNewNode.tooltip = oNodes[i].URI;
+                            oNewNode.isLazy = true;
+                            oNewNode.lazyUrl = '';
+
+                            sNewFileList += "<tr>";
+                            sNewFileList += "   <td>" + oNodes[i].sName + "</td>";
+                            sNewFileList += "   <td>" + oNodes[i].URL + "</td>";
+                            sNewFileList += "   <td>";
+                            if (oNodes[i].IsImage == true) {
+                                sNewFileList += " <img src=" + "\"" + oNodes[i].URL + "\"" + " height=" + "\"" + "32" + "\"" + " />";
+                            }
+                            sNewFileList += "           <a href=" + "\"" + oNodes[i].URL + "\"" + " target=" + "\"" + "_blank" + "\"" + ">Click To View</a>";
+                            sNewFileList += "   </td> ";
+                            sNewFileList += "  <td>";
+                            sNewFileList += "       &nbsp;";
+                            sNewFileList += "";
+                            sNewFileList += "       </td>   ";
+                            sNewFileList += "   </tr>";
+                        }
+                    }
+                    else {
+                        sNewFileList += "<tr>";
+                        sNewFileList += "<td colspan=" + "\"" + "4" + "\"" + ">";
+                        sNewFileList += "    No Records";
+                        sNewFileList += "</td>   ";
+                        sNewFileList += "</tr>";
+                    }
+
+                    sNewFileList += "</table>";
+
+                    oDisplayDiv.innerHTML = sNewFileList;
+                },
+                error: function (reponse) {
+                    oDisplayDiv.innerHTML = "No Files!";
+                }
+            });
+
+        }
+        catch (e) {
+            oDisplayDiv.innerHTML = "No Files!";
+            alert(e);
+        }
+
+    }
+    function building(nodes) {
+
+    }
+    function built(nodes) {
+
+    }
+    function toggled(event, nodes, node) {
+        //alert('Toggled ' + node.text + ' ' + (node.isExpanded ? 'is now open' : 'is now closed'));
+    }
+    function opening(event, nodes, node) {
+        // alert('Opening ' + node.text);
+
+
+    }
+    function opened(event, nodes, node) {
+        //alert('Opened ' + node.text);
+
+    }
+    function closing(event, nodes, node) {
+
+    }
+    function closed(event, nodes, node) {
+
+    }
+    function canDrop(event, nodes, isSourceNode, source, isTargetNode, target) {
+
+    }
+    function dropping(event, _nodes, isSourceNode, source, isTargetNode, target, canDrop) {
+
+    }
+    function dropped(event, nodes, isSourceNode, source, isTargetNode, target) {
+
+    }
+    function stateChanged(nodes, nodesJson) {
+
+
+
+    }
+    function addNode() {
+        // var sourceNode = {};
+        // sourceNode.text = "Testing1";
+        // sourceNode.isFolder = true;
+        //var targetId = $('#lstNodes :selected').val();
+
+        //easytree.addNode(sourceNode, targetId);
+        //easytree.rebuildTree();
+        // loadSelectBox();
+    }
+    function removeNodeX() {
+        //var currentlySelected = $('#lstNodes :selected').val();
+        //var node = easytree.getNode(currentlySelected);
+        //if (!node) { return; }
+
+        // easytree.removeNode(node.id);
+        // easytree.rebuildTree();
+        // loadSelectBox();
+    }
+    function activateNode() {
+        // var currentlySelected = $('#lstNodes :selected').val();
+        // var node = easytree.getNode(currentlySelected);
+        // if (!node) {
+        //     easytree.activateNode(''); // unactivate all nodes
+        //     return;
+        // }
+        //easytree.activateNode(node.id);
+    }
+    function toggleNode() {
+        // var currentlySelected = $('#lstNodes :selected').val();
+        // easytree.toggleNode(currentlySelected);
+        // loadSelectBox();
+    }
+    function openNode() {
+        //var currentlySelected = $('#lstNodes :selected').val();
+        //var node = easytree.getNode(currentlySelected);
+        //if (!node) { return; }
+
+        // node.isExpanded = true;
+        // easytree.rebuildTree();
+        // loadSelectBox();
+    }
+    function closeNode() {
+        // var currentlySelected = $('#lstNodes :selected').val();
+        // var node = easytree.getNode(currentlySelected);
+        // if (!node) { return; }
+
+        //node.isExpanded = false;
+        //easytree.rebuildTree();
+        //loadSelectBox();
+    }
+    // we have to reload selected box at the end of each function to ensure it is always up to date
+    function loadSelectBox() {
+        // var select = $('#lstNodes')[0];
+        // var currentlySelected = $('#lstNodes :selected').val();
+
+        //select.length = 0; // clear select box
+
+        //var root = new Option();
+        // root.text = 'Root';
+        // root.value = '';
+        // select.add(root);
+
+        // var allNodes = easytree.getAllNodes();
+        //addOptions(allNodes, select, '-', currentlySelected);
+    }
+    function addOptions(nodes, select, prefix, currentlySelected) {
+        //var i = 0;
+        //for (i = 0; i < nodes.length; i++) {
+
+        //    var option = new Option();
+        //    option.text = prefix + ' ' + nodes[i].text;
+        //    option.value = nodes[i].id;
+        //    option.selected = currentlySelected == nodes[i].id;
+        //    select.add(option);
+
+        //    if (nodes[i].children && nodes[i].children.length > 0) {
+        //         addOptions(nodes[i].children, select, prefix + '-', currentlySelected);
+        //     }
+        // }
+    }
+
+    var oFolderTree = $('#foldertree1').easytree({
+        enableDnd: true,
+        building: building,
+        built: built,
+        toggling: toggling,
+        toggled: toggled,
+        opening: opening,
+        opened: opened,
+        closing: closing,
+        closed: closed,
+        openLazyNode: openLazyNode
+    });
+
+
+
+    InitializeWithBaseData();
+</script>
+

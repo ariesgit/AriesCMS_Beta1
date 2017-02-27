@@ -1,0 +1,40 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row lightgray_background_op70">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+            <center><h1 class="text-bold">@Model.recWebSiteJobs.sTitle</h1> </center>
+        </div>
+        <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+            <p>
+                <strong>Dead line: </strong> @Model.recWebSiteJobs.sDeadLine <br />
+                <strong>Salary: </strong> @Model.recWebSiteJobs.sSalary <br />
+                <strong>Skills: </strong> @Model.recWebSiteJobs.sSkillsNeeded <br />
+            </p>
+            <p class="text-lg-center text-md-center text-sm-center text-xs-center">
+                @Model.recWebSiteJobs.sJobDescription
+            </p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panel_gradientborder_bottop"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 offset-lg-1 offset-md-1 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            <p class="text-lg-center text-md-center text-sm-center text-xs-center">
+                <a href="#" class="btn btn-blue">APPLY</a>
+            </p>
+            <p>@Model.recWebSiteJobs.sJobDescription</p>
+            <p class="text-lg-center text-md-center text-sm-center text-xs-center">
+                <a href="~/lp/JobApplyFor?Id=@Model.recWebSiteJobs.ID" class="btn btn-blue">APPLY</a>
+            </p>
+        </div>
+    </div>
+</div>
+

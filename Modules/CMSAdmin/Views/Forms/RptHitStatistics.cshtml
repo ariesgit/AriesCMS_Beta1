@@ -1,0 +1,380 @@
+﻿
+<script type="text/javascript">
+
+
+
+
+    <!-- http://www.chartjs.org/docs/ -->
+    function Build_PageAnalytics()
+    {
+        try {
+
+            var dtDate = new Date();
+            var dtyesterday = dtDate.getMonth()  + "/" + (dtDate.getDate() - 1) + "/" + dtDate.getFullYear() + "  " + "12:00:01 AM";
+            var dttoday = dtDate.getMonth()  + "/" + dtDate.getDate() + "/" + dtDate.getFullYear() + "  " + "11:59:59 PM";
+
+            var objAdminDash_PVYesterday = document.getElementById("AdminDash_PVYesterday");
+            var objAdminDash_PVToday = document.getElementById("AdminDash_PVToday");
+
+            var url = "@Url.Content("/AdminAnalytics/Report_Value_PageViews")";
+
+            $.ajax({
+                url: url,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            objAdminDash_PVYesterday.innerHTML = data.PVYesterday;
+                            objAdminDash_PVToday.innerHTML = data.PVToday;
+
+                        }
+                        else{
+                            objAdminDash_PVYesterday.innerHTML = "-1";
+                            objAdminDash_PVToday.innerHTML = "-1";
+                        }
+                    }
+                    else{
+                        objAdminDash_PVYesterday.innerHTML = "-1";
+                        objAdminDash_PVToday.innerHTML = "-1";
+                    }
+                },
+                error: function (reponse) {
+                    objAdminDash_PVYesterday.innerHTML = "-1";
+                    objAdminDash_PVToday.innerHTML = "-1";
+
+                }
+            });
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function Build_UserAnalytics()
+    {
+        try {
+
+            var dtDate = new Date();
+            var dtyesterday = dtDate.getMonth()  + "/" + (dtDate.getDate() - 1) + "/" + dtDate.getFullYear() + "  " + "12:00:01 AM";
+            var dttoday = dtDate.getMonth()  + "/" + dtDate.getDate() + "/" + dtDate.getFullYear() + "  " + "11:59:59 PM";
+
+            var objAdminDash_RUYesterday = document.getElementById("AdminDash_RUYesterday");
+            var objAdminDash_RUToday = document.getElementById("AdminDash_RUToday");
+
+            var objAdminDash_TRUYesterday = document.getElementById("AdminDash_TRUYesterday");
+            var objAdminDash_TRUToday = document.getElementById("AdminDash_TRUToday");
+
+            var objAdminDash_USVYesterday = document.getElementById("AdminDash_USVYesterday");
+            var objAdminDash_USVToday = document.getElementById("AdminDash_USVToday");
+
+
+            var url1 = "@Url.Content("/AdminAnalytics/Report_Value_RegisteredUsers")";
+
+            $.ajax({
+                url: url1,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            objAdminDash_RUYesterday.innerHTML = data.UCYesterday;
+                            objAdminDash_RUToday.innerHTML = data.UCToday;
+
+                        }
+                        else{
+                            objAdminDash_RUYesterday.innerHTML = "-1";
+                            objAdminDash_RUToday.innerHTML = "-1";
+                        }
+                    }
+                    else{
+                        objAdminDash_RUYesterday.innerHTML = "-1";
+                        objAdminDash_RUToday.innerHTML = "-1";
+                    }
+                },
+                error: function (reponse) {
+                    //alert("error : " + reponse);
+
+                    objAdminDash_RUYesterday.innerHTML = "-1";
+                    objAdminDash_RUToday.innerHTML = "-1";
+
+                }
+            });
+
+
+
+            var url2 = "@Url.Content("/AdminAnalytics/Report_Value_RegisteredUsers")";
+
+            $.ajax({
+                url: url2,
+                data: { _From: '01/01/1901 12:00:01 AM', _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            objAdminDash_TRUYesterday.innerHTML = data.UCYesterday;
+                            objAdminDash_TRUToday.innerHTML = data.UCToday;
+
+                        }
+                        else{
+                            objAdminDash_TRUYesterday.innerHTML = "-1";
+                            objAdminDash_TRUToday.innerHTML = "-1";
+                        }
+                    }
+                    else{
+                        objAdminDash_TRUYesterday.innerHTML = "-1";
+                        objAdminDash_TRUToday.innerHTML = "-1";
+                    }
+                },
+                error: function (reponse) {
+                    //alert("error : " + reponse);
+
+                    objAdminDash_TRUYesterday.innerHTML = "-1";
+                    objAdminDash_TRUToday.innerHTML = "-1";
+
+                }
+            });
+
+
+
+
+            var url3 = "@Url.Content("/AdminAnalytics/Report_Value_UniqueSiteVisitors")";
+
+            $.ajax({
+                url: url3,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            objAdminDash_USVYesterday.innerHTML = data.PVYesterday;
+                            objAdminDash_USVToday.innerHTML = data.PVToday;
+
+                        }
+                        else{
+                            objAdminDash_USVYesterday.innerHTML = "-1";
+                            objAdminDash_USVToday.innerHTML = "-1";
+                        }
+                    }
+                    else{
+                        objAdminDash_USVYesterday.innerHTML = "-1";
+                        objAdminDash_USVToday.innerHTML = "-1";
+                    }
+                },
+                error: function (reponse) {
+                    objAdminDash_USVYesterday.innerHTML = "-1";
+                    objAdminDash_USVToday.innerHTML = "-1";
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function Build_Chart_PageViews()
+    {
+        try {
+
+            var dtDate = new Date();
+            var dtyesterday = dtDate.getMonth() + "/" + (dtDate.getDate() - 1) + "/" + dtDate.getFullYear() + "  " + "12:00:01 AM";
+            var dttoday = dtDate.getMonth() + "/" + dtDate.getDate() + "/" + dtDate.getFullYear() + "  " + "11:59:59 PM";
+
+
+            var url1 = "@Url.Content("/AdminAnalytics/Report_ChartData_PageViews")";
+
+            $.ajax({
+                url: url1,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            var oLabels = data.CDataLabels;
+                            var oValues = data.CDataValues;
+
+                            var oChartData = {
+                                labels: oLabels,
+                                datasets: [{
+                                    label: "TrafficByMonth",
+                                    fillColor: "rgba(220,220,220,0.2)",
+                                    strokeColor: "rgba(220,220,220,1)",
+                                    pointColor: "rgba(220,220,220,1)",
+                                    pointStrokeColor: "#fff",
+                                    pointHighlightFill: "#fff",
+                                    pointHighlightStroke: "rgba(220,220,220,1)",
+                                    data: oValues
+                                }]
+                            }
+
+                            var ctx = document.getElementById("chart_Pageviews").getContext("2d");
+                            var myPageViews = new Chart(ctx).Line(oChartData, { responsive: true });
+                        }
+                        else{
+
+                        }
+                    }
+                    else{
+
+                    }
+                },
+                error: function (reponse) {
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function Build_Chart_PopularPages()
+    {
+        try {
+
+            var dtDate = new Date();
+            var dtyesterday = dtDate.getMonth() + "/" + (dtDate.getDate() - 1) + "/" + dtDate.getFullYear() + "  " + "12:00:01 AM";
+            var dttoday = dtDate.getMonth() + "/" + dtDate.getDate() + "/" + dtDate.getFullYear() + "  " + "11:59:59 PM";
+
+            var url1 = "@Url.Content("/AdminAnalytics/Report_ChartData_TopActivePages")";
+
+            $.ajax({
+                url: url1,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            var oLabels = data.CDataLabels;
+                            var oValues = data.CDataValues;
+
+                            var oChartData = {
+                                labels: oLabels,
+                                datasets: [{
+                                    label: "TrafficByMonth",
+                                    fillColor: "rgba(220,220,220,0.2)",
+                                    strokeColor: "rgba(220,220,220,1)",
+                                    pointColor: "rgba(220,220,220,1)",
+                                    pointStrokeColor: "#fff",
+                                    pointHighlightFill: "#fff",
+                                    pointHighlightStroke: "rgba(220,220,220,1)",
+                                    data: oValues
+                                }]
+                            }
+
+                            var ctx = document.getElementById("chart_MPP").getContext("2d");
+                            var myPageViews = new Chart(ctx).Line(oChartData, { responsive: true });
+                        }
+                        else{
+
+                        }
+                    }
+                    else{
+
+                    }
+                },
+                error: function (reponse) {
+                }
+            });
+
+        }
+        catch (e) {
+
+        }
+    }
+
+    function Build_Chart_SiteVisits()
+    {
+        try{
+
+            var dtDate = new Date();
+            var dtyesterday = dtDate.getMonth() + "/" + (dtDate.getDate() - 1) + "/" + dtDate.getFullYear() + "  " + "12:00:01 AM";
+            var dttoday = dtDate.getMonth() + "/" + dtDate.getDate() + "/" + dtDate.getFullYear() + "  " + "11:59:59 PM";
+
+            var url1 = "@Url.Content("/AdminAnalytics/Report_ChartData_SiteVisits")";
+
+            $.ajax({
+                url: url1,
+                data: { _From: dtyesterday, _To: dttoday },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    if (data != null) {
+                        if (data.RESPONSE == "SUCCESS") {
+
+                            var oLabels = data.CDataLabels;
+                            var oValues = data.CDataValues;
+
+                            var oChartData = {
+                                labels: oLabels,
+                                datasets: [{
+                                    label: "TrafficByMonth",
+                                    fillColor: "rgba(220,220,220,0.2)",
+                                    strokeColor: "rgba(220,220,220,1)",
+                                    pointColor: "rgba(220,220,220,1)",
+                                    pointStrokeColor: "#fff",
+                                    pointHighlightFill: "#fff",
+                                    pointHighlightStroke: "rgba(220,220,220,1)",
+                                    data: oValues
+                                }]
+                            }
+
+                            var ctx = document.getElementById("chart_SV").getContext("2d");
+                            var myPageViews = new Chart(ctx).Line(oChartData, { responsive: true });
+                        }
+                        else{
+
+                        }
+                    }
+                    else{
+
+                    }
+                },
+                error: function (reponse) {
+                }
+            });
+        }
+        catch (e) {
+
+        }
+    }
+
+
+</script>
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            <h2>Hit Statistics</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+        </div>
+    </div>
+</div>
+
+

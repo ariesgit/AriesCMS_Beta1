@@ -1,0 +1,48 @@
+@{
+    if (ViewBag.MasterLayout != null)
+    {
+        //Layout = ViewBag.MasterLayout;
+        Layout = "~/Modules/CMSAdmin/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+    else
+    {
+        Layout = "~/Modules/CMSAdmin/Views/Shared/_MasterView.cshtml";
+        ViewBag.Title = "Portal home";
+        ViewBag.PageName = "Portal home";
+    }
+}
+
+
+      
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12 toppadding">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-xs-12">
+            <div class="col-lg-2 col-md-2 col-xs-2">
+                @{ Html.RenderPartial("~/Modules/CMSAdmin/Views/Shared/_MasterNavigation.cshtml"); }
+                
+            </div>
+            <div class="col-lg-10 col-md-10 col-xs-10">
+
+                @if ((ViewBag.bLoggedIn != null) && (ViewBag.bLoggedIn == true))
+                {
+                    Html.RenderPartial("~/Modules/CMSAdmin/Views/Forms/FileManager.cshtml");
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

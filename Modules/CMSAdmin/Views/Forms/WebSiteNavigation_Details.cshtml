@@ -1,0 +1,226 @@
+@model ACMSDBView.WebSiteNavigationViewModel
+
+
+
+
+<script type="text/javascript">
+
+
+    function on_Navigation_iPageID_Changed()
+    {
+        try
+        {
+            var cboControl = document.getElementById("Navigation_iPageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+            
+            var oHiddenField = document.getElementById("Navigation_sPageID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_Navigation_iNavigationTypeID_Changed() {
+        try {
+            var cboControl = document.getElementById("Navigation_iNavigationTypeID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Navigation_sNavigationTypeID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_Navigation_iParentNavID_Changed() {
+        try {
+            var cboControl = document.getElementById("Navigation_iParentNavID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Navigation_sParentNavID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+  
+</script>    
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Navigation Item</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.Navigation.sDisplayName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "WebSiteNavigation_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("WebSiteNavigation_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.Navigation.ID)
+                @Html.HiddenFor(model => model.Navigation.iParentID)
+                @Html.HiddenFor(model => model.Navigation.sParentID)
+                @Html.HiddenFor(model => model.Navigation.sControl)
+                @Html.HiddenFor(model => model.Navigation.dtDateCreated)
+                @Html.HiddenFor(model => model.Navigation.dtLastUpdated)
+                @Html.HiddenFor(model => model.Navigation.iCreatedByID)
+                @Html.HiddenFor(model => model.Navigation.sCreatedByID)
+                @Html.HiddenFor(model => model.Navigation.iUpdatedByID)
+                @Html.HiddenFor(model => model.Navigation.sUpdatedByID)
+                @Html.HiddenFor(model => model.Navigation.sPageID)
+                @Html.HiddenFor(model => model.Navigation.sNavigationTypeID)
+                @Html.HiddenFor(model => model.Navigation.sParentNavID)
+                @Html.HiddenFor(model => model.Navigation.sCustomPrefix)
+                @Html.HiddenFor(model => model.Navigation.sCustomSuffix)
+                @Html.HiddenFor(model => model.Navigation.sCustomAttributes)
+                @Html.HiddenFor(model => model.Navigation.sImageSmallURL)
+                @Html.HiddenFor(model => model.Navigation.sImageLargeURL)
+                @Html.HiddenFor(model => model.Navigation.sPagePreviewSmallURL)
+                @Html.HiddenFor(model => model.Navigation.sPagePreviewLargeURL)
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div class="form-group">
+                        <label for="Navigation_sNavigationIdentifyer">URL:</label>
+                        @Html.TextBoxFor(model => model.Navigation.sNavigationIdentifyer, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.sNavigationIdentifyer, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_sDisplayName">Display name:</label>
+                        @Html.TextBoxFor(model => model.Navigation.sDisplayName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.sDisplayName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_iPageID">Destination page :</label>
+                        @Html.DropDownListFor(model => model.Navigation.iPageID, Model.Pages, new { @Class = "form-control", @onchange = "javascript:on_Navigation_iPageID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.iPageID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_iNavigationTypeID">Type :</label>
+                        @Html.DropDownListFor(model => model.Navigation.iNavigationTypeID, Model.Type, new { @Class = "form-control", @onchange = "javascript:on_Navigation_iNavigationTypeID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.iNavigationTypeID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_iParentNavID">Parent Nav Item :</label>
+                        @Html.DropDownListFor(model => model.Navigation.iParentNavID, Model.ParentNavigation, new { @Class = "form-control", @onchange = "javascript:on_Navigation_iParentNavID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.iParentNavID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_iDisplayIndex"> Display index :</label>
+                        @Html.TextBoxFor(model => model.Navigation.iDisplayIndex, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.iDisplayIndex, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_bHidden">Hidden :</label>
+                        @Html.CheckBoxFor(model => model.Navigation.bHidden, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.bHidden, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_bDisabled">Disable :</label>
+                        @Html.CheckBoxFor(model => model.Navigation.bDisabled, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.bDisabled, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_bRestrictAccess"> Restricted access :</label>
+                        @Html.CheckBoxFor(model => model.Navigation.bRestrictAccess, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.bRestrictAccess, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

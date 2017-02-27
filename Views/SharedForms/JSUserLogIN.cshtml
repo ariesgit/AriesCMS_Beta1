@@ -1,0 +1,140 @@
+﻿<script type="text/javascript">
+
+    function UserLogIn()
+    {
+        try
+        {
+            var txtUserName = document.getElementById("UserName");
+            var txtPassword = document.getElementById("Password");
+
+
+            var oValidated = true;
+
+            if (txtUserName != null) {
+                if ((!txtUserName.value) || (!txtUserName)) {
+                    txtUserName.style.backgroundColor = '#FFCCCC';
+                    oValidated = false;
+                }
+                else if (txtUserName.value == '') {
+                    txtUserName.style.backgroundColor = '#FFCCCC';
+                    oValidated = false;
+                }
+            }
+
+            if (txtPassword != null) {
+                if ((!txtPassword.value) || (!txtPassword)) {
+                    txtPassword.style.backgroundColor = '#FFCCCC';
+                    oValidated = false;
+                }
+                else if (txtPassword.value == '') {
+                    txtPassword.style.backgroundColor = '#FFCCCC';
+                    oValidated = false;
+                }
+            }
+
+            if (oValidated == true)
+            {
+                     
+                var url = "@Url.Content("/RestService/UserLogIn")";
+                document.getElementById('oLogInForm_Button').style.display = 'none';
+                document.getElementById('oLogInForm_PleaseWaith').style.display = 'inline';
+
+                $.ajax({
+                    url: url,
+                    data: { _UserName: txtUserName.value, _Password: txtPassword.value },
+                    cache: false,
+                    type: "POST",
+                    success: function (data) {
+                            
+                        if(data.RESPONSE == 'true')
+                        {
+                            document.getElementById('oLogInForm').style.display = 'none';
+                            document.getElementById('oLoggedInUserInfo').style.display = 'inline';
+                            document.getElementById('oLogInFormPortalLink1').setAttribute('href', data.USERPORTAL);
+                            //location.reload();
+                        }
+                        else
+                        {
+                            alert("Log In error : " + data.MESSAGE);
+                            document.getElementById('oLogInForm_Button').style.display = 'inline';
+                            document.getElementById('oLogInForm_PleaseWaith').style.display = 'none';
+                        }
+
+                    },
+                    error: function (reponse) {
+                        alert("Log In error : " + reponse);
+                    }
+                });
+            }
+            else
+            {
+                alert("Please check your log in info and try again!");
+                document.getElementById('oLogInForm_Button').style.display = 'inline';
+                document.getElementById('oLogInForm_PleaseWaith').style.display = 'none';
+
+            }
+                 
+        }
+        catch(e)
+        {
+            alert(e);
+        }
+    }
+
+    function SetUserIsLoggedIn(_PortalURL)
+    {
+        try {
+
+            document.getElementById('oLogInForm').style.display = 'none';
+            document.getElementById('oLoggedInUserInfo').style.display = 'inline';
+            document.getElementById('oLogInFormPortalLink1').setAttribute('href', _PortalURL);
+        }
+        catch (e)
+        {
+        }
+    }
+
+
+
+</script>
+
+
+<div id="oLoggedInUserInfo" style="display:none;">
+    <span style="font-size:1.4em">
+        Welcome back! <a id="oLogInFormPortalLink1" href="~/portal">Click here</a> to enter your portal.
+    </span>
+</div>
+<div id="oFrontPageLongInForm">
+    <form action="#" method="post">
+        <fieldset>
+            <legend></legend>
+
+            <div style="width:100%;float:left;">
+                <div class="LabelDiv1Required">
+                    User Name:
+                </div>
+                <div class="TextBoxDiv1">
+                    <input type="text" class="TextBox2" placeholder="User Name" name="UserName" id="UserName" />
+                </div>
+                <div class="LabelDiv1Error">
+                </div>
+            </div>
+            <div style="width:100%;float:left;">
+                <div class="LabelDiv1Required">
+                    Password:
+                </div>
+                <div class="TextBoxDiv1">
+                    <input type="password" class="TextBox2" placeholder="" name="Password" id="Password" />
+                </div>
+                <div class="LabelDiv1Error">
+                </div>
+            </div>
+        </fieldset>
+        <div id="oLogInForm_Button" style="float:right; padding-top:12px;">
+            <a href="javascript:UserLogIn();" class="orange-btn button medium left">Log In</a>
+        </div>
+        <div id="oLogInForm_PleaseWaith" style="float:right; padding-top:12px; display:none;">
+            <span class="orange-btn button medium left">Please Wait...</span>
+        </div>
+    </form>
+</div>

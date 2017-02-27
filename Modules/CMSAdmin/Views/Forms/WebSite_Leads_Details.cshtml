@@ -1,0 +1,456 @@
+@model ACMSDBView.WebSite_LeadsViewModel
+
+
+<script type="text/javascript">
+
+
+    function on_WebSite_Leads_iStateID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_Leads_iStateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_Leads_sStateID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_WebSite_Leads_iCountryID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_Leads_iCountryID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_Leads_sCountryID");
+            oHiddenField.value = selectedText;
+
+            NewUserFormData_Get_Country_States_List(cboControl[cboControl.selectedIndex].value, '#WebSite_Leads_iStateID');
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function on_WebSite_Leads_iBillStateID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_Leads_iBillStateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_Leads_sBillStateID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_WebSite_Leads_iBillCountryID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_Leads_iBillCountryID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_Leads_sBillCountryID");
+            oHiddenField.value = selectedText;
+
+            NewUserFormData_Get_Country_States_List(cboControl[cboControl.selectedIndex].value, '#WebSite_Leads_iBillStateID');
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function NewUserFormData_Get_Country_States_List(_Id, _UIControlName)
+    {
+        try {
+            var procemessage = "<option value='0'> Please wait...</option>";
+            //$("#WebSitePageZoneContent_iContentZoneID").html(procemessage).show();
+            $(_UIControlName).html(procemessage).show();
+            var url = "@Url.Content("/RestService/Get_CountryStates/")";
+
+            $.ajax({
+                url: url,
+                data: { _CountryID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+
+                    var oDataSet = data.DATA;
+
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < oDataSet.length; x++) {
+                        markup += "<option value=" + oDataSet[x].ID + ">" + oDataSet[x].sName + "</option>";
+                    }
+                    $(_UIControlName).html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            $(_UIControlName).html("error").show();
+        }
+    }
+
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Lead</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSite_Leads.sPrimaryEMail
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSite_Leads_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSite_Leads_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSite_Leads.ID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iParentID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sParentID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sControl)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sAccessKey)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.bAccLocked)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iPrimaryRole)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sPrimaryRole)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sAvitarImgURL)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.bCurrentlyLoggedIn)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iReputationLevel)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sKeyWords)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sScreenName)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sProfileDiscription)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.iGenderTypeID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sGenderTypeID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.bPrivateProfile)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.dtDateOfBirth)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sActivationKey)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.dtLastLoggedIn)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.bAccountActivated)
+                         @Html.HiddenFor(model => model.WebSite_Leads.sStateID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sCountryID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sBillStateID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sBillCountryID)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.bForceLogOut)  
+                         @Html.HiddenFor(model => model.WebSite_Leads.sCurrentSession) 
+                         @Html.HiddenFor(model => model.WebSite_Leads.sRefferedByID)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sPrefix">Prefix :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sPrefix, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sPrefix)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sFName">First name :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sFName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sFName)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sMName">Middle name :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sMName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sMName)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sLName">Last name :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sLName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sLName)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sCompanyName">Company name :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sCompanyName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sCompanyName)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sCompanyTitle">Title :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sCompanyTitle, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sCompanyTitle)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sCompanyURL">Company URL :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sCompanyURL, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sCompanyURL)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sAddress1">Address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sAddress1, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sAddress1)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sAddress2">Address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sAddress2, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sAddress2)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sAddress3">Address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sAddress3, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sAddress3)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sCity">City :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sCity, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sCity)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iCountryID">Country :</label>
+                                                @Html.DropDownListFor(model => model.WebSite_Leads.iCountryID, Model.Countries, new { @Class = "form-control", @onchange = "javascript:on_WebSite_Leads_iCountryID_Changed();" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iCountryID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iStateID">State :</label>
+                                                @Html.DropDownListFor(model => model.WebSite_Leads.iStateID, Model.States, new { @Class = "form-control", @onchange = "javascript:on_WebSite_Leads_iStateID_Changed();" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iStateID)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sPostalCode">Postal code :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sPostalCode, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sPostalCode)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sPrimaryEMail">E-Mail :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sPrimaryEMail, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sPrimaryEMail)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sPrimaryPhone">Phone :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sPrimaryPhone, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sPrimaryPhone)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_bOptInMarketing">Opt out of marketing :</label>
+                                                @Html.CheckBoxFor(model => model.WebSite_Leads.bOptInMarketing, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.bOptInMarketing)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sBillAddress1">Billing address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sBillAddress1, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sBillAddress1)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sBillAddress2">Billing address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sBillAddress2, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sBillAddress2)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sBillAddress3">Billing address  :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sBillAddress3, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sBillAddress3)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sBillCity">Billing city :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sBillCity, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sBillCity)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iBillCountryID">Billing country :</label>
+                                                @Html.DropDownListFor(model => model.WebSite_Leads.iBillCountryID, Model.Countries, new { @Class = "form-control", @onchange = "javascript:on_WebSite_Leads_iBillCountryID_Changed();" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iBillCountryID)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iBillStateID">Billing state :</label>
+                                                @Html.DropDownListFor(model => model.WebSite_Leads.iBillStateID, Model.States, new { @Class = "form-control", @onchange = "javascript:on_WebSite_Leads_iBillStateID_Changed();" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iBillStateID)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sBillPostalCode">Billing postal code :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sBillPostalCode, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sBillPostalCode)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_IPAddressess">IP Address :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.IPAddressess, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.IPAddressess)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sIP">IP :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sIP, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sIP)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sRefferealCode1">Refferal code :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sRefferealCode1, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sRefferealCode1)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sRefferealCode2">Refferal code :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sRefferealCode2, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sRefferealCode2)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sRefferealCode3">Refferal code :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sRefferealCode3, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sRefferealCode3)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sUserID">User :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sUserID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sUserID)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sRefferedByID">Reffered by :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sRefferedByID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sRefferedByID)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sCookieID">Cookie ID :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.sCookieID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sCookieID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iUserID">Linked User ID :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.iUserID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iUserID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_iUserID">Linked User Name :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Leads.iUserID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.iUserID)</span>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sEventLog">Event Log :</label>
+                                                @Html.TextAreaFor(model => model.WebSite_Leads.sEventLog, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sEventLog)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Leads_sNotes">Notes :</label>
+                                                @Html.TextAreaFor(model => model.WebSite_Leads.sNotes, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sNotes)</span>
+                                            </div>
+
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

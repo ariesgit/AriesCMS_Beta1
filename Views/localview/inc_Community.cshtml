@@ -1,0 +1,139 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row lightgray_background_op70">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+            <center><h1 class="text-bold">@Model.recWebSiteForum.sName</h1> </center>
+        </div>
+        <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            <p>@Model.recWebSiteForum.sDescription</p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panel_gradientborder_bottop"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+            <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 offset-lg-1 offset-md-1 offset-sm-1 offset-xs-1 text-lg-left text-md-left text-sm-left text-xs-left">
+                <div class="row borderGroved_solid_2x">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left orange_background_op70 borderGroved_solid_2x">
+                        <h3 class="text-bold">ANNOUNCEMENTS</h3>
+                    </div>
+                    @{
+
+                        foreach (var objRec in Model.lstWebSiteForumiAnnouncements)
+                        {
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                <h5 class="text-bold">@Html.DisplayFor(modelItem => objRec.sName) </h5>
+                                <p>@Html.DisplayFor(modelItem => objRec.sContent) </p>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 borderGroved_solid_2x">
+                        <h3 class="text-bold">TOPICS</h3>
+                    </div>
+
+                    @{
+
+                        foreach (var objRec in Model.lstWebSiteForumTopics)
+                        {
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left orange_background_op70 borderGroved_solid_2x">
+                                    <h3 class="text-bold">@Html.DisplayFor(modelItem => objRec.sName)</h3>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                    <p>@Html.DisplayFor(modelItem => objRec.sDescription)</p>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-lg-left text-md-left text-sm-left text-xs-left">
+                                        <a href="~/lp/TopicPosts?Id=@objRec.ID" class="a_dark"><i class="fa fa-comments-o fa-3x" aria-hidden="true"></i></a>
+                                    </div>
+                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 text-lg-left text-md-left text-sm-left text-xs-left">
+                                        <strong>Posts: </strong>@Html.DisplayFor(modelItem => objRec.dPostCounts)
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&nbsp;</p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">Recent Posts</h2>
+                </div>
+                @{
+
+                    foreach (var objRec in Model.lstWebSiteForumTopicPosts)
+                    {
+
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                                <img src="@Html.DisplayFor(modelItem => objRec.sUserThumbNail) " alt="" class="img-thumbnail" />
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                <h4 class="text-bold">@Html.DisplayFor(modelItem => objRec.sName)</h4>
+                                <p>@Html.DisplayFor(modelItem => objRec.dtDateCreated)</p>
+                            </div>
+                        </div>
+
+
+
+                    }
+                }
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">ADVERTISEMENTS</h2>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                    <img src="Themes/acms2/images/AriesCMS_orange.png" alt="" class="img-thumbnail" />
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>About this site</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">TRENDING</h2>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                    @{
+
+                        foreach (var objRec in Model.lstWebSiteForumTopicPosts)
+                        {
+                            <p class="text-bold">@Html.DisplayFor(modelItem => objRec.sName)</p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

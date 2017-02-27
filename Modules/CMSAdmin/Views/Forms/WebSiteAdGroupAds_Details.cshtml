@@ -1,0 +1,264 @@
+@model AriesCMSDefinition.DEF_WebSiteAdGroupAds.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSiteAdGroupAds_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteAdGroupAds_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteAdGroupAds_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteAdGroupAds_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteAdGroupAds_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Ad Group Ad</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteAdGroupAds_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteAdGroupAds_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.dtDateCreated)  
+                         @Html.HiddenFor(model => model.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="sName">Name :</label>
+                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sName)</span>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="sDescription">Description :</label>
+                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDescription)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sAdShortHTML">Short HTML :</label>
+                                                @Html.TextAreaFor(model => model.sAdShortHTML, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdShortHTML)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sAdvertisementContentHTML">Full Ad HTML :</label>
+                                                @Html.TextAreaFor(model => model.sAdvertisementContentHTML, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdvertisementContentHTML)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sAdImgURL">Ad Image URL :</label>
+                                                @Html.TextBoxFor(model => model.sAdImgURL, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdImgURL)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sAdImgURI">Ad Image URI :</label>
+                                                @Html.TextBoxFor(model => model.sAdImgURI, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdImgURI)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdPayPerClick">Pay Per Click :</label>
+                                                @Html.TextBoxFor(model => model.dAdPayPerClick, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdPayPerClick)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdCostPerClick">Fee Per Click :</label>
+                                                @Html.TextBoxFor(model => model.dAdCostPerClick, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdCostPerClick)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdPayPerView">Pay Per View :</label>
+                                                @Html.TextBoxFor(model => model.dAdPayPerView, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdPayPerView)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdCostPerView">Fee Per View :</label>
+                                                @Html.TextBoxFor(model => model.dAdCostPerView, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdCostPerView)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdClickBudget">Ad Click Budget :</label>
+                                                @Html.TextBoxFor(model => model.dAdClickBudget, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdClickBudget)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAdViewBudget">Ad View Budget :</label>
+                                                @Html.TextBoxFor(model => model.dAdViewBudget, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdViewBudget)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dClicks"># Clicks :</label>
+                                                @Html.TextBoxFor(model => model.dClicks, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dClicks)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dConversion">Total Conversion :</label>
+                                                @Html.TextBoxFor(model => model.dConversion, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dConversion)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dTotalRevenue">Total revenue :</label>
+                                                @Html.TextBoxFor(model => model.dTotalRevenue, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dTotalRevenue)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dTotalCustomerProfit">Total profit :</label>
+                                                @Html.TextBoxFor(model => model.dTotalCustomerProfit, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dTotalCustomerProfit)</span>
+                                            </div>
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

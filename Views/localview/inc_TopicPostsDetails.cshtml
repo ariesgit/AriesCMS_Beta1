@@ -1,0 +1,138 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+<script type="text/javascript">
+
+    function on_WebSiteForumTopicPosts_NewComment()
+    {
+        on_WebSiteForumTopicPosts_CommentEditor_ClearForm();
+        on_WebSiteForumTopicPosts_CommentEditor_Show();
+    }
+
+    function on_WebSiteForumTopicPosts_CommentEditor_ClearForm()
+    {
+        try{
+            $('#WebSiteForumTopicPostsResponses_sContent').val('');
+        }
+        catch (e) {
+
+        }
+    }
+
+    function on_WebSiteForumTopicPosts_CommentEditor_PostComment() {
+
+        try {
+            $('#WebSiteForumTopicPostsResponses_sContent').val('');
+        }
+        catch (e) {
+
+        }
+    }
+
+    function on_WebSiteForumTopicPosts_CommentEditor_Show() {
+        $('#dlgWebSiteForumTopicPosts_CommentEditor').modal('show')
+
+    }
+    function on_WebSiteForumTopicPosts_CommentEditor_Hide() {
+        $('#dlgWebSiteForumTopicPosts_CommentEditor').modal('hide')
+
+    }
+
+</script>
+
+
+
+<!-- Modal Data Schema Window -->
+<div id="dlgWebSiteForumTopicPosts_CommentEditor" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Comment on - @Model.recWebSiteForumTopicPosts.sName</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <form class="form-group">
+                            <div class="form-group">
+                                <label for="WebSiteForumTopicPostsResponses_sName">COMMENT :</label>
+                                <textarea id="WebSiteForumTopicPostsResponses_sContent" name="WebSiteForumTopicPostsResponses_sContent" class="form-control textarea">
+
+                                </textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <a href="javascript:on_WebSiteForumTopicPosts_CommentEditor_Hide();" class="btn btn-outline-danger">CANCEL</a>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-right text-md-right text-sm-right text-xs-right">
+                    <a href="javascript:on_WebSiteForumTopicPosts_CommentEditor_PostComment();" class="btn btn-outline-primary">POST</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row lightgray_background_op70">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+            <center><h1 class="text-bold">@Model.recWebSiteForumTopicPosts.sName</h1> </center>
+        </div>
+        <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            @Model.recWebSiteForumTopicPosts.sContent
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panel_gradientborder_bottop"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 text-lg-center text-md-center text-sm-center text-xs-center">
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h3 class="text-bold">COMMENTS</h3>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <a href="javascript:on_WebSiteForumTopicPosts_NewComment();" class="a_dark"><i class="fa fa-comments-o fa-3x" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 text-lg-left text-md-left text-sm-left text-xs-left">
+                        &nbsp;
+                    </div>
+                </div>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                @{
+
+                    foreach (var objRec in Model.lstWebSiteForumTopicPostsResponses)
+                    {
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                    <h3 class="text-bold">@Html.DisplayFor(modelItem => objRec.sCreatedByID) , said:</h3>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                    <p>@Html.DisplayFor(modelItem => objRec.sContent)</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+            
+        </div>
+    </div>
+</div>

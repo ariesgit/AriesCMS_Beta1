@@ -1,0 +1,545 @@
+﻿
+
+<script type="text/javascript">
+
+
+
+    function Show_SuccessDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oSuccessDiv");
+            oDiv_Object.style.display = 'inline';
+
+        }
+        catch (e) {
+        }
+    }
+    function Hide_SuccessDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oSuccessDiv");
+            oDiv_Object.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function Show_FormDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oFormDiv");
+            oDiv_Object.style.display = 'inline';
+
+        }
+        catch (e) {
+        }
+    }
+    function Hide_FormDiv() {
+        try {
+            var oDiv_Object = document.getElementById("oFormDiv");
+            oDiv_Object.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function Show_ErrorDiv()
+    {
+        try {
+            var oDiv_Error = document.getElementById("oErrorDiv");
+            oDiv_Error.style.display = 'inline';
+
+        }
+        catch(e) {
+        }
+    }
+    function Hide_ErrorDiv() {
+        try {
+            var oDiv_Error = document.getElementById("oErrorDiv");
+            oDiv_Error.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function SetErrorText(_Value) {
+        try {
+            var oDiv_ErrorMessage = document.getElementById("oErrorMessage");
+            oDiv_ErrorMessage.innerHTML = _Value;
+        }
+        catch (e) {
+        }
+    }
+
+
+    function Submit_Form()
+    {
+        try{
+            var _FirstName = "";
+            var _LastName = "";
+            var _Email = "";
+            var _CompanyName = "";
+            var _Title = "";
+            var _Phone = "";
+            var _PhoneExt = "";
+            var _CompanyURL = "";
+            var _GrossAnnualRevenues = "";
+            var _HowManyEmployees = "";
+            var _RefferalCode = "";
+            var _Notes = "";
+
+            var txt_oFirstName = document.getElementById('txt_oFirstName');
+            var txt_oLastName = document.getElementById('txt_oLastName');
+            var txt_oEmail = document.getElementById('txt_oEmail');
+            var txt_oCompanyName = document.getElementById('txt_oCompanyName');
+            var txt_oTitle = document.getElementById('txt_oTitle');
+            var txt_oPhone = document.getElementById('txt_oPhone');
+            var txt_oPhoneExt = document.getElementById('txt_oPhoneExt');
+            var txt_oCompanyURL = document.getElementById('txt_oCompanyURL');
+            var txt_oGrossAnnualRevenues = document.getElementById('txt_oGrossAnnualRevenues');
+            var txt_oHowManyEmployees = document.getElementById('txt_oHowManyEmployees');
+            var txt_oRefferalCode = document.getElementById('txt_oRefferalCode');
+            var txt_oNotes = document.getElementById('txt_oNotes');
+
+            _FirstName = txt_oFirstName.value;
+            _LastName = txt_oLastName.value;
+            _Email = txt_oEmail.value;
+            _CompanyName = txt_oCompanyName.value;
+            _Title = txt_oTitle.value;
+            _Phone = txt_oPhone.value;
+            _PhoneExt = txt_oPhoneExt.value;
+            _CompanyURL = txt_oCompanyURL.value;
+            _GrossAnnualRevenues = txt_oGrossAnnualRevenues.value;
+            _HowManyEmployees = txt_oHowManyEmployees.value;
+            _RefferalCode = txt_oRefferalCode.value;
+            _Notes = txt_oNotes.value;
+
+
+            var oMydata = {"_FirstName": _FirstName, "_LastName": _LastName, "_Email": _Email, "_CompanyName": _CompanyName, "_Title": _Title, "_Phone": _Phone,
+                "_PhoneExt":_PhoneExt , "_CompanyURL": _CompanyURL, "_GrossAnnualRevenues":_GrossAnnualRevenues , "_HowManyEmployees": _HowManyEmployees, "_RefferalCode":_RefferalCode , "_Notes": _Notes };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Content("/RestService/SendLeadRequest")',
+                data: oMydata,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                },
+                success: function (data) {
+
+                    if (data.RESPONSE == 'true') {
+                        Hide_FormDiv();
+                        Show_SuccessDiv();
+                        alert("Success!");
+                    }
+                    else {
+                        SetErrorText();
+                        Show_ErrorDiv(data.MESSAGE);
+                    }
+                }
+            });
+
+        }
+        catch(e){
+
+        }
+    }
+
+    function Validate_Form()
+    {
+        try{
+
+            var txt_oFirstName = document.getElementById('txt_oFirstName');
+            var txt_oLastName = document.getElementById('txt_oLastName');
+            var txt_oEmail = document.getElementById('txt_oEmail');
+            var txt_oCompanyName = document.getElementById('txt_oCompanyName');
+            var txt_oTitle = document.getElementById('txt_oTitle');
+            var txt_oPhone = document.getElementById('txt_oPhone');
+            var txt_oPhoneExt = document.getElementById('txt_oPhoneExt');
+            var txt_oCompanyURL = document.getElementById('txt_oCompanyURL');
+            var txt_oGrossAnnualRevenues = document.getElementById('txt_oGrossAnnualRevenues');
+            var txt_oHowManyEmployees = document.getElementById('txt_oHowManyEmployees');
+            var txt_oRefferalCode = document.getElementById('txt_oRefferalCode');
+            var txt_oNotes = document.getElementById('txt_oNotes');
+
+            var bResponse = true;
+
+            if (txt_oFirstName != null) {
+                if ((!txt_oFirstName.value) || (!txt_oFirstName)) {
+                    txt_oFirstName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oFirstName.value == '') {
+                    txt_oFirstName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oLastName != null) {
+                if ((!txt_oLastName.value) || (!txt_oLastName)) {
+                    txt_oLastName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oLastName.value == '') {
+                    txt_oLastName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oEmail != null) {
+                if ((!txt_oEmail.value) || (!txt_oEmail)) {
+                    txt_oEmail.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oEmail.value == '') {
+                    txt_oEmail.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oCompanyName != null) {
+                if ((!txt_oCompanyName.value) || (!txt_oCompanyName)) {
+                    txt_oCompanyName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oCompanyName.value == '') {
+                    txt_oName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oTitle != null) {
+                if ((!txt_oTitle.value) || (!txt_oTitle)) {
+                    txt_oTitle.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oTitle.value == '') {
+                    txt_oTitle.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oPhone != null) {
+                if ((!txt_oPhone.value) || (!txt_oPhone)) {
+                    txt_oPhone.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oPhone.value == '') {
+                    txt_oPhone.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oPhoneExt != null) {
+                if ((!txt_oPhoneExt.value) || (!txt_oPhoneExt)) {
+                    txt_oPhoneExt.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oPhoneExt.value == '') {
+                    txt_oPhoneExt.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oCompanyURL != null) {
+                if ((!txt_oCompanyURL.value) || (!txt_oCompanyURL)) {
+                    txt_oCompanyURL.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oCompanyURL.value == '') {
+                    txt_oCompanyURL.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oGrossAnnualRevenues != null) {
+                if ((!txt_oGrossAnnualRevenues.value) || (!txt_oGrossAnnualRevenues)) {
+                    txt_oGrossAnnualRevenues.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oGrossAnnualRevenues.value == '') {
+                    txt_oGrossAnnualRevenues.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oHowManyEmployees != null) {
+                if ((!txt_oHowManyEmployees.value) || (!txt_oHowManyEmployees)) {
+                    txt_oHowManyEmployees.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oHowManyEmployees.value == '') {
+                    txt_oHowManyEmployees.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oRefferalCode != null) {
+                if ((!txt_oRefferalCode.value) || (!txt_oRefferalCode)) {
+                    txt_oRefferalCode.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oRefferalCode.value == '') {
+                    txt_oRefferalCode.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oNotes != null) {
+                if ((!txt_oNotes.value) || (!txt_oNotes)) {
+                    txt_oNotes.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oNotes.value == '') {
+                    txt_oNotes.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+
+
+            return bResponse;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+
+    function onSubmit_Click()
+    {
+        try {
+            if(Validate_Form())
+            {
+                Submit_Form();
+            }
+        }
+        catch (e) {
+
+        }
+    }
+
+
+</script>
+
+<div class="container">
+    <div id="secondary" class="widget-area left-sidebar">
+        <h4 class="pull-top">Get in <strong>touch</strong></h4>
+        <p>Contact us and let's connect so that we can find the best path to move forward with your needs.</p>
+
+        <hr />
+
+        <h4>The <strong>Office</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
+            <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
+            <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
+        </ul>
+
+        <hr />
+
+        <h4>Business <strong>Hours</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
+            <li><i class="icon-time"></i> Saturday - Closed</li>
+            <li><i class="icon-time"></i> Sunday - Closed</li>
+        </ul>
+
+    </div>
+    <div id="primary" class="site-content-left">
+        <div class="entry-content">
+            <div id="oErrorDiv" style="display:none;">
+                <h2 class="strip-title alignleft-text"><strong>Error!</strong> There was an error sending your message.</h2><br />
+                <span id="oErrorMessage"></span>
+            </div>
+
+            <div class="entry-content">
+                <div style="width:660px !important; float:left;">
+
+                    <div id="oFormDiv">
+                        <!-- /forms/SendLeadRequest -->
+                        <form action="#" method="post">
+
+                            <input type="hidden" name="_ViewToLoad" id="_ViewToLoad" value="~/lead" />
+                            <input type="hidden" name="_ViewConfirmation" id="_ViewConfirmation" value="~/lead" />
+                            <input type="hidden" name="_ViewError" id="_ViewError" value="~/lead" />
+
+                            <fieldset>
+                                <legend></legend>
+
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        First name *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="First Name" name="txt_oFirstName" id="txt_oFirstName" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Last name *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Last Name" name="txt_oLastName" id="txt_oLastName" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Email *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        <input type="text" class="TextBox2" placeholder="E-Mail" name="txt_oEmail" id="txt_oEmail" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Company name *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Company Name" name="txt_oCompanyName" id="txt_oCompanyName" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Title *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Title" name="txt_oTitle" id="txt_oTitle" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Phone *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        <input type="text" class="TextBox2" placeholder="Phone" name="txt_oPhone" id="txt_oPhone" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Phone Ext. *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Ext" name="txt_oPhoneExt" id="txt_oPhoneExt" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Company URL
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        <input type="text" class="TextBox2" placeholder="Compmany URL" name="txt_oCompanyURL" id="txt_oCompanyURL" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Gross annual revenues
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                      <input type="text" class="TextBox2" placeholder="Annual Revenu" name="txt_oGrossAnnualRevenues" id="txt_oGrossAnnualRevenues" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        How many employees
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Num of Employees" name="txt_oHowManyEmployees" id="txt_oHowManyEmployees" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Refferal code *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextBox2" placeholder="Refferal Code" name="txt_oRefferalCode" id="txt_oRefferalCode" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Notes *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                       <input type="text" class="TextAreaBox2" placeholder="Notes" name="txt_oNotes" id="txt_oNotes" style="width:650px !important; height:400px !important;" />
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div style="float:right; padding-top:12px;">
+                                <a href="javascript:onSubmit_Click();" class="orange-btn button medium left">Send Message</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="oSuccessDiv" style="display:none;">
+                        <h2 class="strip-title alignleft-text">
+                            <strong>Success!</strong> Your lead has been submitted.<br />
+                            <p class="lead">
+                                Thank you we will follow up with this lead as soon as possible.
+                            </p>
+                            <br />
+                            <a href="~/lead" class="btn btn-large btn-primary pull-top">Submit Another Lead</a>
+                        </h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

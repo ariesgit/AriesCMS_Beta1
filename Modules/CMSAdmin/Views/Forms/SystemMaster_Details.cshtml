@@ -1,0 +1,107 @@
+@model AriesCMSDefinition.DEF_SystemMaster.RecordObject
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new System</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.sName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "SystemMaster_List") to return to the list.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("SystemMaster_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.ID)
+                @Html.HiddenFor(model => model.sControl)
+                @Html.HiddenFor(model => model.dtDateCreated)
+                @Html.HiddenFor(model => model.dtLastUpdated)
+                @Html.HiddenFor(model => model.iCreatedByID)
+                @Html.HiddenFor(model => model.sCreatedByID)
+                @Html.HiddenFor(model => model.iUpdatedByID)
+                @Html.HiddenFor(model => model.sUpdatedByID)
+
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="txt_sPassword">Name :</label>
+                        @Html.TextBoxFor(model => model.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txt_sPassword"> Access key :</label>
+                        @Html.TextBoxFor(model => model.sAccessKey, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sAccessKey, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txt_sPassword">License key :</label>
+                        @Html.TextBoxFor(model => model.sLicKey, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.sLicKey, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+            
+        </div>
+    </div>
+</div>

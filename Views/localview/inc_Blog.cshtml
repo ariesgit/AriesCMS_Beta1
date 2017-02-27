@@ -1,0 +1,132 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+<script type="text/javascript">
+
+    var page = 1;
+    function On_LoadMoreBlogPosts()
+    {
+        try{
+
+        }
+        catch (e) {
+
+        }
+    }
+
+</script>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row lightgray_background_op70">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+            <center><h1 class="text-bold">@Model.recWebSiteBlogEntry.sTitle</h1> </center>
+        </div>
+        <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            <p>@Model.recWebSiteBlogEntry.sSubject</p>
+            <center><h4><a href="~/lp/PostDetails?_iPostID=@Model.recWebSiteBlogEntry.ID" class="btn btn-blue panle_rounded2">Read More</a></h4></center>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panel_gradientborder_bottop"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+
+            @{
+
+                foreach (var objRec in Model.lstWebSiteBlogEntry)
+                {
+
+                    <div class="col-masonry">
+                        <div class="card-block card-toppadding">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                                <h1>@Html.DisplayFor(modelItem => objRec.sTitle)</h1>
+                            </div>
+                            <img src="Themes/acms2/images/shutterstock_103340252.jpg" alt="" class="card-img-cover" />
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                <p>@Html.DisplayFor(modelItem => objRec.sSubject)</p>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                <a href="~/lp/PostDetails?_iPostID=@objRec.ID" class="btn btn-blue">READ MORE</a>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+                                <a href="~/lp/SharePage?_sURL=@Html.Raw(Model.BaseURL + "Blog/PostDetails?_iPostID=" + objRec.ID)" class="a_dark"><i class="fa fa-share-alt-square fa-3x" aria-hidden="true"></i></a>
+                                <a href="~/lp/PostDetails?_iPostID=@objRec.ID" class="a_dark"><i class="fa fa-comments-o fa-3x" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div id="pnlMoreBlogEntries_JSONLoad">
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                <a href="javascript:On_LoadMoreBlogPosts();" class="btn btn-blue">LOAD MORE</a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">Recent Posts</h2>
+                </div>
+
+                @{
+
+                    foreach (var objRec in Model.lstWebSiteBlogComments)
+                    {
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                                <img src="@Html.DisplayFor(modelItem => objRec.sUserThumbNail)" alt="" class="img-thumbnail" />
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                <h4 class="text-bold">@Html.DisplayFor(modelItem => objRec.sUserID)</h4>
+                                <p>@Html.DisplayFor(modelItem => objRec.dtDateCreated)</p>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">ABOUT SITE</h2>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                    <img src="@Model.recWebSiteBlog.sSiteTempalteURL" alt="" class="img-thumbnail" />
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>@Model.recWebSiteBlog.sDescription</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <p>&nbsp;</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <h2 class="text-bold borderGroved_bottom_solid_2x">ARCHIVES</h2>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    @{
+
+                        foreach (var objRec in Model.lstWebSiteBlogEntry)
+                        {
+                            <p class="text-bold">@Html.DisplayFor(modelItem => objRec.dtDateCreated)</p>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

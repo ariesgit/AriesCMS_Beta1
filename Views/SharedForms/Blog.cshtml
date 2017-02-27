@@ -1,0 +1,425 @@
+﻿@model AriesCMS.Models.BlogingPageView
+
+
+
+<script type="text/javascript">
+        function RecordPageView(PageOrContent) {
+            try {
+                var oMydata = { "_Content": PageOrContent };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/PageView")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+        function RecordClickEvent(ClickValue) {
+            try {
+
+                var oMydata = { "_Content": ClickValue };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/ClicksEvent")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@if (Model != null)
+{
+    if ((Model.WebSiteBlogEntry != null) && (Model.WebSiteBlogEntry.ID > 0))
+    {
+
+        <section class="page-top">
+            <div class="container">
+                <div class="row">
+                    <div class="span12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Blog</a> <span class="divider">/</span></li>
+                            <li class="active">Blog Post</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span12">
+                        <h2>@Model.Blog.sTitle</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <div class="container">
+
+                    <div class="row">
+                        <div class="span9">
+                            <div class="blog-posts single-post">
+
+                                <article class="post post-large-image blog-single-post">
+                                    <div class="post-image">
+                                        &nbsp;<img src="~/@Model.WebSiteBlogEntry.sImageURL" />
+                                    </div>
+
+                                    <div class="post-date">
+                                        <span class="day">@Model.WebSiteBlogEntry.dtDateCreated.Day.ToString() </span>
+                                        <span class="month" style="color:#FFF;">@Model.WebSiteBlogEntry.dtDateCreated.ToString("MMM") </span>
+                                    </div>
+
+                                    <div class="post-content">
+
+                                        <h2><a href="#"> @Model.WebSiteBlogEntry.sTitle </a></h2>
+
+                                        <div class="post-meta">
+                                            @*<span><i class="icon-user"></i> By <a href="#"> @Model.PrimaryBlogger.sFName  @Model.PrimaryBlogger.sLName </a> </span>*@
+                                            <span><i class="icon-user"></i> By <a href="#"> Aries TCO </a> </span>
+                                            <!-- <span><i class="icon-tag"></i> <a href="#">Duis</a>, <a href="#">News</a> </span> -->
+                                            <span><i class="icon-comments"></i> <a href="#"> @Model.CommentsCount.ToString() Comments </a></span>
+                                        </div>
+
+                                        @Html.Raw(Model.WebSiteBlogEntry.sContent)
+                                        @*<p> @Model.WebSiteBlogEntry.sContent </p>*@
+
+
+                                        <div class="post-block post-share">
+                                            <h3><i class="icon-share"></i>Share this post</h3>
+                                            <ul class="social-icons">
+                                                <li class="facebook"><a href="http://www.facebook.com/" target="_blank" title="Facebook">Facebook</a></li>
+                                                <li class="twitter"><a href="http://www.twitter.com/" target="_blank" title="Twitter">Twitter</a></li>
+                                                <li class="linkedin"><a href="http://www.linkedin.com" target="_blank" title="Linkedin">Linkedin</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <hr />
+                                        @*<div class="post-block post-author clearfix">
+                                                <h3><i class="icon-user"></i>Author</h3>
+                                                <div class="thumbnail">
+                                                    <a href="~/">
+                                                        <img alt="Aries TCO" src="~/Themes/Porto/images/logo2.png" style="width: 200px;">
+                                                    </a>
+                                                </div>
+                                                <p><strong class="name"><a href="#">@Model.PrimaryBlogger.sFName  @Model.PrimaryBlogger.sLName</a></strong></p>
+                                                <p><strong class="name"><a href="#"> Aries TCO</a></strong></p>
+                                                <p> @Model.PrimaryBlogger.sProfileDiscription </p>
+                                            </div>*@
+
+                                        @*<div class="post-block post-comments clearfix">
+                                                <h3><i class="icon-comments"></i>Comments (@Model.CommentsCount.ToString())</h3>
+
+                                                <ul class="comments">
+                                                    @if (Model.CommentsCount > 0)
+                                                    {
+                                                        foreach (var objRec in Model.WebSiteBlogComments)
+                                                        {
+                                                            <li>
+                                                                <div class="comment">
+                                                                    <div class="thumbnail">
+                                                                        <img class="avatar" alt="" src="~/Themes/Porto/images/avatar.jpg" />
+                                                                    </div>
+                                                                    <div class="comment-block">
+                                                                        <div class="comment-arrow"></div>
+                                                                        <span class="comment-by">
+                                                                            <strong>@objRec.sCreatedByID</strong>
+                                                                            <span class="pull-right">
+                                                                                <span> <a href="#"><i class="icon-reply"></i> Reply</a></span>
+                                                                            </span>
+                                                                        </span>
+                                                                        <p>@objRec.sComment</p>
+                                                                        <span class="date pull-right">@objRec.dtDateCreated.ToLongDateString() @objRec.dtDateCreated.ToLongTimeString()</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                    <ul class="comments reply">
+                                                                       @foreach (var objRecSub in Model.WebSiteBlogComments)
+                                                                       {
+                                                                           if (objRecSub.iParentCommentID == objRec.ID)
+                                                                           {
+                                                                                <li>
+                                                                                    <div class="comment">
+                                                                                        <div class="thumbnail">
+                                                                                            <img class="avatar" alt="" src="~/Themes/Porto/images/avatar.jpg" />
+                                                                                        </div>
+                                                                                        <div class="comment-block">
+                                                                                            <div class="comment-arrow"></div>
+                                                                                            <span class="comment-by">
+                                                                                                <strong>John Doe</strong>
+                                                                                                <span class="pull-right">
+                                                                                                    <span> <a href="#"><i class="icon-reply"></i> Reply</a></span>
+                                                                                                </span>
+                                                                                            </span>
+                                                                                             <p>@objRecSub.sComment</p>
+                                                                                            <span class="date pull-right">@objRec.dtDateCreated.ToLongDateString() @objRec.dtDateCreated.ToLongTimeString()</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </li>
+                                                                           }
+                                                                       }
+                                                                    </ul>
+                                                            </li>
+                                                        }
+                                                    }
+                                                </ul>
+
+                                            </div>*@
+
+                                        @*<div class="post-block post-leave-comment">
+                                                <h3>Leave a comment</h3>
+                                                <form>
+                                                    <div class="row controls">
+                                                        <div class="span4 control-group">
+                                                            <label>Your name (required)</label>
+                                                            <input type="text" value="" maxlength="100" class="span4">
+                                                        </div>
+                                                        <div class="span4 control-group">
+                                                            <label>Your email address (required)</label>
+                                                            <input type="text" value="" maxlength="100" class="span4">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row controls">
+                                                        <div class="span8 control-group">
+                                                            <label>Comment (required)</label>
+                                                            <textarea maxlength="5000" rows="10" class="span8"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="btn-toolbar">
+                                                        <input type="submit" value="Post Comment" class="btn btn-primary btn-large">
+                                                    </div>
+                                                </form>
+                                            </div>*@
+
+                                    </div>
+                                </article>
+
+                            </div>
+                        </div>
+
+                        <div class="span3">
+                            <aside class="sidebar">
+
+                                @Html.Raw(Model.Blog.sDescription)
+                            </aside>
+                        </div>
+                    </div>
+
+                </div>
+
+                <script type="text/javascript">
+            RecordPageView("@Model.WebSiteBlogEntry.sTitle");
+                </script>
+    }
+    else if ((Model.BlogPosts != null) && (Model.BlogPosts.Count > 0))
+    {
+
+        <section class="page-top">
+            <div class="container">
+                <div class="row">
+                    <div class="span12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Blog</a> <span class="divider">/</span></li>
+                            <li class="active">Blog Post</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span12">
+                        <h2>@Model.Blog.sTitle</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <div class="container">
+
+                    <div class="row">
+                        <div class="span9">
+                            <div class="blog-posts">
+                                <article class="post post-medium-image">
+                                    @if (Model.BlogPosts != null)
+                                    {
+                                        if (Model.BlogPosts.Count > 0)
+                                        {
+                                            foreach (var objRec in Model.BlogPosts)
+                                            {
+                                                <div class="row">
+                                                    <div class="span4">
+                                                        <div class="post-image">
+                                                            &nbsp;<img src="~/@objRec.sImageURL" style="width:420px;" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="span5">
+                                                        <div class="post-content">
+
+                                                            <h2>@Html.ActionLink(objRec.sTitle, "PostDetails", new { _iPostID = objRec.ID, _iBlogID = objRec.iParentID })</h2>
+                                                            <p>@Html.Raw(objRec.sSubject)</p>
+
+                                                            <div class="post-meta">
+                                                                @* <span><i class="icon-user"></i>By @Model.PrimaryBlogger.sFName @Model.PrimaryBlogger.sLName</span>*@
+                                                                @*<span><i class="icon-tag"></i><!--  <a href="#">Duis</a>, <a href="#">News</a> --> </span>&nbsp;*@
+                                                                <!-- <a href="blog-post.html" >Read more...</a> -->
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="span9">
+                                                        <div class="post-meta">
+                                                            <span><i class="icon-calendar"></i> @objRec.dtDateCreated.Day.ToString() @objRec.dtDateCreated.ToString("MMM")</span>&nbsp;
+                                                            <span><i class="icon-user"></i> By Aries TCO </span>&nbsp;
+                                                            <span><i class="icon-comments"></i> @Model.CommentsCount.ToString() Comments </span>&nbsp;
+                                                            @Html.ActionLink(" Read more... ", "PostDetails", new { _iPostID = objRec.ID, _iBlogID = objRec.iParentID }, new { @Class = "btn btn-mini btn-primary pull-right" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+
+                                </article>
+                            </div>
+                        </div>
+
+                        <div class="span3">
+                            <aside class="sidebar">
+
+                                @Html.Raw(Model.Blog.sDescription)
+                            </aside>
+                        </div>
+                    </div>
+
+                </div>
+
+                <script type="text/javascript">
+                                    RecordPageView("@Model.Blog.sTitle");
+                </script>
+    }
+    else
+    {
+
+        <section class="page-top">
+            <div class="container">
+                <div class="row">
+                    <div class="span12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Blog</a> <span class="divider">/</span></li>
+                            <li class="active">Blog Post</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span12">
+                        <h2>Aries Blog</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                                        <div class="container">
+
+                                            <div class="row">
+                                                <div class="span9">
+                                                    <div class="blog-posts">
+
+                                                        <article class="post post-large-image">
+                                                            <div class="post-image">
+                                                                &nbsp;
+                                                            </div>
+
+                                                            <div class="post-date">
+                                                                &nbsp;
+                                                            </div>
+
+                                                            <div class="post-content">
+
+                                                                <h2><a href="#">No Content</a></h2>
+                                                                <p>No Content</p>
+
+                                                                <div class="post-meta">
+                                                                    &nbsp;
+                                                                </div>
+
+                                                            </div>
+                                                        </article>
+
+                                                        <div class="pagination pagination-large pull-right">
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="span3">
+                                                    <aside class="sidebar">
+                                                        &nbsp;
+                                                    </aside>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                        <script type="text/javascript">
+                                    RecordPageView("Blog View - No ID");
+                                        </script>
+
+    }
+
+    
+}
+
+
+

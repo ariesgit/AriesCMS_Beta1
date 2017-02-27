@@ -1,0 +1,128 @@
+@model ACMSDBView.RolesViewModel
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Role</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.Roles.sName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "Roles_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("Roles_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.Roles.iParentID)
+                @Html.HiddenFor(model => model.Roles.sParentID)
+                @Html.HiddenFor(model => model.Roles.sControl)
+                @Html.HiddenFor(model => model.Roles.dtDateCreated)
+                @Html.HiddenFor(model => model.Roles.dtLastUpdated)
+                @Html.HiddenFor(model => model.Roles.iCreatedByID)
+                @Html.HiddenFor(model => model.Roles.sCreatedByID)
+                @Html.HiddenFor(model => model.Roles.iUpdatedByID)
+                @Html.HiddenFor(model => model.Roles.sUpdatedByID)
+                @Html.HiddenFor(model => model.Roles.sAccessKey)
+                @Html.HiddenFor(model => model.Roles.dKey)
+
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="Roles.ID">ID :</label>
+                        @Html.TextBoxFor(model => model.Roles.ID, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Roles.ID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Roles_sName">Name :</label>
+                        @Html.TextBoxFor(model => model.Roles.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Roles.sName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Roles_bIsDefaultForNewRegistration">Is default :</label>
+                        @Html.TextBoxFor(model => model.Roles.bIsDefaultForNewRegistration, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Roles.bIsDefaultForNewRegistration, "")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Roles_sAccessKey"> Access level :</label>
+                        @Html.DropDownListFor(model => model.Roles.sAccessKey, Model.AccessLevels, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Roles.sDiscription, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Roles_sDiscription">Description :</label>
+                        @Html.TextBoxFor(model => model.Roles.sDiscription, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Roles.sDiscription, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+            
+        </div>
+    </div>
+</div>

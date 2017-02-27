@@ -1,0 +1,267 @@
+@model ACMSDBView.WebSiteViewModel
+
+<script type="text/javascript">
+
+
+    function on_WebSite_iDefaultTemplateID_Changed()
+    {
+        try
+        {
+            var cboControl = document.getElementById("WebSite_iDefaultTemplateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+            
+            var oHiddenField = document.getElementById("WebSite_sDefaultTemplateID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function on_WebSite_iRequiredRoleID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_iRequiredRoleID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_sRequiredRoleID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+  
+</script>  
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Site</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.WebSite.sName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p> Click To @Html.ActionLink("Manage IPs", "WebSiteIPFilters_List", new { _iParentID = Model.WebSite.ID, _sParentID = Model.WebSite.sName }) Restrictions </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("WebSite_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.WebSite.ID)
+                @Html.HiddenFor(model => model.WebSite.iParentID)
+                @Html.HiddenFor(model => model.WebSite.sParentID)
+                @Html.HiddenFor(model => model.WebSite.sControl)
+                @Html.HiddenFor(model => model.WebSite.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSite.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSite.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSite.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSite.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSite.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSite.sRequiredRoleID)
+                @Html.HiddenFor(model => model.WebSite.sDefaultTemplateID)
+                @Html.HiddenFor(model => model.WebSite.sDefaultBlogID)
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div class="form-group">
+                        <label for="txt_sPassword"> Name :</label>
+                        @Html.TextBoxFor(model => model.WebSite.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sName, "*Required!")
+                        }
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="txt_sPassword">Access key :</label>
+                        @Html.TextBoxFor(model => model.WebSite.sAccesskey, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sAccesskey, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_bSubScriptionBased">Subscription required :</label>
+                        @Html.CheckBoxFor(model => model.WebSite.bSubScriptionBased, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.bSubScriptionBased, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_bRestrictAccess">Restrict access :</label>
+                        @Html.CheckBoxFor(model => model.WebSite.bRestrictAccess, new { @Class = "form-control", style = "width:190px;" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.bRestrictAccess, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_iRequiredRoleID">Required role :</label>
+                        @Html.DropDownListFor(model => model.WebSite.iRequiredRoleID, Model.SecurityRoles, new { @Class = "form-control", style = "width:190px;", @onchange = "javascript:on_WebSite_iRequiredRoleID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.iRequiredRoleID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_iDefaultTemplateID">Default template :</label>
+                        @Html.DropDownListFor(model => model.WebSite.iDefaultTemplateID, Model.SiteTemplates, new { @Class = "form-control", style = "width:190px;", @onchange = "javascript:on_WebSite_iDefaultTemplateID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.iDefaultTemplateID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_iDefaultBlogID">Default blog :</label>
+                        @Html.DropDownListFor(model => model.WebSite.iDefaultBlogID, Model.SiteBloggs, new { @Class = "form-control", style = "width:190px;" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.iDefaultBlogID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sSupportEmail">Support email :</label>
+                        @Html.TextBoxFor(model => model.WebSite.sSupportEmail, new { @Class = "form-control", style = "width:190px;" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sSupportEmail, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sWebMasterEmail"> Webmaster email :</label>
+                        @Html.TextBoxFor(model => model.WebSite.sWebMasterEmail, new { @Class = "form-control", style = "width:190px;" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sWebMasterEmail, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sDefaultMetaTags">Meta Tags :</label>
+                        @Html.TextAreaFor(model => model.WebSite.sDefaultMetaTags, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sDefaultMetaTags, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sDefaultClassification">Meta Classification :</label>
+                        @Html.TextAreaFor(model => model.WebSite.sDefaultClassification, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sDefaultClassification, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sDefaultDescription">Meta Description :</label>
+                        @Html.TextAreaFor(model => model.WebSite.sDefaultDescription, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sDefaultDescription, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_sDefaultKeyWords">Meta Key Words :</label>
+                        @Html.TextAreaFor(model => model.WebSite.sDefaultKeyWords, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.sDefaultKeyWords, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_dUniqueVisitors">Unique visitors :</label>
+                        @Html.TextBoxFor(model => model.WebSite.dUniqueVisitors, new { @Class = "form-control", style = "width:190px;", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.dUniqueVisitors.ToString(), "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_dVisits">Total visits :</label>
+                        @Html.TextBoxFor(model => model.WebSite.dVisits, new { @Class = "form-control", style = "width:190px;", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.dVisits, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSite_dPageViews"> Page views :</label>
+                        @Html.TextBoxFor(model => model.WebSite.dPageViews, new { @Class = "form-control", style = "width:190px;", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSite.dPageViews, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }            
+        </div>
+    </div>
+</div>
+

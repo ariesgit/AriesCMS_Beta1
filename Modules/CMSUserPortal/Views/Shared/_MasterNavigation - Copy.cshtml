@@ -1,0 +1,183 @@
+﻿<style>
+    #accordion {
+        border: none;
+        /*width: 300px;*/
+        /*margin: 50px auto;*/
+    }
+
+        #accordion .ui-accordion-header {
+            background-color: #CCC;
+            font-size: 0.98em;
+            font-weight: bold;
+            border: none;
+            margin-bottom: 3px;
+            background-image: none;
+            padding: 7px 7px 7px 12px;
+        }
+
+            #accordion .ui-accordion-header:hover {
+                background-color: #F3F3F3;
+                font-size: 0.98em;
+                font-weight: bold;
+                border: solid 1px #CCC;
+                margin-bottom: 3px;
+                background-image: none;
+                padding: 7px 7px 7px 12px;
+            }
+
+            #accordion .ui-accordion-header.active {
+                background-color: #F3F3F3;
+                font-size: 0.98em;
+                font-weight: bold;
+                border: solid 2px #CCC;
+                margin-bottom: 3px;
+                background-image: none;
+                padding: 7px 7px 7px 12px;
+            }
+
+        #accordion .ui-accordion-header-active {
+            background-color: #F3F3F3;
+            font-size: 0.98em;
+            font-weight: bold;
+            border: solid 2px #CCC;
+            margin-bottom: 3px;
+            background-image: none;
+            padding: 7px 7px 7px 12px;
+        }
+
+        #accordion .ui-icon {
+            display: none;
+        }
+
+        #accordion .ui-accordion-content {
+            width: 100%;
+            background-color: #FFF;
+            color: #000;
+            font-size: 0.78em;
+            padding: 2px 2px 2px 2px;
+            border: solid 1px #CCC;
+            margin-bottom: 2px;
+        }
+
+            #accordion .ui-accordion-content > * {
+                width: 100%;
+                background-color: transparent;
+                color: #000;
+                font-size: 0.78em;
+                padding: 3px 3px 3px 3px;
+                border: none;
+            }
+
+            #accordion .ui-accordion-content a {
+                width: 100%;
+                background-color: transparent;
+                color: #666;
+                padding: 3px 3px 3px 3px;
+                border: none;
+            }
+
+                #accordion .ui-accordion-content a:hover {
+                    width: 100%;
+                    background-color: transparent;
+                    color: #00F;
+                    padding: 3px 3px 3px 3px;
+                    border-bottom: solid 2px #F00;
+                }
+</style>
+
+
+
+
+
+<script type="text/javascript">
+    var oActiveNode = @Html.Raw(ViewBag.iActiveNode + ";")
+</script>
+
+<div style="padding-top:3px;">
+    @if ((ViewBag.bLoggedIn == false) || (ViewBag.bLoggedIn == null))
+    {
+        <div class="widget widget-recent-posts">
+            <h3 class="widget-title"> Home </h3>
+            <ul>
+                <li>
+                    <i class="icon-file"></i>
+                    <h4><a href="~/">Live Site</a></h4>
+
+                    <p class="post-meta"><span class="post-date">Return to your live site</span></p>
+                </li>
+                <li>
+                    <i class="icon-file"></i>
+                    <h4> <a href="~/portal">Log On</a></h4>
+
+                    <p class="post-meta"><span class="post-date">Log In</span></p>
+                </li>
+            </ul>
+        </div>
+    }
+    else
+    {
+
+        <div id="accordion">
+            <h3 class="widget-title"> Dashboard </h3>
+            <div id="1" class="widget widget-recent-posts">
+                <ul>
+                    <li>
+                        <i class="icon-file"></i>
+                        <h4><a href="~/">Live Site</a></h4>
+                        <p class="post-meta">
+                            <span class="post-date">Return to your live site</span>
+                        </p>
+                    </li>
+                    <li>
+                        <i class="icon-file"></i>
+                        <h4><a href="~/portal">Home</a></h4>
+                        <p class="post-meta">
+                            <span class="post-date">Home<</span>
+                        </p>
+                    </li>
+                    <li>
+                        <i class="icon-file"></i>
+                        <h4><a href="~/portal/home/EditMyProfile">Edit my profile</a></h4>
+                        <p class="post-meta">
+                            <span class="post-date">Edit profile<</span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <h3 class="widget-title"> Blogging </h3>
+            <div id="4" class="widget widget-recent-posts">
+                <ul>
+                    <li>
+                        <i class="icon-file"></i>
+                        <h4><a href="~/portal/home/WebSiteBlogComments_List">My Comments</a></h4>
+                        <p class="post-meta">
+                            <span class="post-date">Blogs</span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <script>
+
+            $("#accordion").accordion({
+                heightStyle: "content"
+            });
+
+            try {
+                //alert(oActiveNode);
+                $("#accordion").accordion("option", "active", oActiveNode);
+            }
+            catch (e) {
+                //alert(e);
+            }
+        </script>
+    }
+</div>
+
+
+
+
+
+

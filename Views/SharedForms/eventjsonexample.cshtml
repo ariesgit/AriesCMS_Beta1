@@ -1,0 +1,60 @@
+﻿@{
+
+    Layout = "~/Modules/CMSAdmin/Views/Shared/_MasterView.cshtml";
+}
+
+
+
+    <script type="text/javascript">
+        function RecordPageView(PageOrContent) {
+            try {
+                var oMydata = { "_Content": PageOrContent };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/PageView")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+        function RecordClickEvent(ClickValue) {
+            try {
+
+                var oMydata = { "_Content": ClickValue };
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("/RestService/ClicksEvent")',
+                    data: oMydata,
+                    dataType: "json",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert("Error: " + errorThrown);
+                    },
+                    success: function (data) {
+                        //alert("Success: " + data.LogIN);
+                    }
+                });
+            }
+            catch (e) {
+                //alert(e);
+            }
+        }
+
+
+        RecordPageView("@Model.WebSitePage.sPageName");
+    </script>
+
+
+            <div class="container"><span class="bottom-shadow"></span></div>
+            <div class="container">
+           <input type="submit" name="submit" value="Update" class="orange-btn button medium" onclick="RecordPageView('eventjsonexample')" />
+
+            </div>

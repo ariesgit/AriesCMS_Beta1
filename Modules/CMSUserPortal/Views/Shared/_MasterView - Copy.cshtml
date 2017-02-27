@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9" />
+    <title>CMS Portal</title>
+
+
+
+
+    <link href="@Url.Content("~/Themes/ElegantBusi/css/style.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Themes/ElegantBusi/css/shortcode.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Themes/ElegantBusi/css/responsive.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Themes/ElegantBusi/css/skins/orange/orange.css")" rel="stylesheet" type="text/css" id="color_skin_css" />
+    <link type="text/css" href="@Url.Content("~/Themes/ElegantBusi/scripts/controlpanel/colorpicker.css")" rel="stylesheet" />
+    <link type="text/css" href="@Url.Content("~/Themes/ElegantBusi/scripts/controlpanel/control-panel.css")" rel="stylesheet" />
+
+    <!-- Icon Font
+    ================================================== -->
+    <link href="@Url.Content("~/Themes/ElegantBusi/css/assets/css/font-awesome.css")" rel="stylesheet" type="text/css" />
+
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Themes/ElegantBusi/css/ie8-and-down.css")" />
+    <![endif]-->
+    <!--[if IE 7]>
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Themes/ElegantBusi/css/ie7.css")">
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Themes/ElegantBusi/css/assets/css/font-awesome-ie7.min.css")">
+    <![endif]-->
+    <!--[if lt IE 9]>
+        <script src="js/layerslider/html5.js"></script>
+    <![endif]-->
+    <!-- ******** Google Fonts ******** -->
+    <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Economica' rel='stylesheet' type='text/css' />
+
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.1.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ddsmoothmenu/jacked.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ddsmoothmenu/jacked.nav.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ddsmoothmenu/ddsmoothmenu.min.js")"></script>
+    <link href="@Url.Content("~/Themes/ElegantBusi/scripts/ddsmoothmenu/ddsmoothmenu.css")" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/hovereffect/jquery-hover-effect.js")"></script>
+    <link href="@Url.Content("~/Themes/ElegantBusi/scripts/hovereffect/hover-style.css")" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/isotope/jquery.isotope.min.js")"></script>
+    <link href="@Url.Content("~/Themes/ElegantBusi/scripts/isotope/isotope-style.css")" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/prettyphoto/jquery.prettyPhoto.js")"></script>
+    <link href="@Url.Content("~/Themes/ElegantBusi/scripts/prettyphoto/prettyPhoto.css")" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.tabs.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/twitter/jquery.tweet.min.js")"></script>
+
+
+    <script src="@Url.Content("~/Scripts/tinymce/tinymce.min.js")"></script>
+    <!-- http://www.chartjs.org/docs/-->
+    <script src="@Url.Content("~/Scripts/Chart.min.js")"></script>
+    <link rel="stylesheet" href="@Url.Content("~/Themes/base_forms.css")" type="text/css" media="all" />
+
+    <script src="@Url.Content("~/Scripts/ariesglobal.js")" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+
+        function Get_SessionManager() {
+            try {
+                //SupportTickets.iLinkTemplateID
+
+                window.setTimeout(Get_SessionManager, 106666);
+
+                var url = "@Url.Content("/RestService/Sessionsss")";
+
+                $.ajax({
+                    url: url,
+                    data: { },
+                    cache: false,
+                    type: "POST",
+                    success: function (data) {
+
+                        if (data.AUTOLOGOFF === 'true')
+                        {
+                            alert("Your session is being closed because we received a request to log off all your instances.");
+                            //window.location.href = "https:" + "//" + window.location.host + "/portal";
+                            window.location.href = window.location.origin + "/portal";
+                        }
+
+                    },
+                    error: function (reponse) {
+
+                    }
+                });
+
+            }
+            catch (e) {
+
+            }
+        }
+
+        function Get_AutoLogOff()
+        {
+            try
+            {
+                //SupportTickets.iLinkTemplateID
+
+                var url = "@Url.Content("/RestService/UserLogOff")";
+
+                $.ajax({
+                    url: url,
+                    data: { },
+                    cache: false,
+                    type: "POST",
+                    success: function (data) {
+
+
+                    },
+                    error: function (reponse) {
+
+                    }
+                });
+
+            }
+            catch (e) {
+
+            }
+        }
+
+        if (window.location.protocol !== "https:")
+        {
+            //window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+        }
+
+        //window.setTimeout(Get_SessionManager, 720000);
+        window.setTimeout(Get_SessionManager, 106666);
+
+        
+        window.onbeforeunload = confirmExit;
+
+        function confirmExit()
+        {
+            if ((window.location.host === 'localhost:19353') || (window.location.host === 'ariesace.com'))
+            {
+                //alert(event.clientY);
+                //alert("Ignor event");
+            }
+            else
+            {
+                //alert('Log Out!');
+                //Get_AutoLogOff();
+            }
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <!-- Main-content Div Starts here -->
+    <div class="main-contant group">
+        <!-- wrapper Div starts here -->
+        <div class="wrapper">
+            <!-- header Div starts here -->
+            <div id="header">
+                <!-- Top-strip starts here -->
+
+                <div class="top-strip custom-skin">
+                    <div class="container">
+                        <div class="float-right">
+                            @if ((ViewBag.bLoggedIn == false) || (ViewBag.bLoggedIn == null))
+                            {
+                                <span style="font-size:1.2em; font-weight:bold;">Admin Dashboard</span>
+                            }
+                            else
+                            {
+                                <div style="float:left; width:100%;">
+                                    <span style="font-size:1.2em; font-weight:bold;">Aries CMS Admin Dashboard -  @DateTime.Now.ToShortDateString() </span>
+                                </div>
+                                <div style="float:right; width:100%; text-align:right; padding-right:90px;">
+                                    <span style="font-size:1.2em; font-weight:bold;">Welcome back [ @ViewBag.User_UserName ], @Html.ActionLink("Log Off!", "UserLogOff") </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- Top-strip ends here -->
+                <div class="menu-top-line"></div>
+                <!-- menu-wrapper starts here -->
+                <!-- menu-wrapper ends here -->
+            </div>
+            <!-- header Div Ends here -->
+
+
+
+            @RenderBody()
+
+
+
+            <!-- Footer Div Starts here -->
+            <div id="footer">
+                <div class="top-bg"></div>
+                <!-- footer-widgets Div Starts here -->
+                <div class="footer-widgets">
+                    <div class="container">
+                        <div class="footer-glow">
+                            <p class="aligncenter-text footer-info-txt">Aries CMS <br /> <a href="#">Simple and </a> easy to use.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- footer-widgets Div Ends here -->
+                <div class="bottom-bg"></div>
+                <!-- footer-info Starts here -->
+                <!-- footer-info Ends here -->
+            </div>
+            <!-- Footer Div Ends here -->
+        </div>
+        <!-- Wrapper Div Ends here -->
+    </div>
+    <!-- Main-content Div Ends here -->
+</body>
+</html>

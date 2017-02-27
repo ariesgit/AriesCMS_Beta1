@@ -1,0 +1,131 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+<script type="text/javascript">
+
+    function on_WebSiteBlogEntry_NewComment()
+    {
+        on_WebSiteBlogEntry_CommentEditor_ClearForm();
+        on_WebSiteBlogEntry_CommentEditor_Show();
+    }
+
+    function on_WebSiteBlogEntry_CommentEditor_ClearForm()
+    {
+        try{
+            $('#WebSiteBlogEntry_sContent').val('');
+        }
+        catch (e) {
+
+        }
+    }
+
+    function on_WebSiteBlogEntry_CommentEditor_PostComment() {
+
+        try {
+            $('#WebSiteBlogEntry_sContent').val('');
+        }
+        catch (e) {
+
+        }
+    }
+
+    function on_WebSiteBlogEntry_CommentEditor_Show() {
+        $('#dlgWebSiteBlogEntry_CommentEditor').modal('show')
+
+    }
+    function on_WebSiteBlogEntry_CommentEditor_Hide() {
+        $('#dlgWebSiteBlogEntry_CommentEditor').modal('hide')
+
+    }
+
+</script>
+
+
+
+<!-- Modal Data Schema Window -->
+<div id="dlgWebSiteBlogEntry_CommentEditor" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Comment on - @Model.recWebSiteBlogEntry.sTitle</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <form class="form-group">
+                            <div class="form-group">
+                                <label for="WebSiteBlogComments_sComment">COMMENT :</label>
+                                <textarea id="WebSiteBlogComments_sComment" name="WebSiteBlogComments_sComment" class="form-control textarea"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <a href="javascript:on_WebSiteBlogEntry_CommentEditor_Hide();" class="btn btn-outline-danger">CANCEL</a>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-right text-md-right text-sm-right text-xs-right">
+                    <a href="javascript:on_WebSiteBlogEntry_CommentEditor_PostComment();" class="btn btn-outline-primary">POST</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center" style="background: url('@Model.recWebSiteBlogEntry.sImageURL') no-repeat center center;">
+            <center><h1 class="text-bold">@Model.recWebSiteBlogEntry.sTitle</h1> </center>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panel_gradientborder_bottop"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 offset-lg-2 offset-md-2  text-lg-left text-md-left text-sm-left text-xs-left">
+            <a href="#" class="a_dark"><i class="fa fa-share-alt-square fa-3x" aria-hidden="true"></i></a>
+            <a href="javascript:on_WebSiteBlogEntry_NewComment();" class="a_dark"><i class="fa fa-comments-o fa-3x" aria-hidden="true"></i></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 offset-lg-2 offset-md-2  text-lg-left text-md-left text-sm-left text-xs-left">
+           @Model.recWebSiteBlogEntry.sContent
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 offset-lg-2 offset-md-2  text-lg-left text-md-left text-sm-left text-xs-left">
+            <a href="#" class="a_dark"><i class="fa fa-share-alt-square fa-3x" aria-hidden="true"></i></a>
+            <a href="javascript:on_WebSiteBlogEntry_NewComment();" class="a_dark"><i class="fa fa-comments-o fa-3x" aria-hidden="true"></i></a>
+        </div>
+    </div>
+
+    @{
+
+        foreach (var objRec in Model.lstWebSiteBlogComments)
+        {
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <h3 class="text-bold">@Html.DisplayFor(modelItem => objRec.sCreatedByID) , said:</h3>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        <p>@Html.DisplayFor(modelItem => objRec.sComment)</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+

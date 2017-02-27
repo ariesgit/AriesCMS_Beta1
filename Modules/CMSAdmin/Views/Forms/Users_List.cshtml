@@ -1,0 +1,162 @@
+@model IEnumerable<AriesCMSDefinition.DEF_Users.RecordObject> 
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            <h2>List of People</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.sErrorMessage != null)
+        {
+            if (!String.IsNullOrWhiteSpace(ViewBag.sErrorMessage))
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+                </div>
+            }
+        }
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @using (Html.BeginForm("Users_List", "", FormMethod.Post))
+            {
+                <div class="col-lg-5 col-md-5 col-xs-5">
+                    @Html.TextBox("Search", "", new { @class = "form-control", placeholder = "Search" })
+                    <input type="hidden" name="_iParentID" id="_iParentID" value="@Html.Encode(ViewBag.iParentID)" />
+                    <input type="hidden" name="_sParentID" id="_sParentID" value="@Html.Encode(ViewBag.sParentID)" />
+                </div>
+                <div class="col-lg-3 col-md-3 col-xs-3">
+                    <input type="submit" class="btn btn-info" value="Search" />
+                </div>
+            }
+            <div class="col-lg-3 col-md-3 col-xs-3">
+                + @Html.ActionLink("Create New", "Users_create", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+            </div>
+        </div>
+        @if (ViewBag.bSearched == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>@Html.ActionLink("Clear Search", "Users_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })</p>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <table class="table">
+                <thead>
+                    <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
+                        <th>User name</th>
+                        <th>Name</th>
+                        <th>E-mail</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Account locked</th>
+                        <th>Account activated</th>
+                        <th>Opt. out of marketing</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (ViewBag.iTotalRecordCount > 0)
+                    {
+                        foreach (var objRec in Model)
+                        {
+                            bool bShowUser = false;
+                            if (objRec.ID == 1)
+                            {
+                                if (ViewBag.IsAdmin != null)
+                                {
+                                    if (ViewBag.IsAdmin == true)
+                                    {
+                                        bShowUser = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                bShowUser = true;
+                            }
+
+                            if (bShowUser == true)
+                            {
+
+                                <tr>
+                                    <th scope="row">@Html.DisplayFor(modelItem => objRec.sUserName)</th>
+                                    <td>@Html.DisplayFor(modelItem => objRec.sFName) @Html.DisplayFor(modelItem => objRec.sLName)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.sPrimaryEMail)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.sPrimaryPhone)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.sPrimaryRole)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.bAccLocked)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.bAccountActivated)</td>
+                                    <td>@Html.DisplayFor(modelItem => objRec.bOptInMarketing)</td>
+                                    <td>
+                                        @Html.ActionLink("Edit", "Users_Details", new { id = objRec.ID })
+                                        @Html.Raw("|")
+                                        @Html.ActionLink("Delete", "Users_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="15">
+                                        @Html.ActionLink("Security Roles", "UserRoles_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Alternate Authentication", "UsersAltAuth_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Chats", "UsersChats_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Shares", "UserShareEvents_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Logs", "UsersLogs_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Messages", "UsersMessages_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                        @Html.ActionLink("| Posts", "UsersPosts_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                                                                                                                                                                                        @Html.ActionLink("| Custom Properties", "UsersPropertiess_List", new { _iParentID = objRec.ID, _sParentID = objRec.sFName + " " + objRec.sLName })
+                                    </th>
+                                </tr>
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <th scope="row" colspan="15">
+                                No Records
+                            </th>
+                        </tr>
+                    }
+
+                    @if (ViewBag.iNumberOfPages > 0)
+                    {
+                        <tr>
+                            <th scope="row" colspan="15" class="blue_background text-lg-center text-md-center text-xs-center">
+                            @Html.ActionLink("First", "Users_List", new { page = 0, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            @if (ViewBag.iCurrentPage >= 1)
+                            {
+                                @Html.ActionLink("< Previous", "Users_List", new { page = ViewBag.iCurrentPage - 1, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            }
+                            else
+                            {
+                                @Html.ActionLink("< Previous", "Users_List", new { page = 0, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            }
+                            <span>@Html.Raw(ViewBag.iCurrentPage) of @Html.Raw(ViewBag.iNumberOfPages)</span>
+                            @Html.ActionLink("Next >", "Users_List", new { page = ViewBag.iCurrentPage + 1, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            @Html.ActionLink("Last", "Users_List", new { page = ViewBag.iNumberOfPages, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            </th>
+                        </tr>
+                    }   
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>      

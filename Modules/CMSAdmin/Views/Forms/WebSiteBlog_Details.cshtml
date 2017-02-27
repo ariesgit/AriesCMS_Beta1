@@ -1,0 +1,331 @@
+@model ACMSDBView.WebSiteBlogViewModel
+
+
+<script type="text/javascript">
+
+    function GetTemplateZones(_Id)
+    {
+        try
+        {
+            //alert("Got Here with ID: " + _Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#Blog_iZoneID").html(procemessage).show();
+            var url = "@Url.Content("/admin/home/GetTemplatZones/")";
+
+            $.ajax({
+                url: url,
+                data: { _iTemplateID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#Blog_iZoneID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch(e)
+        {
+            alert(e);
+        }
+    }
+
+
+    function Get_SiteTemplatePage(_Id) {
+        try {
+            //alert("Got Here with ID: " + _Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#Blog_iSiteTemplatePageID").html(procemessage).show();
+            var url = "@Url.Content("/admin/home/GetTemplatePage/")";
+
+            $.ajax({
+                url: url,
+                data: { _ParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#Blog_iSiteTemplatePageID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#Blog_iSiteTemplatePageID").html("error").show();
+        }
+    }
+
+    function on_Blog_iSiteTemplateID_Changed(_Id) {
+        try {
+            var cboControl = document.getElementById("Blog_iSiteTemplateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Blog_sSiteTemplateID");
+            oHiddenField.value = selectedText;
+
+            Get_SiteTemplatePage(_Id);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_Blog_iSiteTemplatePageID_Changed(_Id) {
+        try {
+            var cboControl = document.getElementById("Blog_iSiteTemplatePageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Blog_sSiteTemplatePageID");
+            oHiddenField.value = selectedText;
+
+
+            GetTemplateZones(_Id);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function on_Blog_iPrimaryContributorID_Changed() {
+        try {
+            var cboControl = document.getElementById("Blog_iPrimaryContributorID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Blog_sPrimaryContributorID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_Blog_iAltContributorID_Changed() {
+        try {
+            var cboControl = document.getElementById("Blog_iAltContributorID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Blog_sAltContributorID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+    
+    function on_Blog_iZoneID_Changed() {
+        try {
+            var cboControl = document.getElementById("Blog_iZoneID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Blog_sZoneID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+</script>
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Blog</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.Blog.sTitle</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @Html.ActionLink("Click here", "WebSiteBlog_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+            @using (Html.BeginForm("WebSiteBlog_AddUpdate", "", FormMethod.Post,  new { enctype = "multipart/form-data" }))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.Blog.ID)
+                @Html.HiddenFor(model => model.Blog.iParentID)
+                @Html.HiddenFor(model => model.Blog.sParentID)
+                @Html.HiddenFor(model => model.Blog.sControl)
+                @Html.HiddenFor(model => model.Blog.dtDateCreated)
+                @Html.HiddenFor(model => model.Blog.dtLastUpdated)
+                @Html.HiddenFor(model => model.Blog.iCreatedByID)
+                @Html.HiddenFor(model => model.Blog.sCreatedByID)
+                @Html.HiddenFor(model => model.Blog.iUpdatedByID)
+                @Html.HiddenFor(model => model.Blog.sUpdatedByID)
+                @Html.HiddenFor(model => model.Blog.sPrimaryContributorID)
+                @Html.HiddenFor(model => model.Blog.sAltContributorID)
+
+                @Html.HiddenFor(model => model.Blog.sSiteTemplatePageID)
+
+                @Html.HiddenFor(model => model.Blog.sSiteTemplateID)
+                @Html.HiddenFor(model => model.Blog.sSiteTemplateURI)
+                @Html.HiddenFor(model => model.Blog.sSiteTempalteURL)
+                @Html.HiddenFor(model => model.Blog.sLoadIncludeURI)
+                @Html.HiddenFor(model => model.Blog.bLoadPartialPage)
+                @Html.HiddenFor(model => model.Blog.sZoneID)
+
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="Blog_sTitle">Title :</label>
+                        @Html.TextBoxFor(model => model.Blog.sTitle, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.sTitle, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_sSubject"> Subject :</label>
+                        @Html.TextAreaFor(model => model.Blog.sSubject, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.sSubject, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_sDescription"> Side HTML :</label>
+                        @Html.TextAreaFor(model => model.Blog.sDescription, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.sDescription, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_iPrimaryContributorID">Blogger :</label>
+                        @Html.DropDownListFor(model => model.Blog.iPrimaryContributorID, Model.Blogger, new { @Class = "form-control", @onchange = "javascript:on_Blog_iPrimaryContributorID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.iPrimaryContributorID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_iAltContributorID">Alternate Blogger :</label>
+                        @Html.DropDownListFor(model => model.Blog.iAltContributorID, Model.Blogger, new { @Class = "form-control", @onchange = "javascript:on_Blog_iAltContributorID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.iAltContributorID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_bRestrictAccess">Restriced access :</label>
+                        @Html.CheckBoxFor(model => model.Blog.bRestrictAccess, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.bRestrictAccess, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_iSiteTemplateID">Theme :</label>
+                        @Html.DropDownListFor(model => model.Blog.iSiteTemplateID, Model.SiteTemplates, new { @Class = "form-control", @onchange = "javascript:on_Blog_iSiteTemplateID_Changed(this.value);" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.iSiteTemplateID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_iSiteTemplatePageID">Theme Page :</label>
+                        @Html.DropDownListFor(model => model.Blog.iSiteTemplatePageID, Model.SiteTemplatesPages, new { @Class = "form-control", @onchange = "javascript:on_Blog_iSiteTemplatePageID_Changed(this.value);" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.iSiteTemplateID, "*Required!")
+                        }
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="Blog_iZoneID">Page Content Zone:</label>
+                        @Html.DropDownListFor(model => model.Blog.iZoneID, Model.TemplateZonesItems, new { @Class = "form-control", @onchange = "javascript:on_Blog_iZoneID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.iZoneID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Blog_sKeyWords">Key words :</label>
+                        @Html.TextBoxFor(model => model.Blog.sKeyWords, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Blog.sKeyWords, "*Required!")
+                        }
+                    </div>
+
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+            
+        </div>
+    </div>
+</div>

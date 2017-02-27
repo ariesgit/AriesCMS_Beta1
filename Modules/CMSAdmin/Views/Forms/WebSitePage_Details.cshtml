@@ -1,0 +1,290 @@
+@model ACMSDBView.WebSitePageViewModel
+
+
+
+
+<script type="text/javascript">
+
+
+    function on_WebSitePage_iLanguageID_Changed()
+    {
+        try
+        {
+            var cboControl = document.getElementById("WebSitePage_iLanguageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+            
+            var oHiddenField = document.getElementById("WebSitePage_sLanguageID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e)
+        {
+            alert(e);
+        }
+    }
+    
+    function on_WebSitePage_iSiteTemplateID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSitePage_iSiteTemplateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSitePage_sSiteTemplateID");
+            oHiddenField.value = selectedText;
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSitePage_iSiteTemplatePageID").html(procemessage).show();
+
+            Get_WebSitePage_SiteTemplatePage(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function on_WebSitePage_iSiteTemplatePageID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSitePage_iSiteTemplatePageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSitePage_sSiteTemplatePageID");
+            oHiddenField.value = selectedText;
+
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function Get_WebSitePage_SiteTemplatePage(_Id) {
+        try {
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSitePage_iSiteTemplatePageID").html(procemessage).show();
+            var url = "@Url.Content("/admin/home/GetTemplatePage/")";
+
+            $.ajax({
+                url: url,
+                data: { _ParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data)
+                {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSitePage_iSiteTemplatePageID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSitePage_iSiteTemplatePageID").html("error").show();
+        }
+    }
+</script>    
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new ZoneM</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.WebSitePage.sPageName</h2>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    @if (ViewBag.bError == true)
+    {
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        </div>
+    }
+    else if (ViewBag.bSaved == true)
+    {
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        </div>
+    }
+            <div class="row">
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <p>@Html.ActionLink("Click here", "WebSitePage_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+
+                    @if ((ViewBag.bSaved == true) || (ViewBag.bAddNew == false))
+                    {
+                        <p>
+                            @Html.ActionLink(" | Edit/View Content", "WebSitePageZone_List", new { _iParentID = Model.WebSitePage.ID, _sParentID = Model.WebSitePage.sPageName })
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+
+                    @using (Html.BeginForm("WebSitePage_AddUpdate", "", FormMethod.Post))
+                    {
+                        @Html.ValidationSummary(true);
+
+                        @Html.HiddenFor(model => model.WebSitePage.ID)
+                        @Html.HiddenFor(model => model.WebSitePage.iParentID)
+                        @Html.HiddenFor(model => model.WebSitePage.sParentID)
+                        @Html.HiddenFor(model => model.WebSitePage.sControl)
+                        @Html.HiddenFor(model => model.WebSitePage.dtDateCreated)
+                        @Html.HiddenFor(model => model.WebSitePage.dtLastUpdated)
+                        @Html.HiddenFor(model => model.WebSitePage.iCreatedByID)
+                        @Html.HiddenFor(model => model.WebSitePage.sCreatedByID)
+                        @Html.HiddenFor(model => model.WebSitePage.iUpdatedByID)
+                        @Html.HiddenFor(model => model.WebSitePage.sUpdatedByID)
+                        @Html.HiddenFor(model => model.WebSitePage.sSiteTemplateID)
+                        @Html.HiddenFor(model => model.WebSitePage.sPageNavigationURL)
+                        @Html.HiddenFor(model => model.WebSitePage.sPageNavigationName)
+                        @Html.HiddenFor(model => model.WebSitePage.dtStart)
+                        @Html.HiddenFor(model => model.WebSitePage.dtEnd)
+                        @Html.HiddenFor(model => model.WebSitePage.sSiteTemplateURI)
+                        @Html.HiddenFor(model => model.WebSitePage.sSiteTempalteURL)
+                        @Html.HiddenFor(model => model.WebSitePage.bLoadPartialPage)
+                        @Html.HiddenFor(model => model.WebSitePage.sLoadIncludeURI)
+                        @Html.HiddenFor(model => model.WebSitePage.iLanguageID)
+                        @Html.HiddenFor(model => model.WebSitePage.sLanguageID)
+                        @Html.HiddenFor(model => model.WebSitePage.sSiteTemplatePageID)
+
+                        <fieldset>
+                            <legend></legend>
+
+                            <div class="form-group">
+                                <label for="txt_sPassword"> Page name :</label>
+                                @Html.TextBoxFor(model => model.WebSitePage.sPageName, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sPageName, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_sPageTitle">Title :</label>
+                                @Html.TextAreaFor(model => model.WebSitePage.sPageTitle, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sPageTitle, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_sMetaTags"> Meta tags :</label>
+                                @Html.TextAreaFor(model => model.WebSitePage.sMetaTags, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sMetaTags, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_sClassification">Classification :</label>
+                                @Html.TextAreaFor(model => model.WebSitePage.sClassification, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sClassification, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_sPageDescription">Page description :</label>
+                                @Html.TextAreaFor(model => model.WebSitePage.sPageDescription, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sPageDescription, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_sKeyWords">Key words :</label>
+                                @Html.TextAreaFor(model => model.WebSitePage.sKeyWords, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sKeyWords, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_bIsLive">Is live :</label>
+                                @Html.CheckBoxFor(model => model.WebSitePage.bIsLive, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.bIsLive, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_bRestrictAccess"> Restrict access :</label>
+                                @Html.CheckBoxFor(model => model.WebSitePage.bRestrictAccess, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.bRestrictAccess, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_iSiteTemplateID">Theme :</label>
+                                @Html.DropDownListFor(model => model.WebSitePage.iSiteTemplateID, Model.SiteTemplates, new { @Class = "form-control", @onchange = "javascript:on_WebSitePage_iSiteTemplateID_Changed();" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.iSiteTemplateID, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_iSiteTemplatePageID">Theme Page :</label>
+                                @Html.DropDownListFor(model => model.WebSitePage.iSiteTemplatePageID, Model.SiteTemplatesPages, new { @Class = "form-control", @onchange = "javascript:on_WebSitePage_iSiteTemplatePageID_Changed();" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.iLanguageID, "*Required!")
+                                }
+                            </div>
+
+                        </fieldset>
+                        <div class="form-group">
+                            @if (ViewBag.bAddNew == true)
+                    {
+                                <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                            }
+                            else
+                            {
+                                <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                            }
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>

@@ -1,0 +1,123 @@
+﻿@model AriesCMS.Models.NewUserRegistration
+
+
+<div class="container">
+    <div id="secondary" class="widget-area left-sidebar">
+        <h4 class="pull-top">Get in <strong>touch</strong></h4>
+        <p>Contact us and let's connect so that we can find the best path to move forward with your needs.</p>
+
+        <hr />
+
+        <h4>The <strong>Office</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
+            <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
+            <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
+        </ul>
+
+        <hr />
+
+        <h4>Business <strong>Hours</strong></h4>
+        <ul class="unstyled">
+            <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
+            <li><i class="icon-time"></i> Saturday - Closed</li>
+            <li><i class="icon-time"></i> Sunday - Closed</li>
+        </ul>
+
+    </div>
+    <div id="primary" class="site-content-left">
+        <div class="entry-content">
+            @if (ViewBag.bFromError == "true")
+            {
+                <h2 class="strip-title alignleft-text"><strong>Error!</strong> There was an error registrering you.</h2><br />
+                @ViewBag.sErrorMessage
+            }
+
+            <div class="entry-content">
+                <div style="width:660px !important; float:left;">
+                    @if ((ViewBag.bRegistrationCompleted == null) || (ViewBag.bRegistrationCompleted == "false"))
+                    {
+                        <form action="/forms/RegisterNewUser" method="post">
+
+                            <input type="hidden" name="_ViewToLoad" id="_ViewToLoad" value="/register" />
+                            <input type="hidden" name="_ViewConfirmation" id="_ViewConfirmation" value="/register" />
+                            <input type="hidden" name="_ViewError" id="_ViewError" value="/register" />
+
+                            <fieldset>
+                                <legend></legend>
+
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        First Name*
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        @Html.TextBoxFor(model => model.FirstName, new { @Class = "TextBox2" })
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Last Name *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        @Html.TextBoxFor(model => model.LastName, new { @Class = "TextBox2" })
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        EMail (User name) *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        @Html.TextBoxFor(model => model.UserName, new { @Class = "TextBox2" })
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Password *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        @Html.TextBoxFor(model => model.Password, new { @Class = "TextBox2" })
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                                <div style="width:100%;float:left;">
+                                    <div class="LabelDiv1Required">
+                                        Confirm Password *
+                                    </div>
+                                    <div class="TextBoxDiv1">
+                                        @Html.TextBoxFor(model => model.PasswordConfirm, new { @Class = "TextBox2" })
+                                    </div>
+                                    <div class="LabelDiv1Error">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div style="float:right; padding-top:12px;">
+                                <input type="submit" class="orange-btn button medium left" value="Register">
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <h2 class="strip-title alignleft-text">
+                            <strong>Success!</strong> You are registered for our site. <br />
+                            <p class="lead">
+                                Thank you for your interest. Remember to be on a look out for our news letter.
+                            </p>
+                            <br />
+                            <a href="~/" class="btn btn-large btn-primary pull-top">Look around our site</a>
+                        </h2>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+

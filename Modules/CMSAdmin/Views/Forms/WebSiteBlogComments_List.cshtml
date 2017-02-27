@@ -1,0 +1,110 @@
+@model IEnumerable<AriesCMSDefinition.DEF_WebSiteBlogComments.RecordObject> 
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            <h2>Blog Comments</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        @if (ViewBag.sErrorMessage != null)
+        {
+            if (!String.IsNullOrWhiteSpace(ViewBag.sErrorMessage))
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+                </div>
+            }
+        }
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @using (Html.BeginForm("WebSiteBlogComments_List", "", FormMethod.Post))
+            {
+                <div class="col-lg-5 col-md-5 col-xs-5">
+                    @Html.TextBox("Search", "", new { @class = "form-control", placeholder = "Search" })
+                    <input type="hidden" name="_iParentID" id="_iParentID" value="@Html.Encode(ViewBag.iParentID)" />
+                    <input type="hidden" name="_sParentID" id="_sParentID" value="@Html.Encode(ViewBag.sParentID)" />
+                </div>
+                <div class="col-lg-3 col-md-3 col-xs-3">
+                    <input type="submit" class="btn btn-info" value="Search" />
+                </div>
+            }
+            <div class="col-lg-3 col-md-3 col-xs-3">
+                + @Html.ActionLink("Create New", "WebSiteBlogComments_create", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+            </div>
+        </div>
+        @if (ViewBag.bSearched == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>@Html.ActionLink("Clear Search", "WebSiteBlogComments_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })</p>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <table class="table">
+                <thead>
+                    <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
+                        <th>Date &amp; Time</th>
+                        <th>Comment</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.iTotalRecordCount > 0)
+                    {
+                        foreach (var objRec in Model)
+                        {
+                            <tr>
+                                <th scope="row">@Html.DisplayFor(modelItem => objRec.dtDateCreated)</th>
+                                <td>@Html.DisplayFor(modelItem => objRec.sComment)</td>
+
+                                <td>
+                                    @Html.ActionLink("Edit", "WebSiteBlogComments_Details", new { id = objRec.ID })
+                                    @Html.Raw("|")
+                                    @Html.ActionLink("Delete", "WebSiteBlogComments_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <th scope="row" colspan="3">
+                                No Records
+                            </th>
+                        </tr>
+                    }
+
+                    @if (ViewBag.iNumberOfPages > 0)
+                    {
+                        <tr>
+                            <th scope="row" colspan="3" class="blue_background text-lg-center text-md-center text-xs-center">
+                                @Html.ActionLink("First", "WebSiteBlogComments_List", new { page = 0, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                                @if (ViewBag.iCurrentPage >= 1)
+                                {
+                                    @Html.ActionLink("< Previous", "WebSiteBlogComments_List", new { page = ViewBag.iCurrentPage - 1, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                                }
+                                else
+                                {
+                                    @Html.ActionLink("< Previous", "WebSiteBlogComments_List", new { page = 0, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                                }
+                                <span>@Html.Raw(ViewBag.iCurrentPage) of @Html.Raw(ViewBag.iNumberOfPages)</span>
+                                @Html.ActionLink("Next >", "WebSiteBlogComments_List", new { page = ViewBag.iCurrentPage + 1, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                                @Html.ActionLink("Last", "WebSiteBlogComments_List", new { page = ViewBag.iNumberOfPages, _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }, new { @Class = "fnav-next" })
+                            </th>
+                        </tr>
+                    }    
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>      

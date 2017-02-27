@@ -1,0 +1,136 @@
+﻿@model AriesCMS.Models.NewUserRegistration
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            <h2>New Registration Form</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            if (ViewBag.sErrorMessage != null)
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+                </div>
+
+                if (ViewBag.sAdminErrorMessage != null)
+                {
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                        <p> Admin debug info: @Html.Raw(ViewBag.sAdminErrorMessage)</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(Model.ErrorMessage)</p>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                    <p>Admin debug info: @Html.Raw(Model.DebugFormResponseMessage)</p>
+                </div>
+            }
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Thank you!  You are now a registered user.</p>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>@Html.ActionLink("Click here to enter your portal", "Portal");</p>
+            </div>
+                                    
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+            @using (Html.BeginForm("RegisterNewUser", "../Forms", FormMethod.Post))
+            {
+
+                if (ViewBag.bError == true)
+                {
+                    if (ViewData.ModelState.IsValid)
+                    {
+                        <span style="color:#F30;">
+                            @Html.ValidationSummary(false, "Sorry but some fields are missing!")
+                        </span>
+                    }
+                }
+
+                @Html.HiddenFor(model => model.TrackingCode)
+
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="UserName">EMail :</label>
+                        @Html.TextBoxFor(model => model.UserName, new { @Class = "form-control" })
+                        @if (Model.UserNameError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.UserName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Password">Password :</label>
+                        @Html.PasswordFor(model => model.Password, new { @Class = "form-control" })
+                        @if (Model.PasswordError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Password, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="PasswordConfirm">Confirm Password :</label>
+                        @Html.PasswordFor(model => model.PasswordConfirm, new { @Class = "form-control" })
+                        @if (Model.PasswordConfirmError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.PasswordConfirm, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="FirstName">First name :</label>
+                        @Html.TextBoxFor(model => model.FirstName, new { @Class = "form-control" })
+                        @if (Model.FirstNameError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.FirstName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="LastName">Last name :</label>
+                        @Html.TextBoxFor(model => model.LastName, new { @Class = "form-control" })
+                        @if (Model.LastNameError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.LastName, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                </div>
+            }
+            
+        </div>
+    </div>
+</div>

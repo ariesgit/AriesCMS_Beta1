@@ -1,0 +1,190 @@
+@model ACMSDBView.WebSitePageTemplateZonesViewModel
+
+
+
+
+<script type="text/javascript">
+
+
+    function on_WebSitePageTemplateZones_iLanguageID_Changed()
+    {
+        try
+        {
+            var cboControl = document.getElementById("WebSitePageTemplateZones_iLanguageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+            
+            var oHiddenField = document.getElementById("WebSitePageTemplateZones_sLanguageID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function ViewFileManager() {
+        try {
+            var myWindow = window.open(window.location.protocol + "//" + window.location.host + "/" + "admin/home/FilesManager_ListPop", "_blank", "toolbar=no, scrollbars=yes, resizable=yes, width=560, height=700, location=no,status=no,titlebar=no");
+        }
+        catch (e) {
+
+        }
+    }
+
+    
+    function SwitchToEditor()
+    {
+
+
+    tinymce.init({
+        selector: 'textarea',
+        force_br_newlines: false,
+        force_p_newlines: false,
+        forced_root_block: '',
+        valid_elements: '*[*]',
+        width: 650,
+        height: 400,
+        cleanup_on_startup: false,
+        trim_span_elements: false,
+        verify_html: false,
+        cleanup: false,
+        convert_urls: false,
+        keep_styles: true,
+        browser_spellcheck: true,
+        plugins: ["advlist autolink lists link image charmap print preview anchor legacyoutput",
+                "searchreplace visualblocks code fullscreen",
+                "insertdatetime media table contextmenu paste moxiemanager"],
+        menubar: "edit insert format table tools",
+        toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | showfilemanager",
+        setup: function (ed) {
+            // Add a custom button
+
+            ed.addButton('showfilemanager', {
+                type: 'button',
+                title: 'Files',
+                text: 'Show Files',
+                onclick: function () {
+                    // Add you own code to execute something on click
+                    ViewFileManager();
+                }
+            });
+        }
+
+    });
+    }
+
+</script>    
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Template Content Zone</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.WebSitePageTemplateZones.sName</h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "WebSitePageTemplateZones_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+
+            @using (Html.BeginForm("WebSitePageTemplateZones_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.ID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.iParentID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sParentID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sControl)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.iTypeID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sTypeID)
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.sLanguageID)
+
+                @Html.HiddenFor(model => model.WebSitePageTemplateZones.iLanguageID)
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplateZones_sName">Zone name :</label>
+                        @Html.TextBoxFor(model => model.WebSitePageTemplateZones.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplateZones.sName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplateZones_sCodeName">Zone code tag :</label>
+                        @Html.TextBoxFor(model => model.WebSitePageTemplateZones.sCodeName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplateZones.sCodeName, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSitePageTemplateZones_sDefaultValue">Defautl body :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
+                        @Html.TextAreaFor(model => model.WebSitePageTemplateZones.sDefaultValue, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSitePageTemplateZones.sDefaultValue, "*Required!")
+                        }
+                    </div>
+
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Update" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+

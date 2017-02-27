@@ -1,0 +1,257 @@
+﻿
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+    @if ((ViewBag.bLoggedIn == false) || (ViewBag.bLoggedIn == null))
+    {
+        <div id="accordion">
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header">HOME</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        <h6><a href="~/">Live Site</a></h6>
+                    </li>
+                    <li>
+                        <h6> <a href="~/admin">Admin Log On</a></h6>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div id="accordion">
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Dashboard</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        <h6><a href="~/">Live Site</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin">Admin Home</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/EditMyProfile">Edit my profile</a></h6>
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Content Management</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6>
+                                <a href="~/admin/home/WebSitePage_List?_iParentID=@ViewBag.iSiteID">Pages</a>
+                            </h6>
+                        }
+                        else
+                        {
+                            <h6>
+                                <a href="~/admin/home/WebSitePage_List?_iParentID=1">Pages</a>
+                            </h6>
+                        }
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteNavigation_List?_iParentID=@ViewBag.iSiteID">Navigation</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteNavigation_List?_iParentID=1">Navigation</a></h6>
+                        }
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=@ViewBag.iSiteID">Site Announcements</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=1">Site Announcements</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Reports</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        <h6><a href="~/admin/home/ReportOverview">Overview</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/ReportRefferalURLs">Reffering URLs</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/ReportRptSiteVisitors">Visitors</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/ReportRptHitStatistics">Hit Statistics</a></h6>
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteEvents_List?_iParentID=@ViewBag.iSiteID">List Site Events</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteEvents_List?_iParentID=1">List Site Events</a></h6>
+                        }
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/Users_List?_iParentID=1">Site Users</a></h6>
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Blogging</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteBlog_List?_iParentID=@ViewBag.iSiteID">Blogs</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteBlog_List?_iParentID=1">Blogs</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Appearance</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSitePageTemplates_List?_iParentID=@ViewBag.iSiteID">Site Templates</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSitePageTemplates_List?_iParentID=1">Site Templates</a></h6>
+                        }
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/FilesManager_List?_iParentID=@ViewBag.iSiteID">File Manager</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/FilesManager_List?_iParentID=1">File Manager</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> System Management</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        <h6><a href="~/admin/home/SystemMaster_Details?id=1">Master Settings</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/Roles_List?_iParentID=1">Security Roles</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteScreen_List?_iParentID=1">System Screens</a></h6>
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSite_Details?id=@ViewBag.iSiteID">Site Settings</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSite_Details?id=1">Site Settings</a></h6>
+                        }
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/Users_List?_iParentID=1">Site Users</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/Countries_List">List of Countries</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/CountryLanguages_List">List of Languages</a></h6>
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Community</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteForum_List?_iParentID=@ViewBag.iSiteID">Communities</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteForum_List?_iParentID=1">Communities</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Sales &amp; Marketing</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSite_Leads_List?_iParentID=@ViewBag.iSiteID">Leads</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSite_Leads_List?_iParentID=1">Leads</a></h6>
+                        }
+                    </li>
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteAdvertisementGroup_List?_iParentID=@ViewBag.iSiteID">Ad Groups</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteAdvertisementGroup_List?_iParentID=1">Ad Groups</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Job Board</h3>
+            <div class="text-md-left text-md-left portal_div_navcontent">
+                <ul class="portal_ul">
+                    <li>
+                        @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
+                        {
+                            <h6><a href="~/admin/home/WebSiteJobs_List?_iParentID=@ViewBag.iSiteID">Jobs</a></h6>
+                        }
+                        else
+                        {
+                            <h6><a href="~/admin/home/WebSiteJobs_List?_iParentID=1">Jobs</a></h6>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+            <div class="text-lg-center text-md-center text-sm-center text-xs-center">
+                <a href="~/admin/home/UserLogOff" class="btn btn-danger">LOG OFF</a>
+            </div>
+
+    }
+</div>
+
+<script type="text/javascript">
+	$("#accordion").accordion({heightStyle: "content"});
+
+    try
+	{
+        //alert(oActiveNode);
+        $("#accordion").accordion("option", "active", oActiveNode);
+    }
+    catch (e)
+	{
+        //alert(e);
+    }
+</script>

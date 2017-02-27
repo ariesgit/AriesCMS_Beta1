@@ -1,0 +1,232 @@
+@model AriesCMSDefinition.DEF_WebSiteJobApplicant.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSiteJobApplicant_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteJobApplicant_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteJobApplicant_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteJobApplicant_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteJobApplicant_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Job Application</h2>
+            }
+            else
+            {
+                 <h2>You are editing - @Model.sUserID   </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteJobApplicant_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteJobApplicant_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.sSyncControl)  
+
+                         @Html.HiddenFor(model => model.dtDateUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.iProfileID)  
+                         @Html.HiddenFor(model => model.sProfileID)  
+                         @Html.HiddenFor(model => model.sProfileThumbURL)  
+                         @Html.HiddenFor(model => model.sPost)  
+                         @Html.HiddenFor(model => model.dAmount)  
+                         @Html.HiddenFor(model => model.iUserID)  
+                         @Html.HiddenFor(model => model.sUserID)  
+                         @Html.HiddenFor(model => model.sUserThumbNail)  
+                         @Html.HiddenFor(model => model.iDomainID)  
+                         @Html.HiddenFor(model => model.sDomainID)  
+                         @Html.HiddenFor(model => model.sDomainThumbNail)  
+                         @Html.HiddenFor(model => model.dDeliveryInTime)  
+                         @Html.HiddenFor(model => model.sDeliveryInTimeFrame)  
+                         @Html.HiddenFor(model => model.dtETA_Delivery)  
+                         @Html.HiddenFor(model => model.sCoverLetter)  
+                         @Html.HiddenFor(model => model.sResume)  
+                         @Html.HiddenFor(model => model.sResumeUploadLink1)  
+                         @Html.HiddenFor(model => model.sResumeUploadLink2)  
+                         @Html.HiddenFor(model => model.sResumeUploadLink3)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="dtDateCreated">Date &amp; Time :</label>
+                                                @Html.TextBoxFor(model => model.dtDateCreated, new { @Class = "form-control", @readonly="readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtDateCreated)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sUserID">Applicant :</label>
+                                                @Html.TextBoxFor(model => model.sUserID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sUserID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dAmount">Income needs :</label>
+                                                @Html.TextBoxFor(model => model.dAmount, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAmount)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sCoverLetter">Cover letter :</label>
+                                                @Html.TextAreaFor(model => model.sCoverLetter, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sCoverLetter)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sResume">Resume :</label>
+                                                @Html.TextAreaFor(model => model.sResume, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sResume)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sResumeUploadLink1">Cover letter (link) :</label>
+                                               <a href="@Html.Raw(Model.sResumeUploadLink1)" target="_blank">Link To File</a>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sResumeUploadLink2">Resume (link) :</label>
+                                                <a href="@Html.Raw(Model.sResumeUploadLink2)" target="_blank">Link To File</a>
+                                            </div>
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

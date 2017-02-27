@@ -1,0 +1,119 @@
+@model ACMSDBView.WebSiteRoleViewModel
+
+<script type="text/javascript">
+
+
+    function on_WebSiteScreenRoles_iRoleID_Changed()
+    {
+        try
+        {
+            var cboControl = document.getElementById("WebSiteRole_iRoleID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+            
+            var oHiddenField = document.getElementById("WebSiteRole_sRoleID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+  
+</script>  
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Web Role</h2>
+            }
+            else
+            {
+                <h2>You are editing - @Model.WebSiteRole.sRoleID</h2>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p>@Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <p>@Html.ActionLink("Click here", "WebSiteRole_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID }) to return to the list.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
+            @using (Html.BeginForm("WebSiteRole_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+
+
+                @Html.HiddenFor(model => model.WebSiteRole.ID)
+                @Html.HiddenFor(model => model.WebSiteRole.iParentID)
+                @Html.HiddenFor(model => model.WebSiteRole.sParentID)
+                @Html.HiddenFor(model => model.WebSiteRole.sControl)
+                @Html.HiddenFor(model => model.WebSiteRole.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSiteRole.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSiteRole.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteRole.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteRole.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteRole.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteRole.sRoleID)
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div class="form-group">
+                        <label for="WebSiteRole_iRoleID">Role :</label>
+
+                        @Html.DropDownListFor(model => model.WebSiteRole.iRoleID, Model.Roles, new { @Class = "form-control", @onchange = "javascript:on_WebSiteRole_iRoleID_Changed();" })
+
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteRole.iRoleID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteRole_sAccessLevel">Access level :</label>
+
+
+                        @Html.DropDownListFor(model => model.WebSiteRole.sAccessLevel, Model.AccessLevels, new { @Class = "form-control" })
+
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteRole.sAccessLevel, "*Required!")
+                        }
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,232 @@
+@model AriesCMSDefinition.DEF_WebSiteJobs.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSiteJobs_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteJobs_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteJobs_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteJobs_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteJobs_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Job</h2>
+            }
+            else
+            {
+                 <h2>You are editing - @Model.sTitle  </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteJobs_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+                @using (Html.BeginForm("WebSiteJobs_AddUpdate", "", FormMethod.Post))
+                {                             
+                
+                          @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.sSyncControl)  
+                         @Html.HiddenFor(model => model.dtDateCreated)  
+                         @Html.HiddenFor(model => model.dtDateUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID) 
+                         @Html.HiddenFor(model => model.iFilledByID)  
+                         @Html.HiddenFor(model => model.sFilledByID)  
+                         @Html.HiddenFor(model => model.sFilledByThumbURL)  
+                         @Html.HiddenFor(model => model.sReview)  
+                         @Html.HiddenFor(model => model.sProgrammerReview)  
+                         @Html.HiddenFor(model => model.dPrice)  
+                         @Html.HiddenFor(model => model.dBudget)  
+                         @Html.HiddenFor(model => model.iEmployerID)  
+                         @Html.HiddenFor(model => model.sEmployerID)  
+                         @Html.HiddenFor(model => model.sEmployerThumbURL)  
+                         @Html.HiddenFor(model => model.dNumApplicants) 
+                         @Html.HiddenFor(model => model.iJobTypeID)  
+                         @Html.HiddenFor(model => model.sJobTypeID)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+                                            <div class="form-group">
+                                                <label for="sTitle">Title :</label>
+                                                @Html.TextBoxFor(model => model.sTitle, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sTitle)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="bOpen">Is Open :</label>
+                                                @Html.CheckBoxFor(model => model.bOpen, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.bOpen)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="bJobFilled">Filled :</label>
+                                                @Html.CheckBoxFor(model => model.bJobFilled, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.bJobFilled)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="bJobFilled">Salary / Pay (range ok) :</label>
+                                                @Html.TextBoxFor(model => model.sSalary, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSalary)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sDeadLine">Deadline :</label>
+                                                @Html.TextBoxFor(model => model.sDeadLine, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDeadLine)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sJobLocation">Location :</label>
+                                                @Html.TextBoxFor(model => model.sJobLocation, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sJobLocation)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sJobDescription">Description :</label>
+                                                @Html.TextAreaFor(model => model.sJobDescription, new { @Class = "form-control textarea" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sJobDescription)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sSkillRequirements">Skills required (separate by ',') :</label>
+                                                @Html.TextAreaFor(model => model.sSkillRequirements, new { @Class = "form-control textarea" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillRequirements)</span>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="sSkillsNeeded">Skills good to have (separate by ',') :</label>
+                                                @Html.TextAreaFor(model => model.sSkillsNeeded, new { @Class = "form-control textarea" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillsNeeded)</span>
+                                            </div>
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                        </div>
+              } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

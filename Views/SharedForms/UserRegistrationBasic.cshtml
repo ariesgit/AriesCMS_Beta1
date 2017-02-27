@@ -1,0 +1,202 @@
+﻿<script type="text/javascript">
+
+    function ValidateRegistrationForm() {
+        try {
+            var bResponse = true;
+            var txt_oFullName = document.getElementById('txt_oFullName');
+            var txt_oUserName = document.getElementById('txt_oUserName');
+            var txt_oPassword = document.getElementById('txt_oPassword');
+            var txt_oConfirmPassword = document.getElementById('txt_oConfirmPassword');
+
+
+            if (txt_oFullName != null) {
+                if ((!txt_oFullName.value) || (!txt_oFullName)) {
+                    txt_oFullName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oFullName.value == '') {
+                    txt_oFullName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            if (txt_oUserName != null) {
+                if ((!txt_oUserName.value) || (!txt_oUserName)) {
+                    txt_oUserName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oUserName.value == '') {
+                    txt_oUserName.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+
+            if (txt_oPassword != null) {
+                if ((!txt_oPassword.value) || (!txt_oPassword)) {
+                    txt_oPassword.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oPassword.value == '') {
+                    txt_oPassword.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+
+            if (txt_oConfirmPassword != null) {
+                if ((!txt_oConfirmPassword.value) || (!txt_oConfirmPassword)) {
+                    txt_oConfirmPassword.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+                else if (txt_oConfirmPassword.value == '') {
+                    txt_oConfirmPassword.style.backgroundColor = '#FFCCCC';
+                    bResponse = false;
+                }
+            }
+
+            return bResponse;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    function Register() {
+        try {
+
+            var oFullName = "";
+            var oUserName = "";
+            var oPassword = "";
+            var oConfirmPassword = "";
+            var oFirstName = "";
+            var oLastName = "";
+            var oEmail = "";
+            var oPhone = "";
+
+            var txt_oFullName = document.getElementById('txt_oFullName');
+            var txt_oUserName = document.getElementById('txt_oUserName');
+            var txt_oPassword = document.getElementById('txt_oPassword');
+            var txt_oConfirmPassword = document.getElementById('txt_oConfirmPassword');
+
+            var lbl_oNewUserID = document.getElementById('NewUserID');
+
+
+            oFullName = txt_oUserName.value;
+            oUserName = txt_oUserName.value;
+            oEmail = txt_oUserName.value;
+            oPassword = txt_oPassword.value;
+            oConfirmPassword = txt_oConfirmPassword.value;
+            oFirstName = txt_oUserName.value;
+            oLastName = txt_oUserName.value;
+
+            var oMydata = {
+                "_UserName": oUserName, "_Password": oPassword, "_ConfirmPassword": oConfirmPassword, "_FirstName": oFirstName,
+                "_LastName": oLastName, "_Email": oEmail, "_Phone": oPhone, "_FullName": oFullName
+            };
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Content("/RestService/UserRegister")',
+                data: oMydata,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                    Hide_oMultiRegistrationStep1_Wait();
+                },
+                success: function (data) {
+
+                    if (data.RESPONSE == 'true') {
+                        lbl_oNewUserID.value = data.NEWUSERID;
+                        Hide_oRegistration_Wait();
+                        alert("Success you are now registered!")
+                    }
+                    else {
+                        var oResponseText = document.getElementById('oRegResponseMessage');
+                        oResponseText.innerHTML = data.MESSAGE;
+                        Hide_oRegistration_Wait();
+                    }
+                }
+            });
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function Show_oRegistration_Wait() {
+        try {
+            var oDiv_oRegistration_Wai = document.getElementById("oUserRegistration_Wait");
+            oDiv_oRegistration_Wai.style.display = 'inline';
+        }
+        catch (e) {
+        }
+    }
+    function Hide_oRegistration_Wait() {
+        try {
+            var oDiv_oRegistration_Wai = document.getElementById("oUserRegistration_Wait");
+            oDiv_oRegistration_Wai.style.display = 'none';
+        }
+        catch (e) {
+        }
+    }
+
+    function Perform_Registration() {
+        Show_oRegistration_Wait();
+        if (ValidateRegistrationForm()) {
+            Register();
+        }
+    }
+
+</script>
+
+
+
+
+<div id="oMultiRegistrationStep1">
+    <div style="width:100%;">
+        <strong>Sign Up, enter your user name and password</strong><br />
+        <div id="oRegResponseMessage" style="color:red; font-weight:bold;"></div>
+        <div style="width:49%; float:left;">
+            <form>
+                <fieldset>
+                    <legend></legend>
+                    <div style="width:100%;float:left;">
+                        Name:
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <input type="text" class="TextBox2" placeholder="Name" name="txt_oFullName" id="txt_oFullName" />
+                    </div>
+                    <div style="width:100%;float:left;">
+                        Email:
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <input type="text" class="TextBox2" placeholder="E-Mail" name="txt_oUserName" id="txt_oUserName" />
+                    </div>
+                    <div style="width:100%;float:left;">
+                        Password:
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <input type="password" class="TextBox2" placeholder="Password" name="txt_oPassword" id="txt_oPassword" />
+                    </div>
+                    <div style="width:100%;float:left;">
+                        Confirm Password:
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <input type="password" class="TextBox2" placeholder="Confirm Password" name="txt_oConfirmPassword" id="txt_oConfirmPassword" />
+                    </div>
+                </fieldset>
+                <div style="float:right; padding-top:12px;">
+                    <a href="javascript:Perform_Registration();" class="orange-btn button medium left">Register </a>
+                </div>
+            </form>
+        </div>
+        <div style="width:49%; float:left;">
+            <p> This is currently disabled</p>
+            <img src="~/Themes/SignInGooglePlus.png" alt="Sign In with Google Plus" />
+            <br />
+            <img src="~/Themes/SignInFaceBook.png" alt="Sign In with Facebook" />
+        </div>
+    </div>
+    <div id="oUserRegistration_Wait" class="overlay_span" style="display:none;">
+        <div style="margin-top:50%; margin-left:50%;"><span style="font-size:1.9em; font-weight:bold;">Please wait...</span></div>
+    </div>
+</div>

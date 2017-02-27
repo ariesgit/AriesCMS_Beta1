@@ -1,0 +1,119 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row rwHeight">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+            <center><h3 class="text-bold">@Model.recWebSiteJobs.sTitle</h3> </center>
+        </div>
+        <p>@Model.recWebSiteJobs.sJobDescription</p>
+        <div class="row">
+            @if (ViewBag.bError == true)
+            {
+                <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 alert-danger">
+                    <p>@Html.Raw(ViewBag.ErrorMessage)</p>
+                </div>
+            }
+            else if (ViewBag.bCompleted == true)
+            {
+                <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 alert-success">
+                    <h4>Thank you!  Your application will be processed and you will recieve a response from us as quickly as possible.</h4>
+                </div>
+            }
+        </div>
+        @if (ViewBag.bCompleted == false)
+        {
+            <div class="row">
+                <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12">
+
+                    <h1 class="text-center text-bold">APPLY FOR THIS POSITION</h1>
+
+                    @using (Html.BeginForm("SubmitContactUs", "fr", FormMethod.Post))
+                    {
+                        @Html.ValidationSummary(true);
+
+                        @Html.HiddenFor(model => model.LocalPageViewFormData.ErrorPageURL)
+                        @Html.HiddenFor(model => model.LocalPageViewFormData.SuccessPageURL)
+                        @Html.HiddenFor(model => model.LocalPageViewFormData.SourceForm)
+                        @Html.HiddenFor(model => model.LocalPageViewFormData.IsCMSForm)
+
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.ID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iParentID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sParentID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sControl)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sSyncControl)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.dtDateCreated)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.dtDateUpdated)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iCreatedByID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sCreatedByID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iUpdatedByID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sUpdatedByID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iProfileID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sProfileID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sProfileThumbURL)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sPost)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iUserID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sUserID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sUserThumbNail)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.iDomainID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sDomainID)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sDomainThumbNail)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.dDeliveryInTime)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.sDeliveryInTimeFrame)
+                        @Html.HiddenFor(model => model.recWebSiteJobApplicant.dtETA_Delivery)
+
+                        <fieldset>
+                            <legend></legend>
+
+                            <div class="form-group">
+                                <label for="recWebSiteJobApplicant_dAmount">Desired Income :</label>
+                                @Html.TextBoxFor(model => model.recWebSiteJobApplicant.dAmount, new { @Class = "form-control", @placeholder = "" })
+                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.recWebSiteJobApplicant.dAmount)</span>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="Name" class="text-bold">Cover letter *:</label>
+                                <textarea class="form-control textarea"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="fileUpload btn btn-primary" id="pnlFileSelect">
+                                    <span><img src="~/Themes/acms2/images/UploadButton_white.png" alt="Upload File" width="35" height="35" /></span>
+                                    <input type="file" name="fileupload" id="fileupload" class="upload" />
+                                    Upload Cover File
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Name" class="text-bold">Resume Text *:</label>
+                                <textarea class="form-control textarea"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="fileUpload btn btn-primary" id="pnlFileSelect">
+                                    <span><img src="~/Themes/acms2/images/UploadButton_white.png" alt="Upload File" width="35" height="35" /></span>
+                                    <input type="file" name="fileupload" id="fileupload" class="upload" />
+                                    Upload Resume File
+                                </div>
+                            </div>
+
+                        </fieldset>
+                                <div class="form-group">
+                                    <input type="submit" name="submit" value="APPLY FOR JOB" class="btn btn-primary" />
+                                </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+

@@ -1,0 +1,45 @@
+﻿@model AriesCMS.Helpers.SiteCoreHelper
+
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 toppadding">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            <h3 class="text-bold">OPEN POSITION</h3>
+        </div>
+        <div class="col-lg-10 col-md-10 offset-lg-1 offset-md-1 col-sm-12 col-xs-12">
+
+            @{
+
+                foreach (var objRec in Model.lstWebSiteJobs)
+                {
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 panle_rounded borderGroved_solid_1x">
+                            <h4 class="text-bold">@Html.DisplayFor(modelItem => objRec.sTitle)</h4>
+                            <p>
+                                Location: @Html.DisplayFor(modelItem => objRec.sJobLocation)
+                            </p>
+                            <p>
+                                @Html.DisplayFor(modelItem => objRec.sJobDescription)
+                            </p>
+                            <p>
+                                <strong>Dead line: </strong> @Html.DisplayFor(modelItem => objRec.sDeadLine) <br />
+                                <strong>Salary: </strong> @Html.DisplayFor(modelItem => objRec.sSalary) <br />
+                                <strong>Skills: </strong> @Html.DisplayFor(modelItem => objRec.sSkillsNeeded) <br />
+                            </p>
+                            <p class="text-lg-center text-md-center text-sm-center text-xs-center">
+                                <a href="~/lp/JobDetails?Id=@objRec.ID" class="btn btn-blue">DETAILS / APPLY</a>
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,264 @@
+@model ACEDataDefinition.DEF_CommunityPosts.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("CommunityPosts_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("CommunityPosts_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#CommunityPosts_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#CommunityPosts_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#CommunityPosts_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new CommunityPosts</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "CommunityPosts_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("CommunityPosts_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.sSync)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.sDescription)  
+                         @Html.HiddenFor(model => model.sVersion)  
+                         @Html.HiddenFor(model => model.iAnsweredByID)  
+                         @Html.HiddenFor(model => model.iAnsweredByResponseID)  
+                         @Html.HiddenFor(model => model.AnsweredByResponseAvitarURL)  
+                         @Html.HiddenFor(model => model.iResponseToID)  
+                         @Html.HiddenFor(model => model.sResponseToID)  
+                         @Html.HiddenFor(model => model.bIsSubPost)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+            
+                                            <div class="form-group">
+                                                   <label for="dtDateCreated">Date:</label>
+                                                    @Html.TextBoxFor(model => model.dtDateCreated, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.dtDateCreated, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="sName">Subject:</label>
+                                                    @Html.TextBoxFor(model => model.sName, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="sContent">Post:</label>
+                                                    @Html.TextBoxFor(model => model.sContent, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.sContent, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="bRemoved">Admin Removed:</label>
+                                                    @Html.TextBoxFor(model => model.bRemoved, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.bRemoved, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="bAnswered">Answered:</label>
+                                                    @Html.TextBoxFor(model => model.bAnswered, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.bAnswered, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="sAnsweredByID">Answered By:</label>
+                                                    @Html.TextBoxFor(model => model.sAnsweredByID, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.sAnsweredByID, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="sAnsweredByResponseID">Answer Title:</label>
+                                                    @Html.TextBoxFor(model => model.sAnsweredByResponseID, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.sAnsweredByResponseID, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="dPoints">Point Value:</label>
+                                                    @Html.TextBoxFor(model => model.dPoints, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.dPoints, "*Required!")
+                                                   }
+                                            </div>
+            
+                                            <div class="form-group">
+                                                   <label for="sAnsweredByAvitarURL">Answered By Avitar:</label>
+                                                    @Html.TextBoxFor(model => model.sAnsweredByAvitarURL, new { @Class="form-control" })
+                                                   @if(ViewBag.bError == true)
+                                                   {                
+                                                    @Html.ValidationMessageFor(model => model.sAnsweredByAvitarURL, "*Required!")
+                                                   }
+                                            </div>
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
