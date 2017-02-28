@@ -8257,1248 +8257,6 @@ GO
 
 
 
-
-
-
-
-
-
-
-
-/* Begin Seeding the DB with start data */
-Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '566feb09-39a1-43d4-b215-9525cbe5a572', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Admin', '', '5041b07e-5149-49da-8b04-55088c35f5ce', '-1.0000', 'False', 'EditFull');
-Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '6485766e-72b0-4fc6-b529-56b22f4c0883', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Author', '', '53076494-f564-490d-b940-3d883f8115a3', '-1.0000', 'False', 'EditFull');
-Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '493fb095-e21e-4783-898a-45edc8a0d2b7', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Contributor', '', '4d667507-7d36-4506-a0ce-4ac80645c15d', '-1.0000', 'True', 'EditAddNoDelete');
-Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '7ba9c420-48cc-48c6-b9a9-b018dbe050b7', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Editor', '', 'c7239048-b01a-44e8-b0ef-9fa401aab76f', '-1.0000', 'False', 'EditNoAddNoDelete');
-Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '0ee4d9fb-5925-4549-a933-bec396f36b14', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Subscriber', '', 'e5c538dd-e475-4e3a-8957-0ca232d32048', '-1.0000', 'False', 'EditAddNoDelete');
-
-Insert Into SystemMaster (sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sAccessKey, sLicKey) VALUES ('b1cfa29c-641c-45de-a6be-279b68bf1521', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Default', '7743972a-bbb0-441c-b996-0c0a8db4183e', '9eecf974-ee05-42c1-bb92-eb95e3d1f379');
-
-Insert Into SystemModules (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sAccessKey, dKey, sPathURL, sPathURI, sAuthKey, sLicKey, sUserName, sPassword) VALUES ('1', 'Default', 'fe1ec3ad-dfc9-488e-ac2f-3645b28efdbe', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Admin Module', 'Module to allow for the administration of the CMS System', 'd97b38d4-6ca7-4af5-bc6d-35ed7f8aca58', '-1.0000', '', '', '', '', '', '');
-Insert Into SystemModules (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sAccessKey, dKey, sPathURL, sPathURI, sAuthKey, sLicKey, sUserName, sPassword) VALUES ('1', 'Default', '3327301d-dc99-4970-87b4-15dfa35dfc4c', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'User Portal', 'Module to allow site users to maintain their profile and information', 'cadfca40-685a-4371-91a9-9a5693f6dec4', '1.0000', '', '', '', '', '', '');
-
-Insert Into Users (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sAccessKey, sUserName, sPassword, sPrefix, sFName, sMName, sLName, bAccLocked, iPrimaryRole, sPrimaryRole, sAvitarImgURL, bCurrentlyLoggedIn, iReputationLevel, sKeyWords, sScreenName, sProfileDiscription, iGenderTypeID, sGenderTypeID, bPrivateProfile, dtDateOfBirth, sActivationKey, dtLastLoggedIn, bAccountActivated, sAddress1, sAddress2, sAddress3, sCity, iStateID, sStateID, sPostalCode, iCountryID, sCountryID, sPrimaryEMail, sPrimaryPhone, bOptInMarketing, sBillAddress1, sBillAddress2, sBillAddress3, sBillCity, iBillStateID, sBillStateID, sBillPostalCode, iBillCountryID, sBillCountryID, IPAddressess) VALUES ('1', 'Default', 'd7f8078c-d026-44bd-a19d-c879c4770740', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'e770fbdf-e2d1-4374-a926-8b091e1d36d6', 'admin', '7B8VTsubZdshDa1sl/zaMg==', '', 'Ssytem', '', 'Admin', 'False', '1', 'Admin', '', 'False', '', '', 'Admin', '', '', '', 'True', '1/31/1901 12:00:00 AM', '23f63e78-9d8f-4306-a9a9-ef2580ca5380', '4/2/2014 12:00:00 AM', 'True', '', '', '', '', '', '', '', '', '', 'info@ariestco.com', 'info@ariestco.com', 'True', '', '', '', '', '', '', '', '', '', '');
-
-Insert Into UserRoles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iRoleID, sRoleID) VALUES ('1', 'Default', 'd27b83fc-bb16-4e24-9d67-93f392d36f51', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', '1', 'Admin');
-
-Insert Into WebSite (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sAccesskey, bSubScriptionBased, iRequiredRoleID, sRequiredRoleID, iDefaultTemplateID, sDefaultTemplateID, iDefaultBlogID, sDefaultBlogID, sDefaultMetaTags, sDefaultClassification, sDefaultDescription, sDefaultKeyWords, sSupportEmail, sWebMasterEmail, dUniqueVisitors, dVisits, dPageViews, bRestrictAccess) VALUES ('1', 'Default', '3327301d-dc99-4970-87b4-15dfa35dfc4c', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Default', '4de05bc2-9fd0-415d-93c5-1dae9a1f7300', 'False', '', '', '1', 'Default', '', '', '', '', '', '', 'info@ariestco.com', 'info@ariestco.com', '', '', '', '');
-
-
-
-Insert Into WebSitePageTemplates (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sThumbNailImageURL, sVersion, sLocationURL, sLocationURI, sTemplateBody, iLanguageID, sLanguageID) VALUES ('1', 'Default', '559ea5f2-588f-4c72-8674-5e6f4695e2c5', '4/2/2014 12:00:00 AM', '8/22/2015 10:54:28 AM', '1', 'Admin', '1', 'Admin', 'Default', '', '', '1.0', '~\Views\Shared\_Default.cshtml', '~/Views/Shared/_Default.cshtml', '', '0', '');
-Insert Into WebSitePageTemplatesPage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sThumbNailImageURL, sVersion, sTemplateBody, iLanguageID, sLanguageID) VALUES ('1', 'Default', 'ac25a255-9f51-40cc-b4ea-aa1f39797570', '1/25/2016 6:33:12 AM', '1/25/2016 6:33:12 AM', '0', '', '0', '', 'Index', '', '', '', '
-        	<acms><!--MAINHeader--></acms>
-
-
-
-        	<acms><!--MAINBODY--></acms>
-
-
-        	<acms><!--MAINFOOTER--></acms>
-
-', '205', 'US English');
-
-Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, iTypeID, sTypeID, sCodeName, sDefaultValue, iLanguageID, sLanguageID, bPrimaryContentArea) VALUES ('1', 'Default', '48e5558c-7ecb-4bb1-bdbc-11e3e1973f7b', '2/19/2015 7:19:43 PM', '6/8/2015 1:10:06 PM', '0', '', '1', 'Ssytem Admin', 'MAINHeader', '0', '', '<acms><!--MAINHeader--></acms>', '
-    <nav class="navbar navbar-fixed-top navbar-light navbar-background2">
-  <div class="container-fluid"> 
-    <div id="fullscreennav"> 
-    	<div class="col-xs-2 text-xs-left">
-        	<a href="~/"><img src="~/themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a>
-    	</div>
-    	<div class="col-xs-8 text-xs-center">
-    		<h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Progrmmes</h3> 
-            <ul class="list-inline">
-            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/">HOME</a></li>
-            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/admin">ADMIN PORTAL</a></li>
-            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/portal">USER PORTAL</a></li>
-            </ul>           
-    	</div>  
-    	<div class="col-xs-2 text-xs-right">
-    		<a href="tel:1-877-262-2830" class="text-bold">(877) 262-2830</a><br/>
-            <a href="~/portal" class="text-bold">SIGN IN</a>
-            <!--<br/>
-            <ul class="list-inline">
-            	<li class="list-inline-item"><a href=""><span class="fa fa-facebook">&nbsp;</span></a></li>
-            	<li class="list-inline-item"><a href=""><span class="fa fa-linkedin">&nbsp;</span></a></li>
-            	<li class="list-inline-item"><a href=""><span class="fa fa-twitter">&nbsp;</span></a></li>
-            </ul>-->
-    	</div>         
-    </div>
-    <div id="mobilenav">
-    	<div class="row">  
-            <div class="col-xs-12">
-                <center><a href="#home"><img src="~/themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a></center>
-            </div>
-        </div>
-    	<div class="row">
-        <div class="col-xs-12">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>    	
-            <div class="collapse navbar-collapse" id="defaultNavbar1">
-                <ul class="nav navbar-nav">
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/">HOME</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/howitworks">LEARN MORE</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/signup?id=3">SIGN UP</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/faq">FAQ</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/videos">VIDEOS</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/blog">BLOG</a></li>
-                  <li class="divider"></li>
-                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/contactus">CONTACT US</a></li>
-                </ul>
-            </div>
-        </div> 
-        </div>
-    </div>
-  </div>
-  <!-- /.container-fluid --> 
-</nav>', '205', 'US English', '');
-Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iContentZoneID, sContentZoneID, iLanguageID, sLanguageID) VALUES ('1', 'Index', '532fa03d-2c1e-4946-9f3f-846affc2d0af', '4/8/2015 6:23:43 PM', '4/8/2015 6:23:43 PM', '0', '', '0', '', '2', 'MAINBODY', '', '
-<div class="container-fluid">
-	<div class="row">
-    	<div class="col-lg-12 col-md-12 col-xs-12 toppadding">
-          <p>&nbsp;</p>
-        </div>
-    </div>
-      <div class="row rwHeight">         
-        <div class="col-lg-6 col-md-6 col-xs-12 offset-lg-3 offset-md-3">       
-          <center><h1>Welcome to the Aries CMS</h1></center>
-          <center><h4><a href="~/portal">Click here to enter your portal.</a></h4></center>
-        </div>        
-      </div>
-</div>', '', 'False', '0', '', '205', 'US English');
-Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, iTypeID, sTypeID, sCodeName, sDefaultValue, iLanguageID, sLanguageID, bPrimaryContentArea) VALUES ('1', 'Default', 'c8b49d39-efae-4102-a829-4543e3498870', '2/19/2015 7:20:57 PM', '6/8/2015 1:07:23 PM', '0', '', '1', 'Ssytem Admin', 'MAINFOOTER', '0', '', '<acms><!--MAINFOOTER--></acms>', '
-
-<footer class="footer">
-      <div class="row">    
-          <div class="col-lg-7 col-md-7 col-xs-7 offset-lg-1 offset-md-1 offset-xs-1">  
-            <span class=""> 
-                <a class="text-bold" href="~/">HOME</a> 
-                <a class="text-bold" href="~/admin">ADMIN PORTAL</a>
-                <a class="text-bold" href="~/portal">USER PORTAL</a>
-            </span> 
-          </div>       
-          <div class="col-lg-2 col-md-2 col-xs-2 offset-lg-2 offset-md-2 offset-xs-2 text-lg-center text-md-center text-xs-center">  
-            <span class=""> 
-                <a class="" href="~/portal">SIGN IN</a>
-            </span> 
-          </div>   
-      </div>   
-      <div class="row">    
-          <div class="col-lg-3 col-md-3 col-xs-3 offset-lg-1 offset-md-1 offset-xs-1">  
-            <span style="color:#9F9B9B; font-weight:bold; font-size:0.95em;">&copy; 2016-2017 Aries TCO, Inc.</span>
-          </div>       
-          <div class="col-lg-3 col-md-3 col-xs-3offset-lg-3 offset-md-3 offset-xs-3">  
-               
-          </div>   
-      </div>
-  <hr>
-</footer>
-
-', '205', 'US English', '');
-
-
-
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
-
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', 'dd127ab8-a658-40f5-acff-d82074cfae0c', '10/4/2014 11:12:25 PM', '2/23/2016 8:39:32 PM', '0', '', '0', '', 'Index', '', '', 'Aries CMS', '<meta name="ROBOTS" content="INDEX,FOLLOW" />
-     <meta name="audience" content="all" />
-     <meta name="author" content="www.ariestco.com" />
-     <meta name="publisher" content="www.ariestco.com" />
-     <meta name="revisit-after" content="7 days" />
-     <meta name="Content-Language" content="en" />
-     <meta name="distribution" content="global" />
-<meta name="keywords" content="Test, testing, and testing again" />
-
-', 'cms, content management', 'Aries CMS', 'Aries CMS', 'True', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', '', '', '', '', 'False', '0', '', 'False', '0', '', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '42d4ad8b-7615-4638-9b6e-8dd2d67dfad2', '6/29/2015 3:12:28 PM', '1/25/2016 8:59:33 AM', '0', '', '0', '', 'Contact Us', '', '', 'Contact Us', '', '', '', '', 'False', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', '', '', '', '', 'False', '0', '', 'False', '0', '', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '0d06c0a5-bd84-4546-930e-9ffead8200dc', '12/6/2015 11:19:32 AM', '2/23/2016 9:24:07 PM', '0', '', '0', '', 'Profile Recovery', '', '', 'Profile Recovery', '', '', '', '', 'True', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', '', '', '', '', 'False', '0', '', 'True', '0', '', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '09090489-1d7e-4805-aa4b-f41857303abb', '1/27/2016 2:34:21 PM', '1/27/2016 8:23:57 PM', '0', '', '0', '', 'Log In Dynamic', '', '', 'Log In', '', '', '', '', 'True', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', 'Default', '', '', '', 'False', '0', '', 'False', '0', '', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '97b31fc2-2573-4c98-bb17-f7f544ddc34b', '1/27/2016 4:40:47 PM', '1/27/2016 4:40:47 PM', '0', '', '0', '', 'Profile Recover Dynamic', '', '', '', '', '', '', '', 'False', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', 'Default', '', '', '', 'False', '0', '', 'False', '205', 'United States English', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '8381a1e5-4d6f-45fe-9f9c-b85cf4a472ca', '1/27/2016 5:51:26 PM', '2/23/2016 9:23:44 PM', '0', '', '0', '', 'Contact Us Dynamic', '', '', 'Dynamic Contact us Form', '', '', '', '', 'True', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', 'Default', '', '', '', 'False', '0', '', 'True', '205', 'United States English', '1', 'Index');
-Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '45b58bad-0ade-4bc9-8695-3688553f8f70', '1/27/2016 8:27:23 PM', '1/27/2016 8:27:23 PM', '0', '', '0', '', 'Register User Dynamic', '', '', 'Register User Dynamic', '', '', '', '', 'False', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', 'Default', '', '', '', 'False', '0', '', 'False', '205', 'United States English', '1', 'Index');
-
-
-
-
-
-
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
-
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('2', 'LeadGenForm', '8705dc45-18c7-4194-9c86-944b8ec18a39', '2/19/2015 7:36:45 PM', '2/19/2015 7:40:20 PM', '0', '', '0', '', '2', 'MAINBODY', '', '', '~/Views/SharedForms/LeadGenForm1.cshtml', 'True', '205', 'US English');
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('3', 'Testpage', 'de2c3bd0-24cd-49b6-97ef-dd4f98b21485', '6/29/2015 3:12:55 PM', '12/5/2015 2:54:12 PM', '0', '', '0', '', '2', 'MAINBODY', '', '', '~/Views/SharedForms/ContactUs.cshtml', 'True', '205', 'US English');
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('4', 'Profile Recovery', '6a735ed9-471c-46f5-8d0b-5fa9301724bc', '12/6/2015 11:21:10 AM', '2/23/2016 8:21:59 PM', '0', '', '0', '', '2', 'MAINBODY', '', '', '~\Views\SharedForms\JSProfileRecovery.cshtml', 'True', '205', 'US English');
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('4', 'Log In Normal', '098af521-1ec3-4216-93cc-7d2f3123d20d', '1/27/2016 2:34:50 PM', '1/27/2016 10:02:24 PM', '0', '', '0', '', '2', 'MAINBODY', '', '  <div class="container">
-                
-                <div id="secondary" class="widget-area left-sidebar">
-                    <h4 class="pull-top">Get in <strong>touch</strong></h4>
-                    <p>Contact us and let''s connect so that we can find the best path to move forward with your needs.</p>
-            
-                    <hr />
-            
-                    <h4>The <strong>Office</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
-                        <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
-                        <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
-                    </ul>
-            
-                    <hr />
-            
-                    <h4>Business <strong>Hours</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
-                        <li><i class="icon-time"></i> Saturday - Closed</li>
-                        <li><i class="icon-time"></i> Sunday - Closed</li>
-                    </ul>
-            
-                </div>
-                
-    			<div id="primary" class="site-content-left">
-                     <script type="text/javascript">
-					 
-					 var bLoggedIn = ''@bLoggedIn'';
-					 var bLoginError = ''@bLoginError'';
-					 var bLoggedIn = ''@bLoggedIn'';
-					 var sResponseMessage = ''@sResponseMessage'';
-					 var bLogInFormPostBack = ''@bLogInFormPostBack'';
-					 
-					 var client_LogInUrl = ''@client_LogInUrl'';
-					 
-					 var otxtUserName = ''@otxtUserName'';
-										 
-					 function Validate_LogInForm()
-					 {
-						 try
-						 {
-							 var bResponse = true;
-							 
-							 
-							var oUserName = document.getElementById(''UserName'');
-							var oPassword = document.getElementById(''Password'');
-							 
-							if (oUserName != null)
-							{
-								if ((!oUserName.value) || (!oUserName))
-								{
-									oUserName.style.backgroundColor = ''#FFCCCC'';
-									bResponse = false;
-								}
-								else if(oUserName.value == ''Phone Number'')
-								{
-									oUserName.style.backgroundColor = ''#FFCCCC'';
-									bResponse = false;
-								}
-							}
-										
-							if (oPassword != null)
-							{
-								if ((!oPassword.value) || (!oPassword))
-								{
-									 oPassword.style.backgroundColor = ''#FFCCCC'';
-									bResponse = false;
-								}
-								else if(oPassword.value == ''Phone Number'')
-								{
-								   oPassword.style.backgroundColor = ''#FFCCCC'';
-								   bResponse = false;
-								}
-							}
-										
-										
-							return bResponse;
-							 
-						 }
-						 catch(e)
-						 {
-							 return false;
-						 }
-					 }
-					 
-					 function SetValuesBackToForm()
-					 {
-						 try
-						 {
-							var oUserName = document.getElementById(''UserName'');
-							 oUserName.value = otxtUserName;
-						 }
-						 catch(e)
-						 {
-						 }
-					 }
-					 
-					 
-					 
-                     </script>
-
-                        <!-- entry-content Div Starts here -->
-                        <div class="entry-content" style="padding:5px 25px 25px 25px;">
-                            <h2 class="strip-title alignleft-text">
-                                 <span class="strip-inner">Sign Into Your Account (Log In)</span>
-                            </h2>
-                            <div id="ajax_message">                            		
-                             		<script type="text/javascript">
-										try
-										{
-											if(bLoginError == ''true'')
-											{
-												document.write("<span style=" + "\"" + "color:#F30;" + "\"" + ">");
-												document.write(sResponseMessage);
-												document.write("</span>");
-											}
-											else if (bLoggedIn == ''true'')
-											{              
-												document.write("<span style=" + "\"" + "font-size:1.4em" + "\"" + ">");
-												document.write("    Your have been successfully sing up! <a href=" + "\"" + client_LogInUrl + "\"" + ">Click here</a> to enter your portal.");
-												document.write("</span>");
-											}
-										}
-										catch(e)
-										{
-										}
-                                    </script>
-                            </div>
-                            
-                            
-                            <div id="oUserLoginForm">                            
-                                <div class="entry-content">                                
-                                   <div style="min-width:360px !important; float:left;">
-                                          <form name="frmLogIn" id="frmLogIn" action="~/Forms/UserLogIn"  onsubmit="return Validate_LogInForm();" method="post">
-                     
-                                            <fieldset>                                             
-                                                <input name="ErrorPageURL" id="ErrorPageURL" type="hidden" value="" />
-                                                <input name="SuccessPageURL" id="SuccessPageURL" type="hidden" value="" />
-                                                <input name="SourceForm" id="SourceForm" type="hidden" value="Log In" />
-                                                <legend></legend>
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                        User name :
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="User Name" name="UserName" id="UserName" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                        Password :
-                                                    </div>
-                                                    <div class="TextBoxDiv1">                                                   
-                                						<input type="password" class="TextBox2" placeholder="" name="Password" id="Password" />  
-                                                    </div>
-                                                    <div class="LabelDiv1Error">  
-                                                    </div>
-                                                </div>
-                                            </fieldset>
-                                           <div style="float:right; padding-top:12px;">
-                                             
-                                                   <input type="submit" name="submit" value="Log In" class="orange-btn button medium" />
-                                           </div>
-                                           <div style="float:left; padding-top:12px;">                                           
-                                                <span style="font-size:1.4em">
-                                                     Forgotten your credentials? <br /><a href="~/profilerecovery">Click here</a> to start a process to recover them.
-                                                </span>
-                                           </div>
-                                      </form>                                        
-                                   </div>
-                                </div>   
-                            </div>
-                        </div>                  
-                     
-                   
-                            <script type="text/javascript">
-								try
-								{
-									if(bLoggedIn != ''true'')
-                        			{
-										document.getElementById(''oUserLoginForm'').style.display = ''inline'';
-									}
-									else
-									{
-										document.getElementById(''oUserLoginForm'').style.display = ''none'';
-									}
-								}
-								catch(e)
-								{
-								}	
-								
-								try
-								{
-									if(bLogInFormPostBack == ''true'')
-									{
-										SetValuesBackToForm();
-									}
-								}
-								catch(e)
-								{
-								}
-							</script>
-                     
-    			</div>
-               
-            </div>
-          ', '', 'False', '205', 'United States English');
-
-
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('5', 'Profile Recover Dynamic', 'b49cd1b2-9b8b-44bb-96e1-97a08295e2e5', '1/27/2016 4:41:15 PM', '1/27/2016 9:52:00 PM', '0', '', '0', '', '2', 'MAINBODY', '', '<div class="container">
-                
-                <div id="secondary" class="widget-area left-sidebar">
-                    <h4 class="pull-top">Get in <strong>touch</strong></h4>
-                    <p>Contact us and let''s connect so that we can find the best path to move forward with your needs.</p>
-            
-                    <hr />
-            
-                    <h4>The <strong>Office</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
-                        <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
-                        <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
-                    </ul>
-            
-                    <hr />
-            
-                    <h4>Business <strong>Hours</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
-                        <li><i class="icon-time"></i> Saturday - Closed</li>
-                        <li><i class="icon-time"></i> Sunday - Closed</li>
-                    </ul>
-            
-                </div>
-                 <script type="text/javascript">
-					 
-					 var bFromError = ''@bFromError'';
-					 var bFromMessageSent = ''@bFromMessageSent'';
-					 var bProfileRecoveryFormPostBack = ''@bProfileRecoveryFormPostBack''
-					 
-					 
-					 var otxtEmail = ''@otxtEmail'';
-					 
-					 
-					 function Validate_ProfileRecoverForm()
-					 {
-						 try
-						 {
-							 var bResponse = true;
-							 
-							 var txtEmail = document.getElementById(''Email'');
-							 
-							if (txtEmail != null)
-							{
-							   if ((!txtEmail.value) || (!txtEmail))
-							   {
-								  txtEmail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtEmail.value == '''')
-							   {
-								  txtEmail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-										
-							return bResponse;
-							 
-						 }
-						 catch(e)
-						 {
-							 return false;
-						 }
-					 }
-					 
-					 function SetValuesBackToForm()
-					 {
-						 try
-						 {
-							 var txtEmail = document.getElementById(''Email'');
-							 							 
-							 txtEmail.value = otxtEmail;
-						 }
-						 catch(e)
-						 {
-						 }
-					 }
-                     </script>
-
-    			 <div id="primary" class="site-content-left">
-                        <!-- entry-content Div Starts here -->
-                        <div class="entry-content" style="padding:5px 25px 25px 25px;">
-                            <h2 class="strip-title alignleft-text">
-                                 <span class="strip-inner">Enter Info To Get Your Log In Info</span>
-                            </h2>
-                            <div id="ajax_message">
-                            		
-                             		<script type="text/javascript">
-										try
-										{
-											if(bFromError == ''true'')
-											{
-												document.write("<span style=" + "\"" + "color:#F30;" + "\"" + ">");
-												document.write("Sorry an error occured in finding your information!");
-												document.write("</span>");
-											}
-											else if (bFromMessageSent == ''true'')
-											{              
-												document.write("<span style=" + "\"" + "font-size:1.4em" + "\"" + ">");
-												document.write("    Your info was found and sent to the email on file.");
-												document.write("</span>");
-											}
-										}
-										catch(e)
-										{
-										}
-                                    </script>
-                                    
-                            
-                            </div>
-                            
-                            
-                            <div id="oUserInfoForm">                            
-                                <div class="entry-content">                                
-                                   <div style="min-width:360px !important; float:left;">
-                                          <form name="frmUserInfoFound" id="frmUserInfoFound" action="~/Forms/RecoverProfile"  onsubmit="return Validate_ProfileRecoverForm();" method="post">
-                     
-                                            <fieldset>                                             
-                                                <input name="ErrorPageURL" id="ErrorPageURL" type="hidden" value="" />
-                                                <input name="SuccessPageURL" id="SuccessPageURL" type="hidden" value="" />
-                                                <input name="SourceForm" id="SourceForm" type="hidden" value="Log In" />
-                                                <legend></legend>
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                        User name :
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="User Name" name="Email" id="Email" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                            </fieldset>
-                                           <div style="float:right; padding-top:12px;">                                             
-                                                   <input type="submit" name="submit" value="Recover My Profile" class="orange-btn button medium" />
-                                           </div>
-                                      </form>                                        
-                                   </div>
-                                </div>   
-                            </div>
-                        </div>                  
-                     
-                   
-                            <script type="text/javascript">
-								try
-								{
-									if(bFromMessageSent == ''true'')
-                        			{
-										document.getElementById(''oUserInfoForm'').style.display = ''none'';
-									}
-									else
-									{
-										document.getElementById(''oUserInfoForm'').style.display = ''inline'';
-									}
-								}
-								catch(e)
-								{
-								}	
-									
-								
-								try
-								{
-									if(bProfileRecoveryFormPostBack == ''true'')
-									{
-										SetValuesBackToForm();
-									}
-								}
-								catch(e)
-								{
-								}								
-							</script>
-    			</div>
-            </div>', '', 'False', '205', 'United States English');
-
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('6', 'Contact Us Dynamic', '99ed46b0-c0b9-4ee0-b330-058dc27085bf', '1/27/2016 5:51:51 PM', '1/27/2016 9:24:41 PM', '0', '', '0', '', '2', 'MAINBODY', '', ' <div class="container">
-                <div id="secondary" class="widget-area left-sidebar">
-                    <h4 class="pull-top">Get in <strong>touch</strong></h4>
-                    <p>Contact us and let''s connect so that we can find the best path to move forward with your needs.</p>
-            
-                    <hr />
-            
-                    <h4>The <strong>Office</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
-                        <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
-                        <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
-                    </ul>
-            
-                    <hr />
-            
-                    <h4>Business <strong>Hours</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
-                        <li><i class="icon-time"></i> Saturday - Closed</li>
-                        <li><i class="icon-time"></i> Sunday - Closed</li>
-                    </ul>
-            
-                </div>
-                
-    			<div id="primary" class="site-content-left">
-                
-                     <script type="text/javascript">
-					 
-					 var bFromMessageSent = ''@bFromMessageSent'';
-					 var bFromError = ''@bFromError'';
-					 var bFromMessageSent = ''@bFromMessageSent'';
-					 var bContactUsFormPostBack = ''@bContactUsFormPostBack'';
-					 				 
-					 
-					 var otxtName = ''@otxtName'';
-					 var otxtEmail = ''@otxtEmail'';
-					 var otxtSubject = ''@otxtSubject'';
-					 var otxtMessage = ''@otxtMessage'';
-					 					 
-					 function Validate_ContactUsFrom()
-					 {
-						 try
-						 {
-							 var bResponse = true;
-							 
-							 
-							 var txtName = document.getElementById(''Name'');
-							 var txtEmail = document.getElementById(''Email'');
-							 var txtSubject = document.getElementById(''Subject'');
-							 var txtMessage = document.getElementById(''Message'');
-							 
-							 
-							if (txtName != null)
-							{
-							   if ((!txtName.value) || (!txtName))
-							   {
-								  txtName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtName.value == '''')
-							   {
-								  txtName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtEmail != null)
-							{
-							   if ((!txtEmail.value) || (!txtEmail))
-							   {
-								  txtEmail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtEmail.value == '''')
-							   {
-								  txtEmail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtSubject != null)
-							{
-							   if ((!txtSubject.value) || (!txtSubject))
-							   {
-								  txtSubject.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtSubject.value == '''')
-							   {
-								  txtSubject.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtMessage != null)
-							{
-							   if ((!txtMessage.value) || (!txtMessage))
-							   {
-								  txtMessage.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtMessage.value == '''')
-							   {
-								  txtMessage.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 		
-										
-							return bResponse;
-							 
-						 }
-						 catch(e)
-						 {
-							 return false;
-						 }
-					 }
-					 
-					 
-					 function SetValuesBackToForm()
-					 {
-						 try
-						 {
-							 
-							 var txtName = document.getElementById(''Name'');
-							 var txtEmail = document.getElementById(''Email'');
-							 var txtSubject = document.getElementById(''Subject'');
-							 var txtMessage = document.getElementById(''Message'');
-							 
-							 
-							 txtName.value = otxtName;
-							 txtEmail.value = otxtEmail;
-							 txtSubject.value = otxtSubject;
-							 txtMessage.value = otxtMessage;
-						 }
-						 catch(e)
-						 {
-						 }
-					 }
-                     </script>
-
-                        <!-- entry-content Div Starts here -->
-                        <div class="entry-content" style="padding:5px 25px 25px 25px;">
-                            <h2 class="strip-title alignleft-text">
-                                 <span class="strip-inner">Sign Into Your Account (Log In)</span>
-                            </h2>
-                            <div id="ajax_message">                            		
-                             		<script type="text/javascript">
-										try
-										{
-											if(bFromError == ''true'')
-											{
-												document.write("<h2 class=" + "\"" + "strip-title alignleft-text" + "\"" + "><strong>Error!</strong> Could Not Send Message!</h2><br />");
-											}
-											else if(bFromMessageSent == ''true'')
-											{
-												document.write("<h2 class=" + "\"" + "strip-title alignleft-text" + "\"" + "><strong>Success!</strong> Your message has been sent!</h2><br />");
-											}
-										}
-										catch(e)
-										{
-										}
-                                    </script>
-                            </div>
-                            
-                            
-                            <div id="oContactUsForm">                            
-                                <div class="entry-content">                                
-                                   <div style="min-width:360px !important; float:left;">
-                                          <form name="frmContactUs" id="frmContactUs" action="~/Forms/SendContactUs"  onsubmit="return Validate_ContactUsFrom();" method="post">
-                     
-                                            <fieldset>                                             
-                                                <input name="ErrorPageURL" id="ErrorPageURL" type="hidden" value="" />
-                                                <input name="SuccessPageURL" id="SuccessPageURL" type="hidden" value="" />
-                                                <input name="SourceForm" id="SourceForm" type="hidden" value="Log In" />
-                                                <legend></legend>
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         Your name *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="Full Name" name="Name" id="Name" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                       Your email address *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="EMail" name="Email" id="Email" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                       Subject
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="Subject" name="Subject" id="Subject" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         Message *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                                    <textarea class="TextAreaBox2" name="Message" id="Message" style = "width:650px !important; height:400px !important;">
-                                                    </textarea>
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                            </fieldset>
-                                           <div style="float:right; padding-top:12px;">                                             
-                                                   <input type="submit" name="submit" value="Send Request" class="orange-btn button medium" />
-                                           </div>
-                                      </form>                                        
-                                   </div>
-                                </div>   
-                            </div>
-                        </div>                  
-                     
-                   
-                            <script type="text/javascript">
-								try
-								{
-									if(bFromMessageSent == ''true'')
-                        			{
-										document.getElementById(''oContactUsForm'').style.display = ''none'';
-									}
-									else
-									{
-										document.getElementById(''oContactUsForm'').style.display = ''inline'';
-									}
-								}
-								catch(e)
-								{
-								}	
-								
-								try
-								{
-									if(bContactUsFormPostBack == ''true'')
-									{
-										SetValuesBackToForm();
-									}
-								}
-								catch(e)
-								{
-								}						
-							</script>
-                     
-    			</div>
-            </div>
-            ', '', 'False', '205', 'United States English');
-
-Insert Into WebSitePageZone (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iZoneID, sZoneID, sName, sContent, sLoadIncludeURI, bLoadPartialPage, iLanguageID, sLanguageID) VALUES ('7', 'Register User Dynamic', 'd3fa3f4b-ce40-449c-a2c1-0f95bce7ec47', '1/27/2016 8:27:42 PM', '1/27/2016 10:13:07 PM', '0', '', '0', '', '2', 'MAINBODY', '', ' <div class="container">
-                  <div id="secondary" class="widget-area left-sidebar">
-                    <h4 class="pull-top">Get in <strong>touch</strong></h4>
-                    <p>Contact us and let''s connect so that we can find the best path to move forward with your needs.</p>
-            
-                    <hr />
-            
-                    <h4>The <strong>Office</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-map-marker"></i> <strong>Address:</strong> 4521 PGA Blvd. #137, Palm Beach Gardens, FL 33418, United States</li>
-                        <li><i class="icon-phone"></i> <strong>Phone:</strong> (877) 262-2830</li>
-                        <li><i class="icon-envelope"></i> <strong>Email:</strong> <a href="mailto:info@ariestco.com">info@ariestco.com</a></li>
-                    </ul>
-            
-                    <hr />
-            
-                    <h4>Business <strong>Hours</strong></h4>
-                    <ul class="unstyled">
-                        <li><i class="icon-time"></i> Monday - Friday 8am to 7pm</li>
-                        <li><i class="icon-time"></i> Saturday - Closed</li>
-                        <li><i class="icon-time"></i> Sunday - Closed</li>
-                    </ul>
-            
-                </div>                
-                
-    			<div id="primary" class="site-content-left">
-                     <script type="text/javascript">
-					 
-					 var sErrorMessage = ''@sErrorMessage'';
-					 var bRegistrationCompleted = ''@bRegistrationCompleted'';
-					 var bFromError = ''@bFromError'';
-					 var client_oVisualState = ''@client_oVisualState'';
-					 var client_oPageReload = ''@client_oPageReload'';
-					 var bRegistrationFormPostBack = ''@bRegistrationFormPostBack'';
-					 
-					 
-					 
-					 var client_UserName = ''@client_UserName'';
-					 var client_FirstName = ''@client_FirstName'';
-					 var client_LastName = ''@client_LastName'';
-					 var client_EMail = ''@client_EMail'';
-					 var client_Phone = ''@client_Phone'';					 
-					 
-					 
-					 function Validate_RegistrationFrom()
-					 {
-						 try
-						 {
-							 var bResponse = true;
-							 
-							 
-							 var txtFirstName = document.getElementById(''FirstName'');
-							 var txtLastName = document.getElementById(''LastName'');
-							 var txtUserName = document.getElementById(''UserName'');
-							 var txtEMail = document.getElementById(''EMail'');
-							 var txtPhone = document.getElementById(''Phone'');
-							 
-							 var txtPassword = document.getElementById(''Password'');
-							 var txtPasswordConfirm = document.getElementById(''PasswordConfirm'');
-							 
-							if (txtFirstName != null)
-							{
-							   if ((!txtFirstName.value) || (!txtFirstName))
-							   {
-								  txtFirstName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtFirstName.value == '''')
-							   {
-								  txtFirstName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtLastName != null)
-							{
-							   if ((!txtLastName.value) || (!txtLastName))
-							   {
-								  txtLastName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtLastName.value == '''')
-							   {
-								  txtLastName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtUserName != null)
-							{
-							   if ((!txtUserName.value) || (!txtUserName))
-							   {
-								  txtUserName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtUserName.value == '''')
-							   {
-								  txtUserName.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtEMail != null)
-							{
-							   if ((!txtEMail.value) || (!txtEMail))
-							   {
-								  txtEMail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtEMail.value == '''')
-							   {
-								  txtEMail.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtPhone != null)
-							{
-							   if ((!txtPhone.value) || (!txtPhone))
-							   {
-								  txtPhone.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtPhone.value == '''')
-							   {
-								  txtPhone.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtPassword != null)
-							{
-							   if ((!txtPassword.value) || (!txtPassword))
-							   {
-								  txtPassword.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtPassword.value == '''')
-							   {
-								  txtPassword.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtPasswordConfirm != null)
-							{
-							   if ((!txtPasswordConfirm.value) || (!txtPasswordConfirm))
-							   {
-								  txtPasswordConfirm.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							   else if(txtPasswordConfirm.value == '''')
-							   {
-								  txtPasswordConfirm.style.backgroundColor = ''#FFCCCC'';
-								  bResponse = false;
-							   }
-							}
-							
-							
-							 
-							if (txtPassword != null)
-							{
-								if (txtPasswordConfirm != null)
-								{
-								   if (txtPassword.value != txtPasswordConfirm.value)
-								   {
-								  	  txtPassword.style.backgroundColor = ''#FFCCCC'';
-									  txtPasswordConfirm.style.backgroundColor = ''#FFCCCC'';
-									  bResponse = false;
-								   }
-								}
-							}
-										
-										
-							return bResponse;
-							 
-						 }
-						 catch(e)
-						 {
-alert(e);
-							 return false;
-						 }
-					 }
-					 
-					 
-					 function SetValuesBackToForm()
-					 {
-						 try
-						 {
-							var txtFirstName = document.getElementById(''FirstName'');
-							var txtLastName = document.getElementById(''LastName'');
-							var txtUserName = document.getElementById(''UserName'');
-							var txtEMail = document.getElementById(''EMail'');
-							var txtPhone = document.getElementById(''Phone'');
-							 
-							 txtFirstName.value = client_FirstName;
-							 txtLastName.value = client_LastName;
-							 txtUserName.value = client_UserName;
-							 txtEMail.value = client_EMail;
-							 txtPhone.value = client_Phone;
-						 }
-						 catch(e)
-						 {
-						 }
-					 }
-                     </script>
-
-                        <!-- entry-content Div Starts here -->
-                        <div class="entry-content" style="padding:5px 25px 25px 25px;">
-                            <h2 class="strip-title alignleft-text">
-                                 <span class="strip-inner">Sign Into Your Account (Log In)</span>
-                            </h2>
-                            <div id="ajax_message">                            		
-                             		<script type="text/javascript">
-										try
-										{
-											if(bFromError == ''true'')
-											{
-												document.write("<h2 class=" + "\"" + "strip-title alignleft-text" + "\"" + "><strong>Error!</strong> Registration Faild!</h2><br />");
-											}
-											else if(bRegistrationCompleted == ''true'')
-											{
-												document.write("<h2 class=" + "\"" + "strip-title alignleft-text" + "\"" + "><strong>Welcome!</strong> You are now a registered User!</h2><br />");
-											}
-										}
-										catch(e)
-										{
-										}
-                                    </script>
-                            </div>
-                            
-                            
-                            <div id="oRegistrationForm">                            
-                                <div class="entry-content">                                
-                                   <div style="min-width:360px !important; float:left;">
-                                          <form name="frmRegistration" id="frmRegistration" action="~/Forms/RegisterNewUser"  onsubmit="return Validate_RegistrationFrom();" method="post">
-                     
-                                            <fieldset>                                             
-                                                <input name="ErrorPageURL" id="ErrorPageURL" type="hidden" value="" />
-                                                <input name="SuccessPageURL" id="SuccessPageURL" type="hidden" value="" />
-                                                <input name="SourceForm" id="SourceForm" type="hidden" value="Log In" />
-                                                <legend></legend>
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         First name *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="First Name" name="FirstName" id="FirstName" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                       Last name *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="Last Name" name="LastName" id="LastName" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                       User name *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="User Name" name="UserName" id="UserName" />    
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         Password *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="password" class="TextBox2" placeholder="" name="Password" id="Password" /> 
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         Confirm Password *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="password" class="TextBox2" placeholder="" name="PasswordConfirm" id="PasswordConfirm" /> 
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         EMail *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="Email" name="EMail" id="EMail" /> 
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                                <div style="width:100%;float:left;">
-                                                    <div class="LabelDiv1Required">
-                                                         Phone *
-                                                    </div>
-                                                    <div class="TextBoxDiv1"> 
-                                						<input type="text" class="TextBox2" placeholder="Phone" name="Phone" id="Phone" /> 
-                                                    </div>
-                                                    <div class="LabelDiv1Error"> 
-                                                    </div>
-                                                </div>
-                                                
-                                            </fieldset>
-                                           <div style="float:right; padding-top:12px;">
-                                             
-                                                   <input type="submit" name="submit" value="Register" class="orange-btn button medium" />
-                                           </div>
-                                      </form>                                        
-                                   </div>
-                                </div>   
-                            </div>
-                        </div>                  
-                     
-                   
-                            <script type="text/javascript">
-								try
-								{
-									if(bRegistrationCompleted == ''true'')
-                        			{
-										document.getElementById(''oRegistrationForm'').style.display = ''none'';
-									}
-									else
-									{
-										document.getElementById(''oRegistrationForm'').style.display = ''inline'';
-									}
-								}
-								catch(e)
-								{
-								}	
-								
-								try
-								{
-									if(bRegistrationFormPostBack == ''true'')
-									{
-										SetValuesBackToForm();
-									}
-								}
-								catch(e)
-								{
-								}						
-							</script>
-                     
-
-    			</div>
-            </div>
-            ', '', 'False', '205', 'United States English');
-
-
-
-
-
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
-
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '701e2eef-feb6-4bda-952f-69f3ca68274e', '10/4/2014 11:17:05 PM', '10/4/2014 11:17:05 PM', '0', '', '0', '', 'Index', '1', 'Index', '/', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '8d4075a1-5e35-4d95-bc60-521a63dc24ef', '10/4/2014 11:17:18 PM', '10/4/2014 11:17:18 PM', '0', '', '0', '', 'Index', '1', 'Index', 'index', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '2b5053b3-1c36-4e2a-b81d-2a824c650723', '2/19/2015 7:41:00 PM', '12/5/2015 2:54:44 PM', '0', '', '0', '', 'Contact Us', '2', 'Contact Us', 'Contactus', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '82a1b5ea-1a16-4259-b070-37f52e630915', '12/6/2015 11:21:43 AM', '2/22/2016 9:52:00 PM', '0', '', '0', '', 'Lost Password', '3', 'Profile Recovery', 'lostpassword', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', 'd304134a-28ee-453a-a5b7-77f4993151c8', '12/6/2015 11:22:02 AM', '12/6/2015 11:22:02 AM', '0', '', '0', '', 'Recover Profile', '3', 'Profile Recovery', 'profilerecovery', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', 'Default', '9c7a18dc-5fc3-4419-9068-0ad65b350c77', '1/27/2016 2:56:01 PM', '1/27/2016 8:24:47 PM', '0', '', '0', '', 'Virtual Log In', '4', 'Log In Dynamic', 'Login1', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '77e321ca-72f1-4336-a80b-0d6c8afb61a4', '1/27/2016 4:43:21 PM', '1/27/2016 4:43:21 PM', '0', '', '0', '', 'Virtual Profile Recovery', '5', 'Profile Recover Dynamic', 'profilerecovery1', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '730a0bed-7690-4ae3-ac69-0090c533d70f', '1/27/2016 5:52:18 PM', '1/27/2016 5:52:18 PM', '0', '', '0', '', 'Contact Us Dynamic', '6', 'Contact Us Dynamic', 'ContactUs2', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', 'f355c559-06c3-4f6c-a32b-1ded6ec8833e', '1/27/2016 8:28:36 PM', '1/27/2016 8:28:36 PM', '0', '', '0', '', 'Register Dynamic', '7', 'Register User Dynamic', 'register2', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
-
-
-
-
-
-
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
-Insert Into WebSiteBlog (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sTitle, sSubject, sDescription, iPrimaryContributorID, sPrimaryContributorID, sKeyWords, iAltContributorID, sAltContributorID, bRestrictAccess, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '02becd50-9ae9-42cb-999f-5b547849ed69', '1/18/2016 8:43:40 PM', '1/26/2016 4:57:31 PM', '0', '', '0', '', 'Default', 'Default Blode', '', '1', 'Ssytem Admin', '', '1', 'Ssytem Admin', 'False', '1', 'Default', '', '', '', 'False', '2', 'MAINBODY', '1', 'Index');
-
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
 Insert Into Countries (dtDateCreated, dtDateUpdated, sControl, sSyncControl, sName, sAbbreviation, dTimeZoneOffSet, sTimeZoneName, iLanguageID, sLanguageID, sTaxRate, dTaxRate, bytTaxTable, sCurrencyName, sCurrentcySymbol, dExchangeRateFromDollar, sThreeAbbreviation) VALUES ('8/1/2007 12:00:00 AM', '8/1/2007 12:00:00 AM', 'a76135fe-9245-4d32-a50b-180234148de6', '', 'Afghanistan', 'AF', '0.0000', '', '', '', '', '', '', '', '', '', '');
 Insert Into Countries (dtDateCreated, dtDateUpdated, sControl, sSyncControl, sName, sAbbreviation, dTimeZoneOffSet, sTimeZoneName, iLanguageID, sLanguageID, sTaxRate, dTaxRate, bytTaxTable, sCurrencyName, sCurrentcySymbol, dExchangeRateFromDollar, sThreeAbbreviation) VALUES ('8/1/2007 12:00:00 AM', '8/1/2007 12:00:00 AM', 'af399f5f-d9f3-46b4-90e5-9e00b0234e4f', '', 'Albania', 'AL', '0.0000', '', '', '', '', '', '', '', '', '', '');
@@ -10021,4 +8779,178 @@ Insert Into CountryLanguages ( sControl, dtDateCreated, dtDateUpdated, sName, sA
 Insert Into CountryLanguages ( sControl, dtDateCreated, dtDateUpdated, sName, sAbbreviation, iCountryID, sCountryID, sThreeAbbreviation, sCultorInfoCode) VALUES ('0c567643-8bfc-4393-b6d7-b1097bd36467', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', 'Vietnamese', 'vi', '219', 'Vietnam', 'vie', 'vi-VN');
 Insert Into CountryLanguages ( sControl, dtDateCreated, dtDateUpdated, sName, sAbbreviation, iCountryID, sCountryID, sThreeAbbreviation, sCultorInfoCode) VALUES ('e37c31d4-a77f-4af0-80dc-0969a1b31a89', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', 'Arabic', 'ar', '222', 'Yemen', 'ara', 'ar-YE');
 Insert Into CountryLanguages ( sControl, dtDateCreated, dtDateUpdated, sName, sAbbreviation, iCountryID, sCountryID, sThreeAbbreviation, sCultorInfoCode) VALUES ('a0e95db4-1aff-43dd-b00a-6e172efb4516', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', 'English', 'en', '226', 'Zimbabwe', 'eng', 'en-ZW');
+
+
+
+/* Begin Seeding the DB with start data */
+Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '566feb09-39a1-43d4-b215-9525cbe5a572', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Admin', '', '5041b07e-5149-49da-8b04-55088c35f5ce', '-1.0000', 'False', 'EditFull');
+Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '6485766e-72b0-4fc6-b529-56b22f4c0883', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Author', '', '53076494-f564-490d-b940-3d883f8115a3', '-1.0000', 'False', 'EditFull');
+Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '493fb095-e21e-4783-898a-45edc8a0d2b7', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Contributor', '', '4d667507-7d36-4506-a0ce-4ac80645c15d', '-1.0000', 'True', 'EditAddNoDelete');
+Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '7ba9c420-48cc-48c6-b9a9-b018dbe050b7', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Editor', '', 'c7239048-b01a-44e8-b0ef-9fa401aab76f', '-1.0000', 'False', 'EditNoAddNoDelete');
+Insert Into Roles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDiscription, sAccessKey, dKey, bIsDefaultForNewRegistration, sDefaultAccessLevel) VALUES ('1', 'Default', '0ee4d9fb-5925-4549-a933-bec396f36b14', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Subscriber', '', 'e5c538dd-e475-4e3a-8957-0ca232d32048', '-1.0000', 'False', 'EditAddNoDelete');
+
+Insert Into SystemMaster (sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sAccessKey, sLicKey) VALUES ('b1cfa29c-641c-45de-a6be-279b68bf1521', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Default', '7743972a-bbb0-441c-b996-0c0a8db4183e', '9eecf974-ee05-42c1-bb92-eb95e3d1f379');
+
+Insert Into SystemModules (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sAccessKey, dKey, sPathURL, sPathURI, sAuthKey, sLicKey, sUserName, sPassword) VALUES ('1', 'Default', 'fe1ec3ad-dfc9-488e-ac2f-3645b28efdbe', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Admin Module', 'Module to allow for the administration of the CMS System', 'd97b38d4-6ca7-4af5-bc6d-35ed7f8aca58', '-1.0000', '', '', '', '', '', '');
+Insert Into SystemModules (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sAccessKey, dKey, sPathURL, sPathURI, sAuthKey, sLicKey, sUserName, sPassword) VALUES ('1', 'Default', '3327301d-dc99-4970-87b4-15dfa35dfc4c', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'User Portal', 'Module to allow site users to maintain their profile and information', 'cadfca40-685a-4371-91a9-9a5693f6dec4', '1.0000', '', '', '', '', '', '');
+
+Insert Into Users (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sAccessKey, sUserName, sPassword, sPrefix, sFName, sMName, sLName, bAccLocked, iPrimaryRole, sPrimaryRole, sAvitarImgURL, bCurrentlyLoggedIn, iReputationLevel, sKeyWords, sScreenName, sProfileDiscription, iGenderTypeID, sGenderTypeID, bPrivateProfile, dtDateOfBirth, sActivationKey, dtLastLoggedIn, bAccountActivated, sAddress1, sAddress2, sAddress3, sCity, iStateID, sStateID, sPostalCode, iCountryID, sCountryID, sPrimaryEMail, sPrimaryPhone, bOptInMarketing, sBillAddress1, sBillAddress2, sBillAddress3, sBillCity, iBillStateID, sBillStateID, sBillPostalCode, iBillCountryID, sBillCountryID, IPAddressess) VALUES ('1', 'Default', 'd7f8078c-d026-44bd-a19d-c879c4770740', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'e770fbdf-e2d1-4374-a926-8b091e1d36d6', 'admin', '7B8VTsubZdshDa1sl/zaMg==', '', 'Ssytem', '', 'Admin', 'False', '1', 'Admin', '', 'False', '', '', 'Admin', '', '', '', 'True', '1/31/1901 12:00:00 AM', '23f63e78-9d8f-4306-a9a9-ef2580ca5380', '4/2/2014 12:00:00 AM', 'True', '', '', '', '', '', '', '', '', '', 'info@ariestco.com', 'info@ariestco.com', 'True', '', '', '', '', '', '', '', '', '', '');
+
+Insert Into UserRoles (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, iRoleID, sRoleID) VALUES ('1', 'Default', 'd27b83fc-bb16-4e24-9d67-93f392d36f51', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', '1', 'Admin');
+
+Insert Into WebSite (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sAccesskey, bSubScriptionBased, iRequiredRoleID, sRequiredRoleID, iDefaultTemplateID, sDefaultTemplateID, iDefaultBlogID, sDefaultBlogID, sDefaultMetaTags, sDefaultClassification, sDefaultDescription, sDefaultKeyWords, sSupportEmail, sWebMasterEmail, dUniqueVisitors, dVisits, dPageViews, bRestrictAccess) VALUES ('1', 'Default', '3327301d-dc99-4970-87b4-15dfa35dfc4c', '4/2/2014 12:00:00 AM', '4/2/2014 12:00:00 AM', '1', 'Admin', '1', 'Admin', 'Default', '4de05bc2-9fd0-415d-93c5-1dae9a1f7300', 'False', '', '', '1', 'Default', '', '', '', '', '', '', 'info@ariestco.com', 'info@ariestco.com', '', '', '', '');
+
+
+Insert Into WebSitePageTemplates (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sThumbNailImageURL, sVersion, sLocationURL, sLocationURI, sTemplateBody, iLanguageID, sLanguageID) VALUES ('1', 'Default', '559ea5f2-588f-4c72-8674-5e6f4695e2c5', '4/2/2014 12:00:00 AM', '8/22/2015 10:54:28 AM', '1', 'Admin', '1', 'Admin', 'Default', '', '', '1.0', '~\Views\Shared\_Default.cshtml', '~/Views/Shared/_Default.cshtml', '', '0', '');
+
+
+Insert Into WebSitePageTemplatesPage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, sDescription, sThumbNailImageURL, sVersion, sTemplateBody, iLanguageID, sLanguageID) VALUES ('1', 'Default', 'ac25a255-9f51-40cc-b4ea-aa1f39797570', '1/25/2016 6:33:12 AM', '1/25/2016 6:33:12 AM', '0', '', '0', '', 'Index', '', '', '', '
+        	<acms><!--MAINHeader--></acms>
+
+
+
+        	<acms><!--MAINBODY--></acms>
+
+
+        	<acms><!--MAINFOOTER--></acms>
+
+', '205', 'US English');
+
+
+
+Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, iTypeID, sTypeID, sCodeName, sDefaultValue, iLanguageID, sLanguageID, bPrimaryContentArea) VALUES ('1', 'Default', '48e5558c-7ecb-4bb1-bdbc-11e3e1973f7b', '2/19/2015 7:19:43 PM', '6/8/2015 1:10:06 PM', '0', '', '1', 'Ssytem Admin', 'MAINHeader', '0', '', '<acms><!--MAINHeader--></acms>', '
+    <nav class="navbar navbar-fixed-top navbar-light navbar-background2">
+  <div class="container-fluid"> 
+    <div id="fullscreennav"> 
+    	<div class="col-xs-2 text-xs-left">
+        	<a href="~/"><img src="~/themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a>
+    	</div>
+    	<div class="col-xs-8 text-xs-center">
+    		<h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Progrmmes</h3> 
+            <ul class="list-inline">
+            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/">HOME</a></li>
+            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/admin">ADMIN PORTAL</a></li>
+            	<li class="list-inline-item text-xs-center"><a class="text-bold" href="~/portal">USER PORTAL</a></li>
+            </ul>           
+    	</div>  
+    	<div class="col-xs-2 text-xs-right">
+    		<a href="tel:1-877-262-2830" class="text-bold">(877) 262-2830</a><br/>
+            <a href="~/portal" class="text-bold">SIGN IN</a>
+            <!--<br/>
+            <ul class="list-inline">
+            	<li class="list-inline-item"><a href=""><span class="fa fa-facebook">&nbsp;</span></a></li>
+            	<li class="list-inline-item"><a href=""><span class="fa fa-linkedin">&nbsp;</span></a></li>
+            	<li class="list-inline-item"><a href=""><span class="fa fa-twitter">&nbsp;</span></a></li>
+            </ul>-->
+    	</div>         
+    </div>
+    <div id="mobilenav">
+    	<div class="row">  
+            <div class="col-xs-12">
+                <center><a href="#home"><img src="~/themes/acms/images/AriesCMS_orange.png" alt="" class="img-fluid" /></a></center>
+            </div>
+        </div>
+    	<div class="row">
+        <div class="col-xs-12">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#defaultNavbar1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>    	
+            <div class="collapse navbar-collapse" id="defaultNavbar1">
+                <ul class="nav navbar-nav">
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/">HOME</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/howitworks">LEARN MORE</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/signup?id=3">SIGN UP</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/faq">FAQ</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/videos">VIDEOS</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/blog">BLOG</a></li>
+                  <li class="divider"></li>
+                  <li style="border-bottom:solid 1px #513031; text-align:center;"><a class="text-bold" href="~/contactus">CONTACT US</a></li>
+                </ul>
+            </div>
+        </div> 
+        </div>
+    </div>
+  </div>
+  <!-- /.container-fluid --> 
+</nav>', '205', 'US English', 'False');
+
+Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, iTypeID, sTypeID, sCodeName, sDefaultValue, iLanguageID, sLanguageID, bPrimaryContentArea) VALUES ('1', 'Default', '532fa03d-2c1e-4946-9f3f-846affc2d0af', '2/19/2015 7:19:43 PM', '6/8/2015 1:10:06 PM', '0', '', '1', 'Ssytem Admin', 'MAINBODY', '0', '', '<acms><!--MAINBODY--></acms>', '
+<div class="container-fluid">
+	<div class="row">
+    	<div class="col-lg-12 col-md-12 col-xs-12 toppadding">
+          <p>&nbsp;</p>
+        </div>
+    </div>
+      <div class="row rwHeight">         
+        <div class="col-lg-6 col-md-6 col-xs-12 offset-lg-3 offset-md-3">       
+          <center><h1>Welcome to the Aries CMS</h1></center>
+          <center><h4><a href="~/portal">Click here to enter your portal.</a></h4></center>
+        </div>        
+      </div>
+</div>', '205', 'US English', 'True');
+
+Insert Into WebSitePageTemplateZones (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sName, iTypeID, sTypeID, sCodeName, sDefaultValue, iLanguageID, sLanguageID, bPrimaryContentArea) VALUES ('1', 'Default', 'c8b49d39-efae-4102-a829-4543e3498870', '2/19/2015 7:20:57 PM', '6/8/2015 1:07:23 PM', '0', '', '1', 'Ssytem Admin', 'MAINFOOTER', '0', '', '<acms><!--MAINFOOTER--></acms>', '
+<footer class="footer">
+      <div class="row">    
+          <div class="col-lg-7 col-md-7 col-xs-7 offset-lg-1 offset-md-1 offset-xs-1">  
+            <span class=""> 
+                <a class="text-bold" href="~/">HOME</a> 
+                <a class="text-bold" href="~/admin">ADMIN PORTAL</a>
+                <a class="text-bold" href="~/portal">USER PORTAL</a>
+            </span> 
+          </div>       
+          <div class="col-lg-2 col-md-2 col-xs-2 offset-lg-2 offset-md-2 offset-xs-2 text-lg-center text-md-center text-xs-center">  
+            <span class=""> 
+                <a class="" href="~/portal">SIGN IN</a>
+            </span> 
+          </div>   
+      </div>   
+      <div class="row">    
+          <div class="col-lg-3 col-md-3 col-xs-3 offset-lg-1 offset-md-1 offset-xs-1">  
+            <span style="color:#9F9B9B; font-weight:bold; font-size:0.95em;">&copy; 2016-2017 Aries TCO, Inc.</span>
+          </div>       
+          <div class="col-lg-3 col-md-3 col-xs-3offset-lg-3 offset-md-3 offset-xs-3">  
+               
+          </div>   
+      </div>
+  <hr>
+</footer>', '205', 'US English', 'False');
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
+
+Insert Into WebSitePage (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sPageName, sPageNavigationName, sPageNavigationURL, sPageTitle, sMetaTags, sClassification, sPageDescription, sKeyWords, bIsLive, dtStart, dtEnd, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, bRestrictAccess, iLanguageID, sLanguageID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', 'dd127ab8-a658-40f5-acff-d82074cfae0c', '10/4/2014 11:12:25 PM', '2/23/2016 8:39:32 PM', '0', '', '0', '', 'Index', '', '', 'Aries CMS', '<meta name="ROBOTS" content="INDEX,FOLLOW" />
+     <meta name="audience" content="all" />
+     <meta name="author" content="www.ariestco.com" />
+     <meta name="publisher" content="www.ariestco.com" />
+     <meta name="revisit-after" content="7 days" />
+     <meta name="Content-Language" content="en" />
+     <meta name="distribution" content="global" />
+<meta name="keywords" content="Test, testing, and testing again" />
+
+', 'cms, content management', 'Aries CMS', 'Aries CMS', 'True', '1/1/1901 12:00:00 AM', '1/1/1901 12:00:00 AM', '1', '', '', '', '', 'False', '0', '', 'False', '0', '', '1', 'Index');
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
+
+Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '701e2eef-feb6-4bda-952f-69f3ca68274e', '10/4/2014 11:17:05 PM', '10/4/2014 11:17:05 PM', '0', '', '0', '', 'Index', '1', 'Index', '/', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
+Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sDisplayName, iPageID, sPageID, sNavigationIdentifyer, iNavigationTypeID, sNavigationTypeID, iParentNavID, sParentNavID, sCustomPrefix, sCustomSuffix, sCustomAttributes, iDisplayIndex, bHidden, bDisabled, bRestrictAccess, iScreenID, sScreenID, iLanguageID, sLanguageID, sImageSmallURL, sImageLargeURL, sPagePreviewSmallURL, sPagePreviewLargeURL) VALUES ('1', '', '8d4075a1-5e35-4d95-bc60-521a63dc24ef', '10/4/2014 11:17:18 PM', '10/4/2014 11:17:18 PM', '0', '', '0', '', 'Index', '1', 'Index', 'index', '0', '', '0', '', '', '', '', '0', 'False', 'False', 'False', '0', '', '0', '', '', '', '', '');
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
+Insert Into WebSiteBlog (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sTitle, sSubject, sDescription, iPrimaryContributorID, sPrimaryContributorID, sKeyWords, iAltContributorID, sAltContributorID, bRestrictAccess, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '02becd50-9ae9-42cb-999f-5b547849ed69', '1/18/2016 8:43:40 PM', '1/26/2016 4:57:31 PM', '0', '', '0', '', 'Default', 'Default Blode', '', '1', 'Ssytem Admin', '', '1', 'Ssytem Admin', 'False', '1', 'Default', '', '', '', 'False', '2', 'MAINBODY', '1', 'Index');
 
