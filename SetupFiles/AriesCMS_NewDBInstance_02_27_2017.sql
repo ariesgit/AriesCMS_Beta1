@@ -8954,3 +8954,9 @@ Insert Into WebSiteNavigation (iParentID, sParentID, sControl, dtDateCreated, dt
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  */
 Insert Into WebSiteBlog (iParentID, sParentID, sControl, dtDateCreated, dtLastUpdated, iCreatedByID, sCreatedByID, iUpdatedByID, sUpdatedByID, sTitle, sSubject, sDescription, iPrimaryContributorID, sPrimaryContributorID, sKeyWords, iAltContributorID, sAltContributorID, bRestrictAccess, iSiteTemplateID, sSiteTemplateID, sSiteTemplateURI, sSiteTempalteURL, sLoadIncludeURI, bLoadPartialPage, iZoneID, sZoneID, iSiteTemplatePageID, sSiteTemplatePageID) VALUES ('1', '', '02becd50-9ae9-42cb-999f-5b547849ed69', '1/18/2016 8:43:40 PM', '1/26/2016 4:57:31 PM', '0', '', '0', '', 'Default', 'Default Blode', '', '1', 'Ssytem Admin', '', '1', 'Ssytem Admin', 'False', '1', 'Default', '', '', '', 'False', '2', 'MAINBODY', '1', 'Index');
 
+
+
+
+
+
+
