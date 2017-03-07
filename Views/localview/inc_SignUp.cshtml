@@ -157,7 +157,7 @@
     </div>
     <div class="row rwHeight">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-smg-center text-xs-center">
-            <center><h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Progrmmes</h3> </center>
+            <center><h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Programmers.</h3> </center>
         </div>
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-smg-center text-xs-center">
@@ -210,63 +210,63 @@
                             <legend></legend>
                             <h3>ACCESS INFORMATION</h3>
                             <div class="form-group">
-                                <label for="NewUserFormData_UserName">User name :</label>
+                                <label for="NewUserFormData_UserName">User Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.UserName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.UserName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_FirstName">First name :</label>
+                                <label for="NewUserFormData_FirstName">First Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.FirstName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.FirstName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_MiddleName">MiddleName :</label>
+                                <label for="NewUserFormData_MiddleName">Middle Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.MiddleName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.MiddleName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_LastName">Last name :</label>
+                                <label for="NewUserFormData_LastName">Last Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.LastName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.LastName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Password">Password :</label>
+                                <label for="NewUserFormData_Password">Password: </label>
                                 @Html.PasswordFor(model => model.NewUserFormData.Password, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Password)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_PasswordConfirm">Confirm Password :</label>
+                                <label for="NewUserFormData_PasswordConfirm">Confirm Password: </label>
                                 @Html.PasswordFor(model => model.NewUserFormData.PasswordConfirm, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.PasswordConfirm)</span>
                             </div>
 
-                            <h3>CONTACT</h3>
+                            <h3>CONTACT INFORMATION</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_EMail">E-Mail :</label>
+                                <label for="NewUserFormData_EMail">E-Mail: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.EMail, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.EMail)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Phone">Phone :</label>
+                                <label for="NewUserFormData_Phone">Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Phone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Phone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Fax">Fax :</label>
+                                <label for="NewUserFormData_Fax">Fax: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Fax, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Fax)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_CellPhone">Cell Phone :</label>
+                                <label for="NewUserFormData_CellPhone">Cell Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.CellPhone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.CellPhone)</span>
                             </div>
@@ -274,25 +274,25 @@
                             <h3>PERSONAL INFORMATION</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_DOBMonth">Date of Birth Month :</label>
+                                <label for="NewUserFormData_DOBMonth">Date of Birth - Month: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.DOBMonth, Model.NewUserFormData.DOBMonths, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.DOBMonth)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_DOBDay">Date of Birth Day :</label>
+                                <label for="NewUserFormData_DOBDay">Date of Birth - Day: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.DOBDay, Model.NewUserFormData.DOBDays, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.DOBDay)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_DOBYear">Date of Birth Year :</label>
+                                <label for="NewUserFormData_DOBYear">Date of Birth - Year: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.DOBYear, Model.NewUserFormData.DOBYears, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.DOBYear)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_SexID">Sex :</label>
+                                <label for="NewUserFormData_SexID">Sex: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.SexID, Model.NewUserFormData.SexType, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_SexID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.SexID)</span>
                             </div>
@@ -300,258 +300,258 @@
                             <h3>PERSONAL ADDRESS</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine1">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine1">Address: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.AddressInfo.AddressLine1, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.AddressLine1)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine2">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine2">Address 2: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.AddressInfo.AddressLine2, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.AddressLine2)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine3">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine3">Address 3: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.AddressInfo.AddressLine3, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.AddressLine3)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_City">City :</label>
+                                <label for="NewUserFormData_AddressInfo_City">City: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.AddressInfo.City, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.City)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_CountryID">Country :</label>
+                                <label for="NewUserFormData_AddressInfo_CountryID">Country: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.AddressInfo.CountryID, Model.CurrentUser.UserView.Countries, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_AddressInfo_CountryID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.CountryID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_StateID">State :</label>
+                                <label for="NewUserFormData_AddressInfo_StateID">State: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.AddressInfo.StateID, Model.CurrentUser.UserView.States, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_AddressInfo_StateID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.StateID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_PostalCode">Postal code :</label>
+                                <label for="NewUserFormData_AddressInfo_PostalCode">Postal Code: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.AddressInfo.PostalCode, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.AddressInfo.PostalCode)</span>
                             </div>
 
 
-                            <h3>COMPANY INFO</h3>
+                            <h3>COMPANY INFORMATION</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CompanyName">Company Name :</label>
+                                <label for="NewUserFormData_Company_CompanyName">Company Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CompanyName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CompanyName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CompanyPhone">Phone :</label>
+                                <label for="NewUserFormData_Company_CompanyPhone">Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CompanyPhone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CompanyPhone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CompanyPhoneExt">Phone Ext. :</label>
+                                <label for="NewUserFormData_Company_CompanyPhoneExt">Phone Ext: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CompanyPhoneExt, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CompanyPhoneExt)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CompanyFax">Fax :</label>
+                                <label for="NewUserFormData_Company_CompanyFax">Fax: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CompanyFax, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CompanyFax)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CompanyCellPhone">Cell phone :</label>
+                                <label for="NewUserFormData_Company_CompanyCellPhone">Cell Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CompanyCellPhone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CompanyCellPhone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_CellPhone">Cell phone :</label>
+                                <label for="NewUserFormData_Company_CellPhone">Cell Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.CellPhone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.CellPhone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_EMail">E-Mail :</label>
+                                <label for="NewUserFormData_Company_EMail">E-Mail: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.EMail, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.EMail)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_Phone">Phone :</label>
+                                <label for="NewUserFormData_Company_Phone">Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.Phone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.Phone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_Fax">Fax :</label>
+                                <label for="NewUserFormData_Company_Fax">Fax: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.Fax, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.Fax)</span>
                             </div>
                             
-                            <h3>COMPANY ADDRESS INFO</h3>
+                            <h3>COMPANY ADDRESS INFORMATION</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_AddressLine1">Company Address :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_AddressLine1">Company Address: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine1, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine1)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_AddressLine2">Address :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_AddressLine2">Company Address 2: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine2, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine2)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_AddressLine3">Address :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_AddressLine3">Company Address 3: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine3, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.AddressLine3)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_City">City :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_City">City: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.AddressInfo.City, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.City)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_CountryID">Country :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_CountryID">Country: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.Company.AddressInfo.CountryID, Model.CurrentUser.UserView.Countries, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_Company_AddressInfo_CountryID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.CountryID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_StateID">State :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_StateID">State: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.Company.AddressInfo.StateID, Model.CurrentUser.UserView.States, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_Company_AddressInfo_StateID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.StateID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_Company_AddressInfo_PostalCode">Postal code :</label>
+                                <label for="NewUserFormData_Company_AddressInfo_PostalCode">Postal Code: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.Company.AddressInfo.PostalCode, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.Company.AddressInfo.PostalCode)</span>
                             </div>
                             
-                            <h3>BILLING INFO</h3>
+                            <h3>BILLING INFORMATION</h3>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_FirstName">First name :</label>
+                                <label for="NewUserFormData_BillingInfo_FirstName">First Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.FirstName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.FirstName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_LastName">Last name :</label>
+                                <label for="NewUserFormData_BillingInfo_LastName">Last Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.LastName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.LastName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_MiddleName">Middle name :</label>
+                                <label for="NewUserFormData_BillingInfo_MiddleName">Middle Name: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.MiddleName, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.MiddleName)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_CreditCardNumber">Credit card number :</label>
+                                <label for="NewUserFormData_BillingInfo_CreditCardNumber">Credit Card Number: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.CreditCardNumber, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.CreditCardNumber)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_CreditCardExpDateMonth">Exp. Month :</label>
+                                <label for="NewUserFormData_BillingInfo_CreditCardExpDateMonth">Exp. Month: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.BillingInfo.CreditCardExpDateMonth, Model.NewUserFormData.BillingInfo.ExpMonth, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.CreditCardExpDateMonth)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_CreditCardExpDateYear">Exp. Year :</label>
+                                <label for="NewUserFormData_BillingInfo_CreditCardExpDateYear">Exp. Year: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.BillingInfo.CreditCardExpDateYear, Model.NewUserFormData.BillingInfo.ExpYear, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.CreditCardExpDateYear)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_CreditCardCVV">Card CVV :</label>
+                                <label for="NewUserFormData_BillingInfo_CreditCardCVV">Card CVV: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.CreditCardCVV, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.CreditCardCVV)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_EMail">E-Mail :</label>
+                                <label for="NewUserFormData_BillingInfo_EMail">Billing E-Mail: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.EMail, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.EMail)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_Phone">Phone :</label>
+                                <label for="NewUserFormData_BillingInfo_Phone">Billing Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.Phone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.Phone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_Fax">Fax :</label>
+                                <label for="NewUserFormData_BillingInfo_Fax">Fax: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.Fax, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.Fax)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_BillingInfo_CellPhone">Cell phone :</label>
+                                <label for="NewUserFormData_BillingInfo_CellPhone">Cell Phone: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.CellPhone, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.CellPhone)</span>
                             </div>
 
 
-                            <h3>BILLING ADDRESS INFO</h3>
+                            <h3>BILLING ADDRESS INFORMATION</h3>
 
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine1">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine1">Billing Address: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine1, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine1)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine2">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine2">Billing Address 2: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine2, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine2)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_AddressLine3">Address :</label>
+                                <label for="NewUserFormData_AddressInfo_AddressLine3">Billing Address 3:</label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine3, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.AddressLine3)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_City">City :</label>
+                                <label for="NewUserFormData_AddressInfo_City">City: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.AddressInfo.City, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.City)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_CountryID">Country :</label>
+                                <label for="NewUserFormData_AddressInfo_CountryID">Country: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.BillingInfo.AddressInfo.CountryID, Model.CurrentUser.UserView.Countries, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_BillingInfo_AddressInfo_CountryID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.CountryID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_StateID">State :</label>
+                                <label for="NewUserFormData_AddressInfo_StateID">State: </label>
                                 @Html.DropDownListFor(model => model.NewUserFormData.BillingInfo.AddressInfo.StateID, Model.CurrentUser.UserView.States, new { @Class = "form-control", @placeholder = "", @onchange = "javascript:on_SignUp_NewUserFormData_BillingInfo_AddressInfo_StateID_Changed();" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.StateID)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="NewUserFormData_AddressInfo_PostalCode">Postal code :</label>
+                                <label for="NewUserFormData_AddressInfo_PostalCode">Postal Code: </label>
                                 @Html.TextBoxFor(model => model.NewUserFormData.BillingInfo.AddressInfo.PostalCode, new { @Class = "form-control", @placeholder = "" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.NewUserFormData.BillingInfo.AddressInfo.PostalCode)</span>
                             </div>
@@ -570,7 +570,7 @@
         {
 
             <div class="col-lg-8 col-md-8 offset-lg-2 offset-md-2 col-sm-12 col-xs-12 alert-success">
-                <h4>Thank you!  You are now sign up to use the cms.</h4>
+                <h4>Thank you!  You are now signed up to use the CMS.</h4>
             </div>
         }
     </div>
