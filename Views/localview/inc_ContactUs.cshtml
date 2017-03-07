@@ -10,7 +10,7 @@
     </div>
     <div class="row rwHeight">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-smg-center text-xs-center">
-            <center><h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Progrmmes</h3> </center>
+            <center><h3 class="" style="font-size:1.3em;">Open Source<strong>.NET C# Content Management Platform</strong> For Programmers, by Programmers</h3> </center>
         </div>
         <div class="row">
             @if (ViewBag.bError == true)
@@ -50,30 +50,30 @@
                             <legend></legend>
 
                             <div class="form-group">
-                                <label for="ContactFormData_Name">Full Name :</label>
+                                <label for="ContactFormData_Name">Full Name: </label>
                                 @Html.TextBoxFor(model => model.ContactFormData.Name, new { @Class = "form-control", @placeholder = "Enter Your Full Name" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.ContactFormData.Name)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="ContactFormData_Email">E-Mail :</label>
+                                <label for="ContactFormData_Email">E-Mail: </label>
                                 @Html.TextBoxFor(model => model.ContactFormData.Email, new { @Class = "form-control", @placeholder = "A Valid Email is Required" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.ContactFormData.Email)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="ContactFormData_Phone">Phone :</label>
+                                <label for="ContactFormData_Phone">Phone: </label>
                                 @Html.TextBoxFor(model => model.ContactFormData.Phone, new { @Class = "form-control", @placeholder = "Your Phone Number would be helpful" })
                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.ContactFormData.Phone)</span>
                             </div>
 
                             <div class="form-group">
-                                <label for="ContactFormData_Subject">Subject :</label>
+                                <label for="ContactFormData_Subject">Subject: </label>
                                 @Html.TextBoxFor(model => model.ContactFormData.Subject, new { @Class = "form-control", @placeholder = "Subject of your inquiry" })
                             </div>
 
                             <div class="form-group">
-                                <label for="ContactFormData_Message">Message :</label>
+                                <label for="ContactFormData_Message">Message: </label>
                                 @Html.TextAreaFor(model => model.ContactFormData.Message, new { @Class = "form-control textareal", @placeholder = "You’re Message" })
                             </div>
 
