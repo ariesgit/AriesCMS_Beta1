@@ -101,7 +101,7 @@
     <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
 
-            @using (Html.BeginForm("WebSiteBlogEntry_AddUpdate", "", FormMethod.Post))
+            @using (Html.BeginForm("WebSiteBlogEntry_AddUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.ValidationSummary(true);
 
@@ -115,19 +115,35 @@
                 @Html.HiddenFor(model => model.sCreatedByID)
                 @Html.HiddenFor(model => model.iUpdatedByID)
                 @Html.HiddenFor(model => model.sUpdatedByID)
-                @Html.HiddenFor(model => model.dtStart)
-                @Html.HiddenFor(model => model.dtEnd)
+                @Html.HiddenFor(model => model.sImageURL)
 
                 <fieldset>
                     <legend></legend>
-
-
+                    
                     <div class="form-group">
                         <label for="sTitle">Title :</label>
                         @Html.TextBoxFor(model => model.sTitle, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.sTitle, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sImageURL">Live on (optional)  :</label>
+                        @Html.TextBoxFor(model => model.dtStart, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.dtStart, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sImageURL">Hidden as of (optional) :</label>
+                        @Html.TextBoxFor(model => model.dtEnd, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.dtEnd, "*Required!")
                         }
                     </div>
 
@@ -141,25 +157,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="sImageURL">Image URL :</label>
-                        @Html.TextBoxFor(model => model.sImageURL, new { @Class = "form-control" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.sImageURL, "*Required!")
-                        }
+                        <label for="sImageURL">Image URL  :</label>
                     </div>
-
                     <div class="form-group">
-                        <div class="fileUpload btn btn-primary" id="pnlFileSelect">
-                            <span><img src="~/Themes/acms2/images/UploadButton_white.png" alt="Upload File" width="35" height="35" /></span>
-                            <input type="file" name="fileupload" id="fileupload" class="upload" />
-                            Upload Cover File
-                        </div>
+                        <img src="~/@Model.User.sImageURL" alt="" class="img-fluid" />
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
                     </div>
 
                     <div class="form-group">
                         <label for="sKeyWords">Key words :</label>
-                        @Html.TextBoxFor(model => model.sKeyWords, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.sKeyWords, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.sKeyWords, "*Required!")
@@ -168,7 +177,7 @@
 
                     <div class="form-group">
                         <label for="sContent"> Content :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
-                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.sContent, "*Required!")
@@ -177,7 +186,7 @@
 
                     <div class="form-group">
                         <label for="bOpenToComments">Open to comments :</label>
-                        @Html.CheckBoxFor(model => model.bOpenToComments, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bOpenToComments, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bOpenToComments, "*Required!")
@@ -186,7 +195,7 @@
 
                     <div class="form-group">
                         <label for="bMustBeLoggedInToComment">Log in required to comment :</label>
-                        @Html.CheckBoxFor(model => model.bMustBeLoggedInToComment, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bMustBeLoggedInToComment, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bMustBeLoggedInToComment, "*Required!")
@@ -195,7 +204,7 @@
 
                     <div class="form-group">
                         <label for="bIsLive">Is live :</label>
-                        @Html.CheckBoxFor(model => model.bIsLive, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bIsLive, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bIsLive, "*Required!")
@@ -204,7 +213,7 @@
 
                     <div class="form-group">
                         <label for="bArchived">Archive :</label>
-                        @Html.CheckBoxFor(model => model.bArchived, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bArchived, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bArchived, "*Required!")
@@ -228,3 +237,21 @@
 </div>
 
 
+
+
+<script type="text/javascript">
+    try {
+
+
+        $(document).ready(function () {
+
+            $('#dtStart').datetimepicker();
+            $('#dtEnd').datetimepicker();
+
+        });
+
+    }
+    catch (e) {
+        //alert(e);
+    }
+</script>

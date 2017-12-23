@@ -58,9 +58,9 @@
             <table class="table">
                 <thead>
                     <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
-                    <th>Content area name</th>
-                    <th>Zone content tag</th>
-                    <th>&nbsp;</th>
+                        <th>Date</th>
+                        <th>Updated by</th>
+                        <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,7 +76,13 @@
                                 <td>
                                     @Html.ActionLink("Edit", "WebSitePageTemplateZones_Details", new { id = objRec.ID })
                                     @Html.Raw("|")
-                                    @Html.ActionLink("Delete", "WebSitePageTemplateZones_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+                                    @Html.ActionLink("Delete", "WebSitePageTemplateZones_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" }) 
+                                  
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    @Html.ActionLink("Change History", "WebSitePageTemplateZones_History_List", new { _iParentID = objRec.ID, _sParentID = objRec.sName })
                                 </td>
                             </tr>
                         }

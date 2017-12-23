@@ -1,0 +1,270 @@
+@model AriesCMSDefinition.DEF_WebSiteSponsorShipTypes.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSiteSponsorShipTypes_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteSponsorShipTypes_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteSponsorShipTypes_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteSponsorShipTypes_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteSponsorShipTypes_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Sponsorship Types</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSiteSponsorShipTypes_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteSponsorShipTypes_AddUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.sSync)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.dtDateCreated)  
+                         @Html.HiddenFor(model => model.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID)
+
+    @Html.HiddenFor(model => model.sURL1)
+    @Html.HiddenFor(model => model.sURL2)
+    @Html.HiddenFor(model => model.sURL3)
+
+    @Html.HiddenFor(model => model.sImageURL)
+    @Html.HiddenFor(model => model.sImageURL2)
+    @Html.HiddenFor(model => model.sImageURL3)
+
+
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="sName">Name :</label>
+                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dCost">Cost :</label>
+                                                @Html.TextBoxFor(model => model.dCost, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="bIsReoccuringBilling">Is Reoccuring :</label>
+                                                @Html.CheckBoxFor(model => model.bIsReoccuringBilling, new { @Class = "form-control checkbox-inline" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dBillingReOccuresEvery_Days">Reoccures every (days) :</label>
+                                                @Html.TextBoxFor(model => model.dBillingReOccuresEvery_Days, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sListingDescription">Description Listing Small :</label>
+                                                @Html.TextAreaFor(model => model.sListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sLargerListingDescription">Description Listing Large :</label>
+                                                @Html.TextAreaFor(model => model.sLargerListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sDetailsDescription">Description Detail Page :</label>
+                                                @Html.TextAreaFor(model => model.sDetailsDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="sImageURL">Image Thumbnail :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.sImageURL" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="sImageURL2">Image Medium :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.sImageURL2" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles2" id="UploadFiles2" class="form-control" />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="sImageURL3">Image Large :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.sImageURL3" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles3" id="UploadFiles3" class="form-control" />
+                                            </div>
+                                            
+
+                                            <div class="form-group">
+                                                <label for="bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
+                                                }
+                                            </div>
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

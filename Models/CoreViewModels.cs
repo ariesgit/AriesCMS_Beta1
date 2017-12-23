@@ -321,6 +321,7 @@ namespace AriesCMS.Models
         //public int age { get; set; }
         #endregion
 
+        public int UserID { get; set; }
         public bool ValidationErrors { get; set; }
 
         [Required(ErrorMessage = "please provide a valid user name")]
@@ -483,7 +484,15 @@ namespace AriesCMS.Models
         public UserAddressInfo AddressInfo { get; set; }
         public UserBillingInfo BillingInfo { get; set; }
 
+
         public string TrackingCode { get; set; }
+        public string ScreenName { get; set; }
+        public string Avitar { get; set; }
+        public string FullPicture { get; set; }
+        public string ProfileBackGrdPicture { get; set; }
+        public string ProfileLink { get; set; }
+        public string ProfileSummary { get; set; }
+        public string HomeTown { get; set; }
 
 
         //This will hold any error message from the server side process
@@ -506,6 +515,7 @@ namespace AriesCMS.Models
 
         public NewUserRegistration()
         {
+            UserID = -1;
             GenderTypes oGen = new GenderTypes();
             SexType = oGen.ListOfTypes;
             Build_DOBMonths();
@@ -515,6 +525,213 @@ namespace AriesCMS.Models
             AddressInfo = new UserAddressInfo();
             BillingInfo = new UserBillingInfo();
         }
+    }
+
+    [Serializable]
+    public partial class IntegrationUser
+    {
+        public string _id { get; set; }
+        public string _email { get; set; }
+        public string _name { get; set; }
+        public string _first_name { get; set; }
+        public string _last_name { get; set; }
+        public string _short_namepublic { get; set; }
+        public string _about { get; set; }
+        public string _birthday { get; set; }
+        public string _cover { get; set; }
+        public string _gender { get; set; }
+        public string _hometown { get; set; }
+        public string _link { get; set; }
+        public string _picture { get; set; }
+
+
+        public bool FromArray(Object[] _ValueObjectArray)
+        {
+            try
+            {
+
+                bool bReturn = false;
+                if (_ValueObjectArray != null)
+                {
+                    #region _id - 0;
+                    try
+                    {
+                        if (_ValueObjectArray[0] != null)
+                        {
+                            _id = _ValueObjectArray.GetValue(0).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _email - 1;
+                    try
+                    {
+                        if (_ValueObjectArray[1] != null)
+                        {
+                            _email = _ValueObjectArray.GetValue(1).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _name - 2;
+                    try
+                    {
+                        if (_ValueObjectArray[2] != null)
+                        {
+                            _name = _ValueObjectArray.GetValue(2).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _first_name - 3;
+                    try
+                    {
+                        if (_ValueObjectArray[3] != null)
+                        {
+                            _first_name = _ValueObjectArray.GetValue(3).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _last_name - 4;
+                    try
+                    {
+                        if (_ValueObjectArray[1] != null)
+                        {
+                            _last_name = _ValueObjectArray.GetValue(4).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _short_namepublic - 5;
+                    try
+                    {
+                        if (_ValueObjectArray[5] != null)
+                        {
+                            _short_namepublic = _ValueObjectArray.GetValue(5).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _about - 6;
+                    try
+                    {
+                        if (_ValueObjectArray[6] != null)
+                        {
+                            _about = _ValueObjectArray.GetValue(6).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _birthday - 7;
+                    try
+                    {
+                        if (_ValueObjectArray[7] != null)
+                        {
+                            _birthday = _ValueObjectArray.GetValue(7).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _cover - 8;
+                    try
+                    {
+                        if (_ValueObjectArray[8] != null)
+                        {
+                            _cover = _ValueObjectArray.GetValue(8).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _gender - 9;
+                    try
+                    {
+                        if (_ValueObjectArray[9] != null)
+                        {
+                            _gender = _ValueObjectArray.GetValue(9).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _hometown - 10;
+                    try
+                    {
+                        if (_ValueObjectArray[10] != null)
+                        {
+                            _hometown = _ValueObjectArray.GetValue(10).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _link - 11;
+                    try
+                    {
+                        if (_ValueObjectArray[11] != null)
+                        {
+                            _link = _ValueObjectArray.GetValue(11).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region _picture - 12;
+                    try
+                    {
+                        if (_ValueObjectArray[12] != null)
+                        {
+                            _picture = _ValueObjectArray.GetValue(12).ToString();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+                }
+
+
+                return bReturn;
+            }
+            catch (Exception s)
+            {
+                return false;
+            }
+        }
+
     }
 
     [Serializable]
@@ -679,6 +896,95 @@ namespace AriesCMS.Models
             ExpMonth.Add(new SelectListItem { Selected = false, Text = "October", Value = "10" });
             ExpMonth.Add(new SelectListItem { Selected = false, Text = "November", Value = "11" });
             ExpMonth.Add(new SelectListItem { Selected = false, Text = "December", Value = "12" });
+        }
+
+        public int Get_ExpMonth_Number(string _Month)
+        {
+            try
+            {
+                int iMonth = 0;
+                switch (_Month)
+                {
+                    case "January":
+                        iMonth = 1;
+                        break;
+                    case "january":
+                        iMonth = 1;
+                        break;
+                    case "February":
+                        iMonth = 2;
+                        break;
+                    case "february":
+                        iMonth = 2;
+                        break;
+                    case "March":
+                        iMonth = 3;
+                        break;
+                    case "march":
+                        iMonth = 3;
+                        break;
+                    case "April":
+                        iMonth = 4;
+                        break;
+                    case "april":
+                        iMonth = 4;
+                        break;
+                    case "May":
+                        iMonth = 5;
+                        break;
+                    case "may":
+                        iMonth = 5;
+                        break;
+                    case "June":
+                        iMonth = 6;
+                        break;
+                    case "june":
+                        iMonth = 6;
+                        break;
+                    case "July":
+                        iMonth = 7;
+                        break;
+                    case "july":
+                        iMonth = 7;
+                        break;
+                    case "August":
+                        iMonth = 8;
+                        break;
+                    case "august":
+                        iMonth = 8;
+                        break;
+                    case "September":
+                        iMonth = 9;
+                        break;
+                    case "september":
+                        iMonth = 9;
+                        break;
+                    case "October":
+                        iMonth = 10;
+                        break;
+                    case "october":
+                        iMonth = 10;
+                        break;
+                    case "November":
+                        iMonth = 11;
+                        break;
+                    case "november":
+                        iMonth = 11;
+                        break;
+                    case "December":
+                        iMonth = 12;
+                        break;
+                    case "december":
+                        iMonth = 12;
+                        break;
+                }
+
+                return iMonth;
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public string CreditCardExpDateYear { get; set; }
@@ -933,4 +1239,1076 @@ namespace AriesCMS.Models
         public string IsCMSForm { get; set; }
 
     }
+    
+    [Serializable]
+    public class ChartData
+    {
+        public string AuthorizationCode { get; set; }
+        public string CardNumber { get; set; }
+        public string CardType { get; set; }
+        public string CardNumberMask { get; set; }
+        public string CVV { get; set; }
+        public string ExpirationDate { get; set; }
+        public string Month { get; set; }
+        public string Year { get; set; }
+        public string ChargeAmount { get; set; }
+        public string ShippingCharge { get; set; }
+        public string Subtotal { get; set; }
+        public string ChargeDescription { get; set; }
+        public string Tax { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string PostalCode { get; set; }
+        public string Country { get; set; }
+        public string PhoneNumber { get; set; }
+        public string EMail { get; set; }
+        public string ClientIPAddress { get; set; }
+
+        public string PaymentID { get; set; }
+
+
+        //This will hold any error message from the server side process
+        public string ChargeResponse { get; set; }
+
+
+        //This will hold any response message from the server side process
+        public string ErrorMessage { get; set; }
+
+        //This is a full url to an error page to handel any errors which occure during processing
+        public string ErrorPageURL { get; set; }
+
+        //This is to handel any success page after a good server side process
+        public string SuccessPageURL { get; set; }
+
+        //This is for when the form is in an cshtml file, allowing you to specify that file
+        public string SourceForm { get; set; }
+
+        //Set to "true" if the form is created via the cms rather than in a cshtml file --- set via hidden form field value
+        public string IsCMSForm { get; set; }
+
+    }
+    
+    [Serializable]
+    public partial class WebSiteSponsorsDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteSponsors.RecordObject WebSiteSponsors { get; set; }
+
+        public List<SelectListItem> Sponsorshiptypes { get; set; }
+        public void Build_Sponsorshiptypes(IEnumerable<DEF_WebSiteSponsorShipTypes.RecordObject> lsrWebSiteSponsorShipTypes)
+        {
+            Sponsorshiptypes = new List<SelectListItem>();
+            Sponsorshiptypes.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteSponsorShipTypes != null)
+            {
+                foreach (DEF_WebSiteSponsorShipTypes.RecordObject oV in lsrWebSiteSponsorShipTypes)
+                {
+                    Sponsorshiptypes.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_Sponsorshiptypes(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteSponsorShipTypes dbInteraction = new DINT_WebSiteSponsorShipTypes(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_Sponsorshiptypes(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public List<SelectListItem> AssociatedUsers { get; set; }
+        public void Build_AssociatedUsers(IEnumerable<DEF_Users.RecordObject> lsrUsers)
+        {
+            AssociatedUsers = new List<SelectListItem>();
+            AssociatedUsers.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrUsers != null)
+            {
+                foreach (DEF_Users.RecordObject oV in lsrUsers)
+                {
+                    AssociatedUsers.Add(new SelectListItem { Selected = false, Text = oV.sFName + " " + oV.sLName + " (" + oV.sPrimaryEMail + ")", Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_AssociatedUsers(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_Users dbInteraction = new DINT_Users(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_AssociatedUsers(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteSponsors dbWebSiteSponsors = new DINT_WebSiteSponsors(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteSponsors.RecordObject> oSearch = dbWebSiteSponsors.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteSponsors = oSearch[0];
+                                    if (WebSiteSponsors != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteSponsorsDBView()
+        {
+            WebSiteSponsors = new DEF_WebSiteSponsors.RecordObject();
+            Build_Sponsorshiptypes(null);
+            Build_AssociatedUsers(null);
+        }
+
+    }
+    
+    [Serializable]
+    public partial class WebSiteEventCalendarSponsorsDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteEventCalendarSponsors.RecordObject WebSiteEventCalendarSponsors { get; set; }
+
+        public List<SelectListItem> WebSiteSponsors { get; set; }
+        public List<DEF_WebSiteSponsors.RecordObject> lstWebSiteSponsors;
+        public void Build_WebSiteSponsors(IEnumerable<DEF_WebSiteSponsors.RecordObject> lsrWebSiteSponsors)
+        {
+            WebSiteSponsors = new List<SelectListItem>();
+            WebSiteSponsors.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteSponsors != null)
+            {
+                foreach (DEF_WebSiteSponsors.RecordObject oV in lsrWebSiteSponsors)
+                {
+                    WebSiteSponsors.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteSponsors(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteSponsors dbInteraction = new DINT_WebSiteSponsors(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstWebSiteSponsors = dbInteraction.Get(lstParameters);
+                        Build_WebSiteSponsors(lstWebSiteSponsors);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteEventCalendarSponsors dbWebSiteEventCalendarSponsors = new DINT_WebSiteEventCalendarSponsors(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteEventCalendarSponsors.RecordObject> oSearch = dbWebSiteEventCalendarSponsors.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteEventCalendarSponsors = oSearch[0];
+                                    if (WebSiteEventCalendarSponsors != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteEventCalendarSponsorsDBView()
+        {
+            WebSiteEventCalendarSponsors = new DEF_WebSiteEventCalendarSponsors.RecordObject();
+            Build_WebSiteSponsors(null);
+        }
+
+    }
+    
+    [Serializable]
+    public partial class WebSiteMembersDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteMembers.RecordObject WebSiteMembers { get; set; }
+
+
+        public List<DEF_WebSiteMemberShips.RecordObject> lstWebSiteMemberShips;
+        public List<SelectListItem> WebSiteMemberShips { get; set; }
+        public void Build_WebSiteMemberShips(IEnumerable<DEF_WebSiteMemberShips.RecordObject> lsrWebSiteMemberShips)
+        {
+            WebSiteMemberShips = new List<SelectListItem>();
+            WebSiteMemberShips.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteMemberShips != null)
+            {
+                foreach (DEF_WebSiteMemberShips.RecordObject oV in lsrWebSiteMemberShips)
+                {
+                    WebSiteMemberShips.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteMemberShips(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteMemberShips dbInteraction = new DINT_WebSiteMemberShips(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstWebSiteMemberShips = dbInteraction.Get(lstParameters);
+
+                        Build_WebSiteMemberShips(lstWebSiteMemberShips);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        public List<SelectListItem> AssociatedUsers { get; set; }
+        public void Build_AssociatedUsers(IEnumerable<DEF_Users.RecordObject> lsrUsers)
+        {
+            AssociatedUsers = new List<SelectListItem>();
+            AssociatedUsers.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrUsers != null)
+            {
+                foreach (DEF_Users.RecordObject oV in lsrUsers)
+                {
+                    AssociatedUsers.Add(new SelectListItem { Selected = false, Text = oV.sFName + " " + oV.sLName + " (" + oV.sPrimaryEMail + ")", Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_AssociatedUsers(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_Users dbInteraction = new DINT_Users(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_AssociatedUsers(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+
+        public List<DEF_WebSiteMemberShipsCategories.RecordObject> lstWebSiteMemberShipsCategories;
+        public List<SelectListItem> WebSiteMemberShipsCategories { get; set; }
+        public void Build_WebSiteMemberShipsCategories(IEnumerable<DEF_WebSiteMemberShipsCategories.RecordObject> _lsrWebSiteMemberShipsCategories)
+        {
+            WebSiteMemberShipsCategories = new List<SelectListItem>();
+            WebSiteMemberShipsCategories.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (_lsrWebSiteMemberShipsCategories != null)
+            {
+                foreach (DEF_WebSiteMemberShipsCategories.RecordObject oV in _lsrWebSiteMemberShipsCategories)
+                {
+                    WebSiteMemberShipsCategories.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteMemberShipsCategories(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteMemberShipsCategories dbInteraction = new DINT_WebSiteMemberShipsCategories(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        lstWebSiteMemberShipsCategories = dbInteraction.Get(lstParameters);
+                        Build_WebSiteMemberShipsCategories(lstWebSiteMemberShipsCategories);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        public List<DEF_WebSiteMemberCats.RecordObject> lstWebSiteMemberCats;
+        public List<SelectListItem> WebSiteMemberCats { get; set; }
+        public void Build_WebSiteMemberCats(IEnumerable<DEF_WebSiteMemberCats.RecordObject> lsrWebSiteMemberCats)
+        {
+            WebSiteMemberCats = new List<SelectListItem>();
+            WebSiteMemberCats.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteMemberCats != null)
+            {
+                foreach (DEF_WebSiteMemberCats.RecordObject oV in lsrWebSiteMemberCats)
+                {
+                    WebSiteMemberCats.Add(new SelectListItem { Selected = false, Text = oV.sCategoryID, Value = oV.iCategoryID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteMemberCats(IDataConnection _cnCon, int _iParentID)
+        {
+            try
+            {
+                if (_iParentID > 0)
+                {
+                    if (_cnCon != null)
+                    {
+                        if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                        {
+                            DINT_WebSiteMemberCats dbInteraction = new DINT_WebSiteMemberCats(_cnCon);
+
+                            List<DataParameter> lstParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("iParentID", _iParentID.ToString(), "int", 0, "iParentID", " = ", "");
+                            lstParameters.Add(pParameter);
+
+                            lstWebSiteMemberCats = dbInteraction.Get(lstParameters);
+
+                            Build_WebSiteMemberCats(lstWebSiteMemberCats);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+        
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteMembers dbWebSiteMembers = new DINT_WebSiteMembers(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteMembers.RecordObject> oSearch = dbWebSiteMembers.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteMembers = oSearch[0];
+                                    if (WebSiteMembers != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteMembersDBView()
+        {
+            WebSiteMembers = new DEF_WebSiteMembers.RecordObject();
+            Build_AssociatedUsers(null);
+            Build_WebSiteMemberShips(null);
+        }
+
+    }
+
+    [Serializable]
+    public partial class WebSiteMemberCatsDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteMemberCats.RecordObject WebSiteMemberCats { get; set; }
+
+
+        public List<DEF_WebSiteMemberShipsCategories.RecordObject> lstWebSiteMemberShipsCategories;
+        public List<SelectListItem> WebSiteMemberShipsCategories { get; set; }
+        public void Build_WebSiteMemberShipsCategories(IEnumerable<DEF_WebSiteMemberShipsCategories.RecordObject> lsrWebSiteMemberShipsCategories)
+        {
+            WebSiteMemberShipsCategories = new List<SelectListItem>();
+            WebSiteMemberShipsCategories.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteMemberShipsCategories != null)
+            {
+                foreach (DEF_WebSiteMemberShipsCategories.RecordObject oV in lsrWebSiteMemberShipsCategories)
+                {
+                    WebSiteMemberShipsCategories.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteMemberShipsCategories(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteMemberShipsCategories dbInteraction = new DINT_WebSiteMemberShipsCategories(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstWebSiteMemberShipsCategories = dbInteraction.Get(lstParameters);
+
+                        Build_WebSiteMemberShipsCategories(lstWebSiteMemberShipsCategories);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+               
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteMemberCats dbWebSiteMemberCats = new DINT_WebSiteMemberCats(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteMemberCats.RecordObject> oSearch = dbWebSiteMemberCats.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteMemberCats = oSearch[0];
+                                    if (WebSiteMemberCats != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteMemberCatsDBView()
+        {
+            WebSiteMemberCats = new DEF_WebSiteMemberCats.RecordObject();
+            Build_WebSiteMemberShipsCategories(null);
+        }
+
+    }
+    
+    [Serializable]
+    public partial class WebSitePartnersDBView
+    {
+        int iID = 0;
+        public DEF_WebSitePartners.RecordObject WebSitePartners { get; set; }
+
+
+        public List<DEF_WebSitePartnerTypes.RecordObject> lstWebSitePartnerTypes;
+        public List<SelectListItem> WebSitePartnerTypes { get; set; }
+        public void Build_WebSitePartnerTypes(IEnumerable<DEF_WebSitePartnerTypes.RecordObject> lsrWebSitePartnerTypes)
+        {
+            WebSitePartnerTypes = new List<SelectListItem>();
+            WebSitePartnerTypes.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSitePartnerTypes != null)
+            {
+                foreach (DEF_WebSitePartnerTypes.RecordObject oV in lsrWebSitePartnerTypes)
+                {
+                    WebSitePartnerTypes.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSitePartnerTypes(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSitePartnerTypes dbInteraction = new DINT_WebSitePartnerTypes(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstWebSitePartnerTypes = dbInteraction.Get(lstParameters);
+
+                        Build_WebSitePartnerTypes(lstWebSitePartnerTypes);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        public List<SelectListItem> AssociatedUsers { get; set; }
+        public void Build_AssociatedUsers(IEnumerable<DEF_Users.RecordObject> lsrUsers)
+        {
+            AssociatedUsers = new List<SelectListItem>();
+            AssociatedUsers.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrUsers != null)
+            {
+                foreach (DEF_Users.RecordObject oV in lsrUsers)
+                {
+                    AssociatedUsers.Add(new SelectListItem { Selected = false, Text = oV.sFName + " " + oV.sLName + " (" + oV.sPrimaryEMail + ")", Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_AssociatedUsers(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_Users dbInteraction = new DINT_Users(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_AssociatedUsers(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSitePartners dbWebSitePartners = new DINT_WebSitePartners(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSitePartners.RecordObject> oSearch = dbWebSitePartners.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSitePartners = oSearch[0];
+                                    if (WebSitePartners != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSitePartnersDBView()
+        {
+            WebSitePartners = new DEF_WebSitePartners.RecordObject();
+            Build_AssociatedUsers(null);
+            Build_WebSitePartnerTypes(null);
+        }
+
+    }
+    
+    [Serializable]
+    public partial class WebSiteAffiliatesDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteAffiliates.RecordObject WebSiteAffiliates { get; set; }
+
+
+        public List<DEF_WebSiteAffiliateTypes.RecordObject> lstWebSiteAffiliateTypes;
+        public List<SelectListItem> WebSiteAffiliateTypes { get; set; }
+        public void Build_WebSiteAffiliateTypes(IEnumerable<DEF_WebSiteAffiliateTypes.RecordObject> lsrWebSiteAffiliateTypes)
+        {
+            WebSiteAffiliateTypes = new List<SelectListItem>();
+            WebSiteAffiliateTypes.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteAffiliateTypes != null)
+            {
+                foreach (DEF_WebSiteAffiliateTypes.RecordObject oV in lsrWebSiteAffiliateTypes)
+                {
+                    WebSiteAffiliateTypes.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteAffiliateTypes(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteAffiliateTypes dbInteraction = new DINT_WebSiteAffiliateTypes(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstWebSiteAffiliateTypes = dbInteraction.Get(lstParameters);
+
+                        Build_WebSiteAffiliateTypes(lstWebSiteAffiliateTypes);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+        public List<SelectListItem> AssociatedUsers { get; set; }
+        public void Build_AssociatedUsers(IEnumerable<DEF_Users.RecordObject> lsrUsers)
+        {
+            AssociatedUsers = new List<SelectListItem>();
+            AssociatedUsers.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrUsers != null)
+            {
+                foreach (DEF_Users.RecordObject oV in lsrUsers)
+                {
+                    AssociatedUsers.Add(new SelectListItem { Selected = false, Text = oV.sFName + " " + oV.sLName + " (" + oV.sPrimaryEMail + ")", Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_AssociatedUsers(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_Users dbInteraction = new DINT_Users(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_AssociatedUsers(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteAffiliates dbWebSiteAffiliates = new DINT_WebSiteAffiliates(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteAffiliates.RecordObject> oSearch = dbWebSiteAffiliates.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteAffiliates = oSearch[0];
+                                    if (WebSiteAffiliates != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteAffiliatesDBView()
+        {
+            WebSiteAffiliates = new DEF_WebSiteAffiliates.RecordObject();
+            Build_AssociatedUsers(null);
+            Build_WebSiteAffiliateTypes(null);
+        }
+
+    }
+
+    [Serializable]
+    public partial class WebSite_MessagingDBView
+    {
+        int iID = 0;
+        public DEF_WebSite_Messaging.RecordObject WebSite_Messaging { get; set; }
+
+
+        public List<DEF_CountryLanguages.RecordObject> lstCountryLanguages;
+        public List<SelectListItem> CountryLanguages { get; set; }
+        public void Build_CountryLanguages(IEnumerable<DEF_CountryLanguages.RecordObject> lsrCountryLanguages)
+        {
+            CountryLanguages = new List<SelectListItem>();
+            CountryLanguages.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrCountryLanguages != null)
+            {
+                foreach (DEF_CountryLanguages.RecordObject oV in lsrCountryLanguages)
+                {
+                    CountryLanguages.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_CountryLanguages(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_CountryLanguages dbInteraction = new DINT_CountryLanguages(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        lstCountryLanguages = dbInteraction.Get(lstParameters);
+
+                        Build_CountryLanguages(lstCountryLanguages);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+                
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSite_Messaging dbWebSite_Messaging = new DINT_WebSite_Messaging(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSite_Messaging.RecordObject> oSearch = dbWebSite_Messaging.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSite_Messaging = oSearch[0];
+                                    if (WebSite_Messaging != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSite_MessagingDBView()
+        {
+            WebSite_Messaging = new DEF_WebSite_Messaging.RecordObject();
+            Build_CountryLanguages(null);
+        }
+
+    }
+    
+    [Serializable]
+    public partial class WebSiteAnnouncementsDBView
+    {
+        int iID = 0;
+        public DEF_WebSiteAnnouncements.RecordObject WebSiteAnnouncements { get; set; }
+
+        public List<SelectListItem> WebSiteAnnouncementsType { get; set; }
+        public void Build_WebSiteAnnouncementsType(IEnumerable<DEF_WebSiteAnnouncementsType.RecordObject> lsrWebSiteAnnouncementsType)
+        {
+            WebSiteAnnouncementsType = new List<SelectListItem>();
+            WebSiteAnnouncementsType.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (lsrWebSiteAnnouncementsType != null)
+            {
+                foreach (DEF_WebSiteAnnouncementsType.RecordObject oV in lsrWebSiteAnnouncementsType)
+                {
+                    WebSiteAnnouncementsType.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                }
+            }
+        }
+        public void Get_WebSiteAnnouncementsType(IDataConnection _cnCon)
+        {
+            try
+            {
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteAnnouncementsType dbInteraction = new DINT_WebSiteAnnouncementsType(_cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+
+                        Build_WebSiteAnnouncementsType(dbInteraction.Get(lstParameters));
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+
+
+        public bool GetView(IDataConnection _cnCon, int _Id = 0)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        if (_Id > 0)
+                        {
+                            iID = _Id;
+
+                            DINT_WebSiteAnnouncements dbWebSiteAnnouncements = new DINT_WebSiteAnnouncements(_cnCon);
+
+                            List<DataParameter> lspParameters = new List<DataParameter>();
+                            DataParameter pParameter = new DataParameter("ID", _Id.ToString(), "int", 0, "ID", " = ", "");
+                            lspParameters.Add(pParameter);
+
+                            List<DEF_WebSiteAnnouncements.RecordObject> oSearch = dbWebSiteAnnouncements.Get(lspParameters);
+                            if (oSearch != null)
+                            {
+                                if (oSearch.Count > 0)
+                                {
+                                    WebSiteAnnouncements = oSearch[0];
+                                    if (WebSiteAnnouncements != null)
+                                    {
+                                        bResponse = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public WebSiteAnnouncementsDBView()
+        {
+            WebSiteAnnouncements = new DEF_WebSiteAnnouncements.RecordObject();
+            Build_WebSiteAnnouncementsType(null);
+        }
+
+    }
+
+    [Serializable]
+    public partial class WebSiteBlog_Navigation
+    {
+
+    }
+    
+    [Serializable]
+    public partial class FaceBookUser
+    {
+        public string _id { get; set; }
+        public string _email { get; set; }
+        public string _name { get; set; }
+        public string _first_name { get; set; }
+        public string _last_name { get; set; }
+        public string _short_namepublic { get; set; }
+        public string _about { get; set; }
+        public string _birthday { get; set; }
+        public string _cover { get; set; }
+        public string _gender { get; set; }
+        public string _hometown { get; set; }
+        public string _link { get; set; }
+        public string _picture { get; set; }
+
+
+    }
+    
+    [Serializable]
+    public partial class LeasUserSearch
+    {
+        public int SourceID { get; set; }
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string FName { get; set; }
+        public string LName { get; set; }
+        public string Phone { get; set; }
+
+
+    }
+
+
 }

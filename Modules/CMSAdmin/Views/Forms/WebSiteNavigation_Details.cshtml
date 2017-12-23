@@ -22,6 +22,21 @@
         }
     }
 
+
+    function on_Navigation_iMemberShipID_Changed() {
+        try {
+            var cboControl = document.getElementById("Navigation_iMemberShipID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("Navigation_sMemberShipID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
     function on_Navigation_iNavigationTypeID_Changed() {
         try {
             var cboControl = document.getElementById("Navigation_iNavigationTypeID");
@@ -182,7 +197,7 @@
 
                     <div class="form-group">
                         <label for="Navigation_bHidden">Hidden :</label>
-                        @Html.CheckBoxFor(model => model.Navigation.bHidden, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.Navigation.bHidden, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Navigation.bHidden, "*Required!")
@@ -191,7 +206,7 @@
 
                     <div class="form-group">
                         <label for="Navigation_bDisabled">Disable :</label>
-                        @Html.CheckBoxFor(model => model.Navigation.bDisabled, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.Navigation.bDisabled, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Navigation.bDisabled, "*Required!")
@@ -200,12 +215,32 @@
 
                     <div class="form-group">
                         <label for="Navigation_bRestrictAccess"> Restricted access :</label>
-                        @Html.CheckBoxFor(model => model.Navigation.bRestrictAccess, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.Navigation.bRestrictAccess, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Navigation.bRestrictAccess, "*Required!")
                         }
                     </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_bAnyActiveMemberShip"> Restrict to any membership :</label>
+                        @Html.CheckBoxFor(model => model.Navigation.bAnyActiveMemberShip, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.bAnyActiveMemberShip, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Navigation_iSiteTemplateID">Restrict to Membership :</label>
+                        @Html.DropDownListFor(model => model.Navigation.iMemberShipID, Model.WebSiteMemberShips, new { @Class = "form-control", @onchange = "javascript:on_Navigation_iMemberShipID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.Navigation.iMemberShipID, "*Required!")
+                        }
+                    </div>
+
+
 
                 </fieldset>
                 <div class="form-group">

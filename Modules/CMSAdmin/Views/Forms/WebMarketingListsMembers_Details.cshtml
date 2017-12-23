@@ -1,0 +1,683 @@
+@model AriesCMSDefinition.DEF_WebMarketingListsMembers.RecordObject
+
+
+<script type="text/javascript">
+    var sBaseURL = window.location.protocol + "//" + window.location.host + "/";
+    var iListID = @Html.Raw("'" + ViewBag.iParentID + "';");
+    var sListID = @Html.Raw("'" + ViewBag.sParentID + "';");
+
+    //_SourceID, _Id, _Email, _FName, _LName, _Phone
+    var oListOfUserSearch = [];
+
+    function On_AddUserToList(_SourceID, _Id, _Email, _FName, _LName, _Phone) {
+        try {
+
+            var oUser = { SourceID: _SourceID, Id: _Id, Email: _Email, FName: _FName, LName: _LName, Phone: _Phone };
+
+            oListOfUserSearch.push(oUser);
+
+        }
+        catch (e) {
+            alert("On_AddUserToList:" + e);
+        }
+    }
+
+    function On_RemoveUserFromList(_SourceID, _Id)
+    {
+        try {
+
+            if (oListOfUserSearch != null) {
+                if (oListOfUserSearch.length > 0) {
+                    var iI = oListOfUserSearch.length;
+                    for (var i = 0; i < oListOfUserSearch.length; i++) {
+                        var oUser = oListOfUserSearch[i];
+
+                        if (oUser.SourceID === _SourceID) {
+                            if (oUser.ID === _Id) {
+                                oListOfUserSearch.splice(i, 1);
+                                i = iI + 1;
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    //alert("List lenght is less than!");
+                }
+            }
+            else {
+                //alert("List lenght is null!");
+            }
+        }
+        catch (e) {
+            alert("On_RemoveUserFromList:" + e);
+        }
+    }
+
+    function On_Build_SearchResults_Table() {
+        try {
+
+
+            var sContent = "";
+
+            sContent += "   <table class=" + "\"" + "table" + "\"" + ">" + "\n\r";
+            sContent += "                <thead>" + "\n\r";
+            sContent += "                    <tr class=" + "\"" + "blue_background text-lg-center text-md-center text-xs-center whitetype" + "\"" + ">" + "\n\r";
+            sContent += "                        <th>First Name</th>" + "\n\r";
+            sContent += "                        <th>Last Name</th>" + "\n\r";
+            sContent += "                        <th>E-Mail</th>" + "\n\r";
+            sContent += "                        <th>Phone</th>" + "\n\r";
+            sContent += "                        <th>&nbsp;</th>" + "\n\r";
+            sContent += "                    </tr>" + "\n\r";
+            sContent += "                </thead>" + "\n\r";
+            sContent += "                <tbody>" + "\n\r";
+
+            if (oListOfUserSearch != null) {
+                if (oListOfUserSearch.length > 0) {
+                    for (var i = 0; i < oListOfUserSearch.length; i++)
+                    {
+                        if (oListOfUserSearch[i] != null)
+                        {
+                            sContent += "                    <tr>" + "\n\r";
+                            sContent += "                        <th scope=" + "\"" + "row" + "\"" + ">" + "\n\r";
+                            sContent += "                           " + oListOfUserSearch[i].FName + "\n\r";
+                            sContent += "                        </th>" + "\n\r";
+                            sContent += "                        <td>" + "\n\r";
+                            sContent += "                           " + oListOfUserSearch[i].LName + "\n\r";
+                            sContent += "                        </td>" + "\n\r";
+                            sContent += "                        <td>" + "\n\r";
+                            sContent += "                            " + oListOfUserSearch[i].Email + "\n\r";
+                            sContent += "                        </td>" + "\n\r";
+                            sContent += "                        <td>" + "\n\r";
+                            sContent += "                           " + oListOfUserSearch[i].Phone + "\n\r";
+
+                            if (oListOfUserSearch[i].SourceID == 1)
+                            {
+                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "UAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + ">ADD</a> " + "\n\r";
+                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "URemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Users_click(" + oListOfUserSearch[i].ID + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
+                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "URemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</a> " + "\n\r";
+                            }
+                            else if (oListOfUserSearch[i].SourceID == 2)
+                            {
+                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + ">ADD</a> " + "\n\r";
+                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LRemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
+                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LRemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</span> " + "\n\r";
+                            }
+                            sContent += "                        </td>" + "\n\r";
+                            sContent += "                    </tr>" + "\n\r";
+                        }
+                    }
+                }
+            }
+   
+            sContent += "                </tbody>" + "\n\r";
+            sContent += "            </table>" + "\n\r";
+
+            $('#pnlFindPersonSearchResults').empty();
+            $('#pnlFindPersonSearchResults').html(sContent);
+        }
+        catch (e) {
+            alert("On_Build_SearchResults_Table Error - " + e);
+        }
+    }
+
+    function On_AddAll_Users_click()
+    {
+        try {
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_AddAllUsers";
+            var oMydata = { _ID: iListID };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Records Added!");
+                        window.location.href = sBaseURL + "admin/home/WebMarketingListsMembers_List?_iParentID=" + iListID + "&_sParentID=" + sListID;
+
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_AddAll_Users_click Error - " + e);
+        }
+    }
+    
+    function On_AddAll_Leads_click()
+    {
+        try {
+
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_AddAllLeads";
+            var oMydata = { _ID: iListID };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Records Added!");
+                        window.location.href = sBaseURL + "admin/home/WebMarketingListsMembers_List?_iParentID=" + iListID + "&_sParentID=" + sListID;
+
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_AddAll_Leads_click Error - " + e);
+        }
+    }
+
+    function On_Add_Users_click(_Id)
+    {
+        try {
+
+
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_AddNewUser";
+            var oMydata = { _ID: iListID, _LeadID: 0, _UserID: _Id };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Record Added!");
+
+                        $('#btn' + _Id + 'URemove').show();
+                        $('#btn' + _Id + 'UAdd').hide();
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_Add_Users_click Error - " + e);
+        }
+    }
+    function On_Remove_Users_click(_Id) {
+        try {
+
+
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_RemoveUser";
+            var oMydata = { _ID: iListID, _LeadID: 0, _UserID: _Id };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Record Added!");
+
+                        $('#btn' + _Id + 'URemove').hide();
+                        $('#btn' + _Id + 'UAdd').show();
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_Add_Users_click Error - " + e);
+        }
+    }
+
+    function On_Add_Lead_click(_Id) {
+        try {
+
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_AddNewUser";
+            var oMydata = { _ID: iListID, _LeadID: _Id, _UserID:0  };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Record Added!");
+
+                        $('#btn' + _Id + 'LRemove').show();
+                        $('#btn' + _Id + 'LAdd').hide();
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_Add_Users_click Error - " + e);
+        }
+    }
+    function On_Remove_Lead_click(_Id) {
+        try {
+
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_RemoveUser";
+            var oMydata = { _ID: iListID, _LeadID: _Id, _UserID: 0 };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Record Removed!");
+
+                        $('#btn' + _Id + 'LRemove').hide();
+                        $('#btn' + _Id + 'LAdd').show();
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+            alert("On_Add_Users_click Error - " + e);
+        }
+    }
+    
+    function On_Search_For_Person_Click()
+    {
+        try {
+
+            var oSearch = $('#txt_sSearchForAddperson').val();
+            $('#pnlFindPersonSearchResults').hide(200);
+            $('#pnlFindPersonSearchResults_PleaseWaith').show(100);
+
+
+            var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_SearchForUser";
+            var oMydata = { _Search: oSearch };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true')
+                    {
+                        var oUserList = data.DATA;
+                        var oLeadList = data.DATA2;
+                        oListOfUserSearch = [];
+
+                        if (oUserList != null) {
+                            if (oUserList.length > 0) {
+                                for (var i = 0; i < oUserList.length; i++)
+                                {
+                                    On_AddUserToList(1, oUserList[i].ID, oUserList[i].sPrimaryEMail, oUserList[i].sFName, oUserList[i].sLName, oUserList[i].sPrimaryPhone);
+                                }
+                            }
+                        }
+
+                        if (oLeadList != null) {
+                            if (oLeadList.length > 0) {
+                                for (var i = 0; i < oLeadList.length; i++) {
+                                    On_AddUserToList(2, oLeadList[i].ID, oLeadList[i].sPrimaryEMail, oLeadList[i].sFName, oLeadList[i].sLName, oLeadList[i].sPrimaryPhone);
+                                }
+                            }
+                        }
+                        On_Build_SearchResults_Table();
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                    }
+                    else {
+
+                        $('#pnlFindPersonSearchResults').show(200);
+                        $('#pnlFindPersonSearchResults_PleaseWaith').hide(100);
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+
+
+        }
+        catch (e) {
+            alert("On_Search_For_Person_Click Error - " + e);
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>Add member(s) to the list</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.sEMail
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+            <<  @Html.ActionLink("Return List View", "WebMarketingListsMembers_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+        </div>
+
+        @if (ViewBag.bAddNew)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+                <p>You can, <a href="javascript:">Add All Leads</a> or <a href="javascript:">Add All Users</a></p>
+            </div>
+        }
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    @if (ViewBag.bAddNew)
+    {
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                &nbsp;
+            </div>
+            <div class="col-lg-5 col-md-5 offset-lg-7 offset-md-7 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+                <h6 class="text-bold">User Search</h6>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <a href="javascript:On_Search_For_Person_Click();" class="btn btn-info">Search</a>
+                    </span>
+                    <input type="text" class="form-control" placeholder="Search email, first name or last name" name="txt_sSearchForAddperson" id="txt_sSearchForAddperson" required="" />
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                <h6 class="text-bold">Search Results</h6>
+            </div>
+            <div id="pnlFindPersonSearchResults" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                <table class="table">
+                    <thead>
+                        <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>E-Mail</th>
+                            <th>Phone</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                &nbsp;
+                            </th>
+                            <td>
+                                &nbsp;
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                            <td>
+                                &nbsp;
+                                <!--<a id="btn123LAdd" href="javascript:">ADD</a>-->
+                                <!--<a id="btn123LRemove" href="javascript:">ADD</a>-->
+                                <!--<a id="btn123UAdd" href="javascript:">ADD</a>-->
+                                <!--<a id="btn123URemove" href="javascript:">ADD</a>-->
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="pnlFindPersonSearchResults_PleaseWaith" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left" style="display:none;">
+                <span>Please wait...</span>
+                <center><img src="~/Themes/loader.GIF" alt="" class="img-fluid" /></center>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1" style="display:none;">
+                @using (Html.BeginForm("WebMarketingListsMembers_AddUpdate", "", FormMethod.Post))
+                {
+                    @Html.ValidationSummary(true);
+                    @Html.HiddenFor(model => model.ID)
+                    @Html.HiddenFor(model => model.sControl)
+                    @Html.HiddenFor(model => model.sSync)
+                    @Html.HiddenFor(model => model.iParentID)
+                    @Html.HiddenFor(model => model.sParentID)
+                    @Html.HiddenFor(model => model.dtDateCreated)
+                    @Html.HiddenFor(model => model.dtLastUpdated)
+                    @Html.HiddenFor(model => model.iCreatedByID)
+                    @Html.HiddenFor(model => model.sCreatedByID)
+                    @Html.HiddenFor(model => model.iUpdatedByID)
+                    @Html.HiddenFor(model => model.sUpdatedByID)
+                    @Html.HiddenFor(model => model.iUserID)
+                    @Html.HiddenFor(model => model.sUserID)
+                    @Html.HiddenFor(model => model.iLeadID)
+                    @Html.HiddenFor(model => model.sLeadID)
+
+                    @Html.HiddenFor(model => model.bNegative)
+                    @Html.HiddenFor(model => model.bHidden)
+
+                    @Html.HiddenFor(model => model.sAvitarURL)
+                    @Html.HiddenFor(model => model.sCellPhone)
+                    @Html.HiddenFor(model => model.dtsentouton)
+
+                    @Html.HiddenFor(model => model.bSent)
+                    @Html.HiddenFor(model => model.bReceived)
+                    @Html.HiddenFor(model => model.bOpenned)
+                    @Html.HiddenFor(model => model.bClicked)
+
+
+                    <fieldset>
+                        <legend></legend>
+
+                        <div class="form-group">
+                            <label for="sEMail">E-Mail :</label>
+                            @Html.TextBoxFor(model => model.sEMail, new { @Class = "form-control", @readonly = "readonly" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.sEMail)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="sFName">First name :</label>
+                            @Html.TextBoxFor(model => model.sFName, new { @Class = "form-control", @readonly = "readonly" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.sFName)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="sLName">Last name :</label>
+                            @Html.TextBoxFor(model => model.sLName, new { @Class = "form-control", @readonly = "readonly" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.sLName)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="dtLastsendouton">Last message send on :</label>
+                            @Html.TextBoxFor(model => model.dtLastsendouton, new { @Class = "form-control", @readonly = "readonly" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtLastsendouton)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bSuspended">Suspended :</label>
+                            @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.bSuspended)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bDisabled">Disabled :</label>
+                            @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control" })
+                            <span class="alert-danger">@Html.ValidationMessageFor(model => model.bDisabled)</span>
+                        </div>
+
+
+
+
+                    </fieldset>
+                                        <div class="form-group">
+                                            
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+
+                                        </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

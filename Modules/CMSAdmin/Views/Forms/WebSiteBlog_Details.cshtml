@@ -191,7 +191,7 @@
     <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1 ">
 
-            @using (Html.BeginForm("WebSiteBlog_AddUpdate", "", FormMethod.Post,  new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("WebSiteBlog_AddUpdate", "", FormMethod.Post))
             {
                 @Html.ValidationSummary(true);
 
@@ -232,7 +232,7 @@
 
                     <div class="form-group">
                         <label for="Blog_sSubject"> Subject :</label>
-                        @Html.TextAreaFor(model => model.Blog.sSubject, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.Blog.sSubject, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Blog.sSubject, "*Required!")
@@ -241,7 +241,7 @@
 
                     <div class="form-group">
                         <label for="Blog_sDescription"> Side HTML :</label>
-                        @Html.TextAreaFor(model => model.Blog.sDescription, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.Blog.sDescription, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Blog.sDescription, "*Required!")
@@ -268,7 +268,7 @@
 
                     <div class="form-group">
                         <label for="Blog_bRestrictAccess">Restriced access :</label>
-                        @Html.CheckBoxFor(model => model.Blog.bRestrictAccess, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.Blog.bRestrictAccess, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.Blog.bRestrictAccess, "*Required!")

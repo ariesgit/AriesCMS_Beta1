@@ -120,7 +120,7 @@
 
                     <div style="width:100%;float:left;">
                         <label for="sContent">Content :</label>
-                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control", @style = "height:400px !important;" })
+                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control textarea_admin", @style = "height:400px !important;" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.sContent, "*Required!")

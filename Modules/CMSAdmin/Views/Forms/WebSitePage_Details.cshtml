@@ -22,7 +22,24 @@
             alert(e);
         }
     }
+
+
+    function on_WebSitePage_iMemberShipID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSitePage_iMemberShipID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSitePage_sMemberShipID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
     
+
     function on_WebSitePage_iSiteTemplateID_Changed() {
         try {
             var cboControl = document.getElementById("WebSitePage_iSiteTemplateID");
@@ -179,6 +196,8 @@
                         @Html.HiddenFor(model => model.WebSitePage.sLanguageID)
                         @Html.HiddenFor(model => model.WebSitePage.sSiteTemplatePageID)
 
+                        @Html.HiddenFor(model => model.WebSitePage.iNavLinkID)
+                        @Html.HiddenFor(model => model.WebSitePage.sMemberShipID)
                         <fieldset>
                             <legend></legend>
 
@@ -193,7 +212,7 @@
 
                             <div class="form-group">
                                 <label for="WebSitePage_sPageTitle">Title :</label>
-                                @Html.TextAreaFor(model => model.WebSitePage.sPageTitle, new { @Class = "form-control" })
+                                @Html.TextAreaFor(model => model.WebSitePage.sPageTitle, new { @Class = "form-control textarea_admin" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.sPageTitle, "*Required!")
@@ -201,8 +220,17 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="WebSitePage_sPageTitle">Navigation (url value) :</label>
+                                @Html.TextBoxFor(model => model.WebSitePage.sNavLinkID, new { @Class = "form-control" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.sNavLinkID, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
                                 <label for="WebSitePage_sMetaTags"> Meta tags :</label>
-                                @Html.TextAreaFor(model => model.WebSitePage.sMetaTags, new { @Class = "form-control" })
+                                @Html.TextAreaFor(model => model.WebSitePage.sMetaTags, new { @Class = "form-control textarea_admin" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.sMetaTags, "*Required!")
@@ -211,7 +239,7 @@
 
                             <div class="form-group">
                                 <label for="WebSitePage_sClassification">Classification :</label>
-                                @Html.TextAreaFor(model => model.WebSitePage.sClassification, new { @Class = "form-control" })
+                                @Html.TextAreaFor(model => model.WebSitePage.sClassification, new { @Class = "form-control textarea_admin" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.sClassification, "*Required!")
@@ -220,7 +248,7 @@
 
                             <div class="form-group">
                                 <label for="WebSitePage_sPageDescription">Page description :</label>
-                                @Html.TextAreaFor(model => model.WebSitePage.sPageDescription, new { @Class = "form-control" })
+                                @Html.TextAreaFor(model => model.WebSitePage.sPageDescription, new { @Class = "form-control textarea_admin" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.sPageDescription, "*Required!")
@@ -229,7 +257,7 @@
 
                             <div class="form-group">
                                 <label for="WebSitePage_sKeyWords">Key words :</label>
-                                @Html.TextAreaFor(model => model.WebSitePage.sKeyWords, new { @Class = "form-control" })
+                                @Html.TextAreaFor(model => model.WebSitePage.sKeyWords, new { @Class = "form-control textarea_admin" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.sKeyWords, "*Required!")
@@ -238,7 +266,7 @@
 
                             <div class="form-group">
                                 <label for="WebSitePage_bIsLive">Is live :</label>
-                                @Html.CheckBoxFor(model => model.WebSitePage.bIsLive, new { @Class = "form-control" })
+                                @Html.CheckBoxFor(model => model.WebSitePage.bIsLive, new { @Class = "form-control checkbox-inline" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.bIsLive, "*Required!")
@@ -246,11 +274,29 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="WebSitePage_bRestrictAccess"> Restrict access :</label>
-                                @Html.CheckBoxFor(model => model.WebSitePage.bRestrictAccess, new { @Class = "form-control" })
+                                <label for="WebSitePage_bRestrictAccess"> Restrict access (loged in):</label>
+                                @Html.CheckBoxFor(model => model.WebSitePage.bRestrictAccess, new { @Class = "form-control checkbox-inline" })
                                 @if (ViewBag.bError == true)
                                 {
                                     @Html.ValidationMessageFor(model => model.WebSitePage.bRestrictAccess, "*Required!")
+                                }
+                            </div>
+
+                            <div class="form-group">
+                                <label for="WebSitePage_bAnyActiveMemberShip"> Restrict to any membership :</label>
+                                @Html.CheckBoxFor(model => model.WebSitePage.bAnyActiveMemberShip, new { @Class = "form-control checkbox-inline" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.bAnyActiveMemberShip, "*Required!")
+                                }
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="WebSitePage_iSiteTemplateID">Restrict to Membership :</label>
+                                @Html.DropDownListFor(model => model.WebSitePage.iMemberShipID, Model.WebSiteMemberShips, new { @Class = "form-control", @onchange = "javascript:on_WebSitePage_iMemberShipID_Changed();" })
+                                @if (ViewBag.bError == true)
+                                {
+                                    @Html.ValidationMessageFor(model => model.WebSitePage.iMemberShipID, "*Required!")
                                 }
                             </div>
 
@@ -271,6 +317,10 @@
                                     @Html.ValidationMessageFor(model => model.WebSitePage.iLanguageID, "*Required!")
                                 }
                             </div>
+
+
+
+
 
                         </fieldset>
                         <div class="form-group">

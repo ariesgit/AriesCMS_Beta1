@@ -47,6 +47,20 @@
         }
     }
 
+
+    function on_User_iMemberShipID_Changed() {
+        try {
+            var cboControl = document.getElementById("User_iMemberShipID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("User_sMemberShipID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
   
 </script> 
 
@@ -75,7 +89,7 @@
     <div class="row">
         <div class="col-lg-10 col-md-10 col-xs-12 offset-lg-1 offset-md-1 ">
 
-            @using (Html.BeginForm("ProfileUpdate", "", FormMethod.Post))
+            @using (Html.BeginForm("ProfileUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.ValidationSummary(true);
 
@@ -111,6 +125,13 @@
                 @Html.HiddenFor(model => model.User.iBillCountryID)
 
                 @Html.HiddenFor(model => model.CurrentPassword)
+            
+                @Html.HiddenFor(model => model.User.bAccLocked)
+                @Html.HiddenFor(model => model.User.iPrimaryRole)
+                @Html.HiddenFor(model => model.User.sActivationKey)
+                @Html.HiddenFor(model => model.User.bAccountActivated)
+                @Html.HiddenFor(model => model.User.sMemberShipID)
+
 
                 <fieldset>
                     <legend></legend>
@@ -146,41 +167,12 @@
                         }
                     </div>
 
-                    <div class="form-group">
-                        <label for="User_bAccLocked">Account locked :</label>
-                        @Html.CheckBoxFor(model => model.User.bAccLocked, new { @Class = "form-control" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.User.bAccLocked, "*Required!")
-                        }
-                    </div>
-
+                    
                     <div class="form-group">
                         <label for="User_iPrimaryRole"> Primary security role :</label>
-                        @Html.DropDownListFor(model => model.User.iPrimaryRole, Model.Roles, new { @Class = "form-control", @onchange = "javascript:on_User_iPrimaryRole_Changed();" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.User.iPrimaryRole, "*Required!")
-                        }
+                        @Html.DisplayFor(model => model.User.sPrimaryRole)
                     </div>
 
-                    <div class="form-group">
-                        <label for="User_sActivationKey"> Activation key :</label>
-                        @Html.TextBoxFor(model => model.User.sActivationKey, new { @Class = "form-control", @readonly = "readonly" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.User.sActivationKey, "*Required!")
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="User_bAccountActivated">Account activated :</label>
-                        @Html.CheckBoxFor(model => model.User.bAccountActivated, new { @Class = "form-control" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.User.bAccountActivated, "*Required!")
-                        }
-                    </div>
 
                     <div class="form-group">
                         <h4>User Identity</h4>
@@ -224,6 +216,18 @@
 
 
                     <div class="form-group">
+                        <label for="User_sAvitarImgURL">Avitar :</label>
+                    </div>
+                    <div class="form-group">
+                        <img src="@Model.User.sAvitarImgURL" alt="" class="img-fluid" />
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
+                    </div>
+
+
+
+                    <div class="form-group">
                         <h4>Contact Information</h4>
                     </div>
 
@@ -248,7 +252,7 @@
 
                     <div class="form-group">
                         <label for="User_bOptInMarketing">Opt. out of marketing :</label>
-                        @Html.CheckBoxFor(model => model.User.bOptInMarketing, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.User.bOptInMarketing, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.User.bOptInMarketing, "*Required!")
@@ -353,6 +357,69 @@
                             @Html.ValidationMessageFor(model => model.User.sBillPostalCode, "*Required!")
                         }
                     </div>
+
+                    <div class="form-group">
+                        <h4>Billing Info</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="User_sCN">Credit card no.:</label>
+                        @Html.TextBoxFor(model => model.User.sCN, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.sCN, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="User_sCExp">Exp. date :</label>
+                        @Html.TextBoxFor(model => model.User.sCExp, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.sCExp, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="User_sCCVV">CVV :</label>
+                        @Html.TextBoxFor(model => model.User.sCCVV, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.sCCVV, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Membership Info</h4>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="User_iMemberShipID">Membership :</label>
+                        @Html.DropDownListFor(model => model.User.iMemberShipID, Model.WebSiteMemberShips, new { @Class = "form-control", @onchange = "javascript:on_User_iMemberShipID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.iMemberShipID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="User_dtMembershipExpOn">Membership exp. on :</label>
+                        @Html.TextBoxFor(model => model.User.dtMembershipExpOn, new { @Class = "form-control", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.dtMembershipExpOn, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="User_bMembershipInActive">Membership disabled :</label>
+                        @Html.CheckBoxFor(model => model.User.bMembershipInActive, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.User.bMembershipInActive, "*Required!")
+                        }
+                    </div>
+                   
 
                 </fieldset>
                 <div class="form-group">

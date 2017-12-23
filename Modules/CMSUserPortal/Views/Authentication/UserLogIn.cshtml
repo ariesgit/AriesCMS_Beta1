@@ -35,7 +35,7 @@
 {
     <div class="row">
         <div class="col-lg-12 col-md-12 col-xs-12">
-            @using (Html.BeginForm("UserLogIn", "", FormMethod.Post))
+            @using (Html.BeginForm("ACEUserLogIn", "", FormMethod.Post))
             {
                 Html.ValidationSummary(true);
                 <fieldset>
@@ -66,7 +66,7 @@
     </div>
     <div class="row">
         <div class="col-lg-10 col-md-10 col-xs-12 offset-lg-1 offset-md-1">
-            <p> Forgotten your credentials? <br /> <a href="~/profilerecovery">Click here</a> to start a process to recover them.</p>
+            <p> Forgotten your credentials? <br /> <a href="~/lp/recoverProfile">Click here</a> to start a process to recover them.</p>
         </div>
     </div>
 }

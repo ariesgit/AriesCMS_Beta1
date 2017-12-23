@@ -137,9 +137,10 @@
                          @Html.HiddenFor(model => model.sResume)  
                          @Html.HiddenFor(model => model.sResumeUploadLink1)  
                          @Html.HiddenFor(model => model.sResumeUploadLink2)  
-                         @Html.HiddenFor(model => model.sResumeUploadLink3)  
-      
-      
+                         @Html.HiddenFor(model => model.sResumeUploadLink3)
+
+
+
                                         <fieldset> 
                                             <legend></legend>
 
@@ -164,13 +165,13 @@
 
                                             <div class="form-group">
                                                 <label for="sCoverLetter">Cover letter :</label>
-                                                @Html.TextAreaFor(model => model.sCoverLetter, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sCoverLetter, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sCoverLetter)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sResume">Resume :</label>
-                                                @Html.TextAreaFor(model => model.sResume, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sResume, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sResume)</span>
                                             </div>
 
@@ -185,6 +186,38 @@
                                             </div>
 
 
+                                            <div class="form-group">
+                                                <label for="bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
+                                                }
+                                            </div>
 
                                         </fieldset>
                                         <div class="form-group">

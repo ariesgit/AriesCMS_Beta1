@@ -78,6 +78,12 @@
                                     @Html.ActionLink("Edit", "WebSitePageTemplateZonesContent_Details", new { id = objRec.ID })
                                     @Html.Raw("|")
                                     @Html.ActionLink("Delete", "WebSitePageTemplateZonesContent_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+                                 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    @Html.ActionLink("Change History", "WebSitePageTemplateZonesContent_History_List", new { _iParentID = objRec.ID, _sParentID = objRec.sName })
                                 </td>
                             </tr>
                         }

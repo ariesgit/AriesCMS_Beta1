@@ -1,0 +1,229 @@
+@model AriesCMS.Models.WebSiteEventCalendarSponsorsDBView
+
+
+<script type="text/javascript">
+    
+
+    function on_WebSiteEventCalendarSponsors_iSponsorID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEventCalendarSponsors_iSponsorID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEventCalendarSponsors_SponsorID");
+            oHiddenField.value = selectedText;
+
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteEventCalendarSponsors_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteEventCalendarSponsors_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteEventCalendarSponsors_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Calendar Event Sponsor</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSiteEventCalendarSponsors.sSponsorID
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteEventCalendarSponsors_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+
+
+
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteEventCalendarSponsors_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.ID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sUpdatedByID)  
+                       
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sSponsorID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sName)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.iSponsorShipTypeID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sSponsorShipTypeID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sImageURL)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sImageURL2)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sImageURL3)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sListingDescription)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sLargerListingDescription)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sDetailsDescription)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.iAssociatedUserID)  
+                         @Html.HiddenFor(model => model.WebSiteEventCalendarSponsors.sAssociatedUserID)
+
+
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteEventCalendarSponsors_iSponsorID">Sponsor :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteEventCalendarSponsors.iSponsorID, Model.WebSiteSponsors, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEventCalendarSponsors_iSponsorID_Changed(this.value);" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendarSponsors.iSponsorID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteEventCalendarSponsors_bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteEventCalendarSponsors.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteEventCalendarSponsors.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteEventCalendarSponsors_bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteEventCalendarSponsors.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteEventCalendarSponsors.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteEventCalendarSponsors_bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteEventCalendarSponsors.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteEventCalendarSponsors.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteEventCalendarSponsors_bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteEventCalendarSponsors.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteEventCalendarSponsors.bHidden, "*Required!")
+                                                }
+                                            </div>
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -134,7 +134,7 @@
                         <label for="WebSiteScreen_sSiteTempalteURL">Location :</label>
 
 
-                        @Html.TextAreaFor(model => model.WebSiteScreen.sSiteTempalteURL, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSiteScreen.sSiteTempalteURL, new { @Class = "form-control textarea_admin" })
 
                         @if (ViewBag.bError == true)
                         {
@@ -147,7 +147,7 @@
                         <label for="WebSiteScreen_bIsLive">Is live :</label>
 
 
-                        @Html.CheckBoxFor(model => model.WebSiteScreen.bIsLive, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.WebSiteScreen.bIsLive, new { @Class = "form-control checkbox-inline" })
 
                         @if (ViewBag.bError == true)
                         {
@@ -160,7 +160,7 @@
                         <label for="WebSiteScreen_bRestrictAccess">Restrict access :</label>
 
 
-                        @Html.CheckBoxFor(model => model.WebSiteScreen.bRestrictAccess, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.WebSiteScreen.bRestrictAccess, new { @Class = "form-control checkbox-inline" })
 
                         @if (ViewBag.bError == true)
                         {

@@ -1,0 +1,355 @@
+@model AriesCMSDefinition.DEF_WebSiteEMailCampaign.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSiteEMailCampaign_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteEMailCampaign_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteEMailCampaign_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteEMailCampaign_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new E-Mail Campaign</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSiteEMailCampaign_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+                    @using (Html.BeginForm("WebSiteEMailCampaign_AddUpdate", "", FormMethod.Post))
+                       {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.sSync)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.dtDateCreated)  
+                         @Html.HiddenFor(model => model.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID) 
+
+                         @Html.HiddenFor(model => model.sContent)  
+                         @Html.HiddenFor(model => model.sVersion)  
+                         @Html.HiddenFor(model => model.bRemoved)  
+                         @Html.HiddenFor(model => model.bAnswered)  
+                         @Html.HiddenFor(model => model.iAnsweredByID)  
+                         @Html.HiddenFor(model => model.sAnsweredByID)  
+                         @Html.HiddenFor(model => model.iAnsweredByResponseID)  
+                         @Html.HiddenFor(model => model.sAnsweredByResponseID)  
+
+                         @Html.HiddenFor(model => model.bNegative)  
+                         @Html.HiddenFor(model => model.bHidden)  
+                         @Html.HiddenFor(model => model.iTypeID)  
+                         @Html.HiddenFor(model => model.sTypeID)  
+                         @Html.HiddenFor(model => model.sURL1)  
+                         @Html.HiddenFor(model => model.sURL2)  
+                         @Html.HiddenFor(model => model.sURL3)  
+                         @Html.HiddenFor(model => model.sImageURL)  
+                         @Html.HiddenFor(model => model.sImageURL2)  
+                         @Html.HiddenFor(model => model.sImageURL3)  
+
+                         @Html.HiddenFor(model => model.dtSecondRunAt)  
+                         @Html.HiddenFor(model => model.sHTML2)  
+                         @Html.HiddenFor(model => model.sText2)
+                        
+                        @Html.HiddenFor(model => model.sSubjectLine2)
+
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="sFieldName">Name :</label>
+                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="sSubjectLine1">Subject :</label>
+                                                @Html.TextBoxFor(model => model.sSubjectLine1, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.sSubjectLine1, "*Required!")
+                                                }
+                                            </div>
+
+
+
+
+
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                                    <ul class="nav nav-tabs" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a id="tabHTMLContent" class="nav-link active" href="#pnlHTMLContent" role="tab" data-toggle="tab">HTML Message</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabTextContent" class="nav-link" href="#pnlTextContent" role="tab" data-toggle="tab">Text Message</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabProperties" class="nav-link" href="#pnlProperties" role="tab" data-toggle="tab">Properties</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabCodeHelp" class="nav-link" href="#pnlCodeHelp" role="tab" data-toggle="tab">Code Help</a>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="tab-content">
+                                                        <div role="tabpanel" class="tab-pane fadein active" id="pnlHTMLContent">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                                                                <div class="form-group">
+                                                                    @Html.TextAreaFor(model => model.sHTML1, new { @Class = "form-control textarea_admin" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.sHTML1, "*Required!")
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlTextContent">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                                                                <div class="form-group">
+                                                                    @Html.TextAreaFor(model => model.sText1, new { @Class = "form-control textarea_admin" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.sText1, "*Required!")
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlProperties">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                                                                <div class="form-group">
+                                                                    <label for="sFromName">From Name :</label>
+                                                                    @Html.TextBoxFor(model => model.sFromName, new { @Class = "form-control" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.sFromName, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="sFromEmail">From E-Mail :</label>
+                                                                    @Html.TextBoxFor(model => model.sFromEmail, new { @Class = "form-control" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.sFromEmail, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="sFromPhone">From Phone :</label>
+                                                                    @Html.TextBoxFor(model => model.sFromPhone, new { @Class = "form-control" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.dtRunAt, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="dtRunAt">Run at (Date &amp; Time eg. 01/01/2000 12:00 AM) :</label>
+                                                                    @Html.TextBoxFor(model => model.dtRunAt, new { @Class = "form-control" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.dtRunAt, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="sDescription">Description :</label>
+                                                                    @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control textarea_admin" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.sDescription, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="bDisabled">Disable :</label>
+                                                                    @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control  checkbox-inline" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="bSuspended">Suspend :</label>
+                                                                    @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                                    @if (ViewBag.bError == true)
+                                                                    {
+                                                                        @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
+                                                                    }
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlCodeHelp">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                                                <p>Person's First Name: 
+                                                                    <span class="CodeMirror-lines"><##sFName##></##sFName##></span>
+                                                                </p>
+                                                                <p>
+                                                                    Person's Last Name:
+                                                                    <span class="CodeMirror-lines"><##sLName##></##sLName##></span>
+                                                                </p>
+                                                                <p>
+                                                                    Person's E-Mail:
+                                                                    <span class="CodeMirror-lines"><##sEMail##></##sEMail##></span>
+                                                                </p>
+                                                                <p>
+                                                                    Person's Cell Phone:
+                                                                    <span class="CodeMirror-lines"><##sCellPhone##></##sCellPhone##></span>
+                                                                </p>
+                                                                <p>
+                                                                    Person's Avitar URL:
+                                                                    <span class="CodeMirror-lines"><##sAvitarURL##></##sAvitarURL##></span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

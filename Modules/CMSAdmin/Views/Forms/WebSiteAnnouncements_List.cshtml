@@ -66,6 +66,7 @@
                     <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
                         <th>Title</th>
                         <th>Date &amp; Time</th>
+                        <th>Type</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -77,6 +78,7 @@
                             <tr>
                                 <th scope="row">@Html.DisplayFor(modelItem => objRec.sName)</th>
                                 <td>@Html.DisplayFor(modelItem => objRec.dtDateCreated)</td>
+                                <td>@Html.DisplayFor(modelItem => objRec.sTypeID)</td>
                             <td>
                                 @Html.ActionLink("Edit", "WebSiteAnnouncements_Details", new { id=objRec.ID}) 
                                 @Html.Raw("|")
@@ -89,7 +91,7 @@
                     {
                             <tr>
                             
-                          <td colspan="1">
+                          <td colspan="4">
 
                             
                             
@@ -109,7 +111,7 @@
                     {     
                     <tr>
                             
-                    <td scope="row" colspan="1" class="blue_background text-lg-center text-md-center text-xs-center">
+                    <td scope="row" colspan="4" class="blue_background text-lg-center text-md-center text-xs-center">
 
                           
                       

@@ -1,0 +1,204 @@
+@model ACMSDBView.WebSiteEMailCampaignListsViewModel
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_WebSiteEMailCampaignLists_iListID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEMailCampaignLists_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaignLists_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteEMailCampaignLists_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteEMailCampaignLists_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteEMailCampaignLists_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new E-Mail List</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSiteEMailCampaignLists.sListID
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteEMailCampaignLists_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteEMailCampaignLists_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.ID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sUpdatedByID)  
+
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sListID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.iLeadID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sLeadID)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bDisabled)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bSuspended)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bNegative)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bHidden)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sEMail)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sFName)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sLName)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sAvitarURL)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.sCellPhone)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.dtsentouton)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.dtLastsendouton)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bSent)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bReceived)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bOpenned)  
+                         @Html.HiddenFor(model => model.WebSiteEMailCampaignLists.bClicked)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="sFieldName">Select Marketing List :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteEMailCampaignLists.iListID, Model.WebMarketingLists, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSiteEMailCampaignLists_iListID_Changed();" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                                                }
+                                            </div>
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -162,7 +162,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageZone_sContent">Content :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
-                        @Html.TextAreaFor(model => model.WebSitePageZone.sContent, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageZone.sContent, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageZone.sContent, "*Required!")
@@ -171,7 +171,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageZone_bLoadPartialPage">Use Partial Page :</label>
-                        @Html.CheckBoxFor(model => model.WebSitePageZone.bLoadPartialPage, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.WebSitePageZone.bLoadPartialPage, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageZone.bLoadPartialPage, "*Required!")

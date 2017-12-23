@@ -49,9 +49,13 @@ namespace AriesCMS.Controllers
     public partial class LPController : Controller
     {
 
-        int _igBaseTemplateID = 1;
-        int _igBaseTemplatePageID = 1;
-        int _igBaseTemplatePageZoneID = 2;
+        //int _igBaseTemplateID = 1;
+        //int _igBaseTemplatePageID = 1;
+        //int _igBaseTemplatePageZoneID = 2;
+        //int[] iAccessRolesAllowed = new int[5] { 1, 2, 3, 4, 5 };
+        int _igBaseTemplateID = 2;
+        int _igBaseTemplatePageID = 3;
+        int _igBaseTemplatePageZoneID = 8;
         int[] iAccessRolesAllowed = new int[5] { 1, 2, 3, 4, 5 };
 
 
@@ -165,6 +169,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -314,6 +321,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -443,6 +453,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -575,6 +588,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -704,6 +720,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -838,6 +857,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -967,6 +989,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -984,6 +1009,8 @@ namespace AriesCMS.Controllers
                 return Redirect("~/error");
             }
         }
+
+
 
 
 
@@ -1011,6 +1038,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteBlog();
 
                 Object oResponse = null;
 
@@ -1088,6 +1116,7 @@ namespace AriesCMS.Controllers
                 {
                     if (oSystem.WebSiteBlog_List("", 1, "", 1))
                     {
+                        oSystem.recWebSiteBlog = null;
                         oSystem.recWebSiteBlog = oSystem.lstWebSiteBlog[0];
                         if (oSystem.recWebSiteBlog != null)
                         {
@@ -1100,6 +1129,7 @@ namespace AriesCMS.Controllers
                 //If blog was found then continue to load the page or else go to error page
                 if (bFoundBlog)
                 {
+                    oSystem.Ini_WebSiteBlogEntry();
                     oSystem.WebSiteBlogEntry_List("", oSystem.recWebSiteBlog.ID, oSystem.recWebSiteBlog.sTitle, 1);
 
                     //load blog comments
@@ -1144,6 +1174,9 @@ namespace AriesCMS.Controllers
                         oPage.AuthenticatedUser = true;
                         oPage.PartialViewToLoad = "";
                         oPage.CanEditPages = false;
+                        oPage.User = oSystem.CurrentUser.UserView;
+                        oPage.User.Get_Countries(oSystem.cnCon);
+                        oPage.User.Get_States(oSystem.cnCon);
 
                         oSystem.CloseDataConnection();
                         return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -1177,6 +1210,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteBlogEntry();
 
                 Object oResponse = null;
 
@@ -1306,6 +1340,9 @@ namespace AriesCMS.Controllers
                                 oPage.AuthenticatedUser = true;
                                 oPage.PartialViewToLoad = "";
                                 oPage.CanEditPages = false;
+                                oPage.User = oSystem.CurrentUser.UserView;
+                                oPage.User.Get_Countries(oSystem.cnCon);
+                                oPage.User.Get_States(oSystem.cnCon);
 
                                 oSystem.CloseDataConnection();
                                 return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -1363,6 +1400,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteForum();
 
                 Object oResponse = null;
 
@@ -1433,6 +1471,7 @@ namespace AriesCMS.Controllers
                 {
                     if (oSystem.WebSiteForum_List("", 1, "", 1))
                     {
+                        oSystem.recWebSiteForum = null;
                         oSystem.recWebSiteForum = oSystem.lstWebSiteForum[0];
                         if (oSystem.recWebSiteForum != null)
                         {
@@ -1445,6 +1484,7 @@ namespace AriesCMS.Controllers
                 //If blog was found then continue to load the page or else go to error page
                 if (bCommunityFound)
                 {
+                    oSystem.Ini_WebSiteForumTopics();
                     oSystem.WebSiteForumTopics_List("", oSystem.recWebSiteForum.ID, oSystem.recWebSiteForum.sName, 1);
                     //load Community Announcements
                     oSystem.WebSiteForumiAnnouncements_List("", oSystem.recWebSiteForum.ID, oSystem.recWebSiteForum.sName, 1);
@@ -1504,6 +1544,9 @@ namespace AriesCMS.Controllers
                         oPage.AuthenticatedUser = true;
                         oPage.PartialViewToLoad = "";
                         oPage.CanEditPages = false;
+                        oPage.User = oSystem.CurrentUser.UserView;
+                        oPage.User.Get_Countries(oSystem.cnCon);
+                        oPage.User.Get_States(oSystem.cnCon);
 
                         oSystem.CloseDataConnection();
                         return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -1537,6 +1580,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteForumTopics();
 
                 Object oResponse = null;
 
@@ -1676,6 +1720,9 @@ namespace AriesCMS.Controllers
                             oPage.AuthenticatedUser = true;
                             oPage.PartialViewToLoad = "";
                             oPage.CanEditPages = false;
+                            oPage.User = oSystem.CurrentUser.UserView;
+                            oPage.User.Get_Countries(oSystem.cnCon);
+                            oPage.User.Get_States(oSystem.cnCon);
 
                             oSystem.CloseDataConnection();
                             return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -1715,6 +1762,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteForumTopics();
 
                 Object oResponse = null;
 
@@ -1869,6 +1917,9 @@ namespace AriesCMS.Controllers
                                 oPage.AuthenticatedUser = true;
                                 oPage.PartialViewToLoad = "";
                                 oPage.CanEditPages = false;
+                                oPage.User = oSystem.CurrentUser.UserView;
+                                oPage.User.Get_Countries(oSystem.cnCon);
+                                oPage.User.Get_States(oSystem.cnCon);
 
                                 oSystem.CloseDataConnection();
                                 return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -1905,8 +1956,7 @@ namespace AriesCMS.Controllers
             }
         }
     }
-
-
+    
     public partial class JobsController : Controller
     {
         
@@ -1924,6 +1974,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteJobs();
 
                 Object oResponse = null;
 
@@ -2026,6 +2077,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -2053,6 +2107,7 @@ namespace AriesCMS.Controllers
             if (oSystem.OpenDataConnection())
             {
                 oSystem.GetCurrentUser();
+                oSystem.Ini_WebSiteJobs();
 
                 Object oResponse = null;
 
@@ -2163,6 +2218,9 @@ namespace AriesCMS.Controllers
                         oPage.AuthenticatedUser = true;
                         oPage.PartialViewToLoad = "";
                         oPage.CanEditPages = false;
+                        oPage.User = oSystem.CurrentUser.UserView;
+                        oPage.User.Get_Countries(oSystem.cnCon);
+                        oPage.User.Get_States(oSystem.cnCon);
 
                         oSystem.CloseDataConnection();
                         return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -2307,6 +2365,9 @@ namespace AriesCMS.Controllers
                         oPage.AuthenticatedUser = true;
                         oPage.PartialViewToLoad = "";
                         oPage.CanEditPages = false;
+                        oPage.User = oSystem.CurrentUser.UserView;
+                        oPage.User.Get_Countries(oSystem.cnCon);
+                        oPage.User.Get_States(oSystem.cnCon);
 
                         oSystem.CloseDataConnection();
                         return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -2689,7 +2750,6 @@ namespace AriesCMS.Controllers
         }
     }
     
-
     public partial class ErrorPageController : Controller
     {
         //
@@ -3107,6 +3167,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -5214,6 +5277,7 @@ namespace AriesCMS.Controllers
                             //_NewUserRecord.sBillStateID = "";
                             //_NewUserRecord.iBillCountryID = 0;
                             //_NewUserRecord.sBillCountryID = "";
+                            _NewUserRecord.dtMembershipExpOn = DateTime.Parse("01/01/1901");
 
                             _NewUserRecord.sUserName = _oNewUser.UserName;
                             _NewUserRecord.sPassword = oSystem.rsGlobalVeriables.oEncryption.Encrypt(_oNewUser.Password);
@@ -5424,6 +5488,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -6172,6 +6239,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -6659,6 +6729,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -7286,6 +7359,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -7811,6 +7887,9 @@ namespace AriesCMS.Controllers
                     oPage.AuthenticatedUser = true;
                     oPage.PartialViewToLoad = "";
                     oPage.CanEditPages = false;
+                    oPage.User = oSystem.CurrentUser.UserView;
+                    oPage.User.Get_Countries(oSystem.cnCon);
+                    oPage.User.Get_States(oSystem.cnCon);
 
                     oSystem.CloseDataConnection();
                     return View(sModuleBase + "Views/Default/Index.cshtml", oPage);
@@ -8058,6 +8137,9 @@ namespace AriesCMS.Controllers
             }
             return false;
         }
+
+
+
 
     }
 

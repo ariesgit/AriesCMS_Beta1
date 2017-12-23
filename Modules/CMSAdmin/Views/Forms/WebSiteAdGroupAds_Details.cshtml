@@ -119,111 +119,132 @@
                          @Html.HiddenFor(model => model.iCreatedByID)  
                          @Html.HiddenFor(model => model.sCreatedByID)  
                          @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID)  
-      
-      
+                         @Html.HiddenFor(model => model.sUpdatedByID)
+
+
                                         <fieldset> 
                                             <legend></legend>
 
 
                                             <div class="form-group">
                                                 <label for="sName">Name :</label>
-                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sName)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="dtAdExpOn">Exp. on :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.dtAdExpOn, new { @Class = "form-control" })
                                             </div>
                                             
                                             <div class="form-group">
                                                 <label for="sDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDescription)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sAdShortHTML">Short HTML :</label>
-                                                @Html.TextAreaFor(model => model.sAdShortHTML, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextAreaFor(model => model.sAdShortHTML, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdShortHTML)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sAdvertisementContentHTML">Full Ad HTML :</label>
-                                                @Html.TextAreaFor(model => model.sAdvertisementContentHTML, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextAreaFor(model => model.sAdvertisementContentHTML, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdvertisementContentHTML)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sAdImgURL">Ad Image URL :</label>
-                                                @Html.TextBoxFor(model => model.sAdImgURL, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.sAdImgURL, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdImgURL)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sAdImgURI">Ad Image URI :</label>
-                                                @Html.TextBoxFor(model => model.sAdImgURI, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.sAdImgURI, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sAdImgURI)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdPayPerClick">Pay Per Click :</label>
-                                                @Html.TextBoxFor(model => model.dAdPayPerClick, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdPayPerClick, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdPayPerClick)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdCostPerClick">Fee Per Click :</label>
-                                                @Html.TextBoxFor(model => model.dAdCostPerClick, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdCostPerClick, new { @Class = "form-control", @readonly="readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdCostPerClick)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdPayPerView">Pay Per View :</label>
-                                                @Html.TextBoxFor(model => model.dAdPayPerView, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdPayPerView, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdPayPerView)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdCostPerView">Fee Per View :</label>
-                                                @Html.TextBoxFor(model => model.dAdCostPerView, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdCostPerView, new { @Class = "form-control", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdCostPerView)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdClickBudget">Ad Click Budget :</label>
-                                                @Html.TextBoxFor(model => model.dAdClickBudget, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdClickBudget, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdClickBudget)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dAdViewBudget">Ad View Budget :</label>
-                                                @Html.TextBoxFor(model => model.dAdViewBudget, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dAdViewBudget, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dAdViewBudget)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dClicks"># Clicks :</label>
-                                                @Html.TextBoxFor(model => model.dClicks, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dClicks, new { @Class = "form-control", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dClicks)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dConversion">Total Conversion :</label>
-                                                @Html.TextBoxFor(model => model.dConversion, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dConversion, new { @Class = "form-control", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dConversion)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dTotalRevenue">Total revenue :</label>
-                                                @Html.TextBoxFor(model => model.dTotalRevenue, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dTotalRevenue, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dTotalRevenue)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="dTotalCustomerProfit">Total profit :</label>
-                                                @Html.TextBoxFor(model => model.dTotalCustomerProfit, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextBoxFor(model => model.dTotalCustomerProfit, new { @Class = "form-control" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.dTotalCustomerProfit)</span>
                                             </div>
 
 
+                                            <div class="form-group">
+                                                <label for="bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                }
+                                            </div>
 
+                                            <div class="form-group">
+                                                <label for="bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
+                                                }
+                                            </div>
 
                                         </fieldset>
                                         <div class="form-group">

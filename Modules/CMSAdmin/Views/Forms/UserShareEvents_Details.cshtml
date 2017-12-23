@@ -161,13 +161,13 @@
                                             
                                             <div class="form-group">
                                                 <label for="sMessage">Message body :</label>
-                                                @Html.TextAreaFor(model => model.sMessage, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sMessage, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sMessage)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sHTTPx">Logs :</label>
-                                                @Html.TextAreaFor(model => model.sHTTPx, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sHTTPx, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sHTTPx)</span>
                                             </div>
 

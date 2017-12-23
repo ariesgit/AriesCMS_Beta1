@@ -294,7 +294,7 @@
                                             
                                             <div class="form-group">
                                                 <label for="WebSite_Leads_bOptInMarketing">Opt out of marketing :</label>
-                                                @Html.CheckBoxFor(model => model.WebSite_Leads.bOptInMarketing, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.CheckBoxFor(model => model.WebSite_Leads.bOptInMarketing, new { @Class = "form-control checkbox-inline", @placeholder = "" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.bOptInMarketing)</span>
                                             </div>
                                             
@@ -403,13 +403,13 @@
 
                                             <div class="form-group">
                                                 <label for="WebSite_Leads_sEventLog">Event Log :</label>
-                                                @Html.TextAreaFor(model => model.WebSite_Leads.sEventLog, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.WebSite_Leads.sEventLog, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sEventLog)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="WebSite_Leads_sNotes">Notes :</label>
-                                                @Html.TextAreaFor(model => model.WebSite_Leads.sNotes, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.WebSite_Leads.sNotes, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSite_Leads.sNotes)</span>
                                             </div>
 

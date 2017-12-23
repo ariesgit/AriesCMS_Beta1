@@ -22,6 +22,55 @@
     <meta name="keywords" content="@Model.KeyWords" />
 }
 
+
+
+<script type="text/javascript">
+
+    @{
+
+        if (Model.User != null)
+        {
+            if (Model.User.User != null)
+            {
+                Html.Raw("var oUIK = '" + Model.User.User.sCurrentSession + "';");
+                Html.Raw("var oUID = '" + Model.User.User.ID + "';");
+                Html.Raw("var oUFN = '" + Model.User.User.sFName + "';");
+                Html.Raw("var oULN = '" + Model.User.User.sLName + "';");
+                Html.Raw("var oUK = '" + Model.User.User.sAccessKey + "';");
+                Html.Raw("var oSN = '" + Model.User.User.sScreenName + "';");
+                Html.Raw("var oAV = '" + Model.User.User.sAvitarImgURL + "';");
+
+                Html.Raw("var oCountriesDataList = " + Json.Encode(Model.User.Countries) + ";" + "\n\r");
+                Html.Raw("var oStateDataList = " + Json.Encode(Model.User.States) + ";" + "\n\r");
+
+            }
+            else
+            {
+                Html.Raw("var oUIK = '" + "" + "';");
+                Html.Raw("var oUID = '" + "" + "';");
+                Html.Raw("var oUFN = '" + "" + "';");
+                Html.Raw("var oULN = '" + "" + "';");
+                Html.Raw("var oUK = '" + "" + "';");
+                Html.Raw("var oSN = '" + "" + "';");
+                Html.Raw("var oAV = '" + "" + "';");
+            }
+
+        }
+        else
+        {
+            Html.Raw("var oUIK = '" + "" + "';");
+            Html.Raw("var oUID = '" + "" + "';");
+            Html.Raw("var oUFN = '" + "" + "';");
+            Html.Raw("var oULN = '" + "" + "';");
+            Html.Raw("var oUK = '" + "" + "';");
+            Html.Raw("var oSN = '" + "" + "';");
+            Html.Raw("var oAV = '" + "" + "';");
+        }
+    }
+
+</script>
+
+
 @if (Model != null)
 {
     if (Model.PageBody != null)
@@ -100,6 +149,8 @@ foreach (CMSPartialPageBuilder.PageItems oPage in Model.PageContent)
 
 
 <script type="text/javascript">
+
+
         function RecordPageView(PageOrContent)
         {
             try {

@@ -32,6 +32,12 @@
         <member name="P:Google.Apis.Analytics.v3.AnalyticsService.BasePath">
             <summary>Gets the service base path.</summary>
         </member>
+        <member name="P:Google.Apis.Analytics.v3.AnalyticsService.BatchUri">
+            <summary>Gets the batch base URI; <c>null</c> if unspecified.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.AnalyticsService.BatchPath">
+            <summary>Gets the batch base path; <c>null</c> if unspecified.</summary>
+        </member>
         <member name="T:Google.Apis.Analytics.v3.AnalyticsService.Scope">
             <summary>Available OAuth 2.0 scopes for use with the Google Analytics API.</summary>
         </member>
@@ -2539,6 +2545,41 @@
         <member name="M:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.#ctor(Google.Apis.Services.IClientService)">
             <summary>Constructs a new resource.</summary>
         </member>
+        <member name="M:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.Delete(System.String,System.String,System.String)">
+            <summary>Delete a remarketing audience.</summary>
+            <param name="accountId">Account ID to which the remarketing audience belongs.</param>
+            <param
+            name="webPropertyId">Web property ID to which the remarketing audience belongs.</param>
+            <param
+            name="remarketingAudienceId">The ID of the remarketing audience to delete.</param>
+        </member>
+        <member name="T:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest">
+            <summary>Delete a remarketing audience.</summary>
+        </member>
+        <member name="M:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.#ctor(Google.Apis.Services.IClientService,System.String,System.String,System.String)">
+            <summary>Constructs a new Delete request.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.AccountId">
+            <summary>Account ID to which the remarketing audience belongs.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.WebPropertyId">
+            <summary>Web property ID to which the remarketing audience belongs.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.RemarketingAudienceId">
+            <summary>The ID of the remarketing audience to delete.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.MethodName">
+            <summary>Gets the method name.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.HttpMethod">
+            <summary>Gets the HTTP method.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.RestPath">
+            <summary>Gets the REST path.</summary>
+        </member>
+        <member name="M:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.DeleteRequest.InitParameters">
+            <summary>Initializes Delete parameter list.</summary>
+        </member>
         <member name="M:Google.Apis.Analytics.v3.ManagementResource.RemarketingAudienceResource.Get(System.String,System.String,System.String)">
             <summary>Gets a remarketing audience to which the user has access.</summary>
             <param name="accountId">The account ID of the remarketing audience to retrieve.</param>
@@ -4147,6 +4188,9 @@
         <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.ProfilesLinked">
             <summary>IDs of views (profiles) linked to the custom data source.</summary>
         </member>
+        <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.Schema">
+            <summary>Collection of schema headers of the custom data source.</summary>
+        </member>
         <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.SelfLink">
             <summary>Link for this Analytics custom data source.</summary>
         </member>
@@ -4158,6 +4202,9 @@
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.Updated">
             <summary><seealso cref="T:System.DateTime"/> representation of <see cref="P:Google.Apis.Analytics.v3.Data.CustomDataSource.UpdatedRaw"/>.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.UploadType">
+            <summary>Upload type of the custom data source.</summary>
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.CustomDataSource.WebPropertyId">
             <summary>Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.</summary>
@@ -5370,7 +5417,8 @@
             <summary>The status of this foreign account link.</summary>
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.LinkedForeignAccount.Type">
-            <summary>The type of the foreign account. For example `ADWORDS_LINKS`.</summary>
+            <summary>The type of the foreign account. For example, `ADWORDS_LINKS`, `DBM_LINKS`, `MCC_LINKS` or
+            `OPTIMIZE`.</summary>
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.LinkedForeignAccount.WebPropertyId">
             <summary>Web property ID of the form UA-XXXXX-YY to which this linked foreign account belongs.</summary>
@@ -6212,6 +6260,12 @@
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.Upload.Status">
             <summary>Upload status. Possible values: PENDING, COMPLETED, FAILED, DELETING, DELETED.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.Data.Upload.UploadTimeRaw">
+            <summary>Time this file is uploaded.</summary>
+        </member>
+        <member name="P:Google.Apis.Analytics.v3.Data.Upload.UploadTime">
+            <summary><seealso cref="T:System.DateTime"/> representation of <see cref="P:Google.Apis.Analytics.v3.Data.Upload.UploadTimeRaw"/>.</summary>
         </member>
         <member name="P:Google.Apis.Analytics.v3.Data.Upload.ETag">
             <summary>The ETag of the item.</summary>

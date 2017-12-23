@@ -141,12 +141,12 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="sDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDescription)</span>
                                             </div>
                                             <div class="form-group">
                                                 <label for="sContent">HTML :</label>
-                                                @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control textarea_admin", @placeholder = "" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sContent)</span>
                                             </div>
 

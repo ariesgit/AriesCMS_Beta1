@@ -113,5 +113,38 @@ namespace AriesCMS.Models
     {
 
     }
+        
+    public partial class WebSiteSponsorsDBView
+    {
+        
+    }
+        
+    public partial class WebSiteEventCalendarSponsorsDBView
+    {
 
+    }
+        
+    public partial class WebSiteMembersDBView
+    {
+        
+    }
+    
+    public partial class WebSiteMemberCatsDBView
+    {
+       
+
+    }
+        
+    public partial class WebSitePartnersDBView
+    {
+    }
+        
+    public partial class WebSiteAffiliatesDBView
+    {
+    }
+
+    public partial class WebSiteBlog_Navigation
+    {
+
+    }
 }

@@ -134,7 +134,7 @@
 
                                             <div class="form-group">
                                                 <label for="sComment">Comment :</label>
-                                                @Html.TextAreaFor(model => model.sComment, new { @Class = "form-control textarea", @placeholder = "", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sComment, new { @Class = "form-control textarea_admin", @placeholder = "", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sComment)</span>
                                             </div>
 
@@ -142,7 +142,7 @@
 
                                             <div class="form-group">
                                                 <label for="bRestrictAccess">Remove :</label>
-                                                @Html.CheckBoxFor(model => model.bRestrictAccess, new { @Class = "form-control", @placeholder = "" })
+                                                @Html.CheckBoxFor(model => model.bRestrictAccess, new { @Class = "form-control checkbox-inline", @placeholder = "" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.bRestrictAccess)</span>
                                             </div>
 

@@ -190,7 +190,7 @@
                 @Html.HiddenFor(model => model.WebSitePageZoneContent.bLoadPartialPage)
 
                 @Html.HiddenFor(model => model.WebSitePageZoneContent.sContentZoneID)
-                @Html.HiddenFor(model => model.WebSitePageZoneContent.iLanguageID)
+
                 @Html.HiddenFor(model => model.WebSitePageZoneContent.sLanguageID)
 
                 <fieldset>
@@ -219,7 +219,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageZoneContent_sContent">Content :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
-                        @Html.TextAreaFor(model => model.WebSitePageZoneContent.sContent, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageZoneContent.sContent, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageZoneContent.sContent, "*Required!")

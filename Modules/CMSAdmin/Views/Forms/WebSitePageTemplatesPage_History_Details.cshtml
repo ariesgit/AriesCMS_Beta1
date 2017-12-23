@@ -1,0 +1,194 @@
+@model AriesCMSDefinition.DEF_WebSitePageTemplatesPage_History.RecordObject
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_Changed() {
+        try {
+        var cboControl = document.getElementById("WebSitePageTemplatesPage_History_FIELDID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSitePageTemplatesPage_History_FIELDHIDDEN");
+            oHiddenField.value = selectedText;
+
+            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function Buildcbo_SelectBasedOnParentID(_Id) {
+        try {
+
+            //alert(_Id);
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSitePageTemplatesPage_History_FIELDID").html(procemessage).show();
+            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
+            
+            $.ajax({
+                url: url,
+                data: { _iParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data) {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSitePageTemplatesPage_History_FIELDID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSitePageTemplatesPage_History_FIELDID").html("error").show();
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Change History</h2>
+            }
+            else
+            {
+                 <h2>You are viewing - 
+                   @Model.dtDateCreated
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSitePageTemplatesPage_History_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSitePageTemplatesPage_History_Restore", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.ID)  
+                         @Html.HiddenFor(model => model.iParentID)  
+                         @Html.HiddenFor(model => model.sParentID)  
+                         @Html.HiddenFor(model => model.sControl)  
+                         @Html.HiddenFor(model => model.dtDateCreated)  
+                         @Html.HiddenFor(model => model.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.iCreatedByID)  
+                         @Html.HiddenFor(model => model.sCreatedByID)  
+                         @Html.HiddenFor(model => model.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.sName)  
+                         @Html.HiddenFor(model => model.sDescription)  
+                         @Html.HiddenFor(model => model.sThumbNailImageURL)  
+                         @Html.HiddenFor(model => model.sVersion)  
+                         @Html.HiddenFor(model => model.sTemplateBody)  
+                         @Html.HiddenFor(model => model.iLanguageID)  
+                         @Html.HiddenFor(model => model.sLanguageID)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+                                            <div class="form-group">
+                                                <label for="sName"> Name :</label>
+                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @readonly="readonly" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                                                }
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sTemplateBody">Body :</label>
+                                                @Html.TextAreaFor(model => model.WebSitePageTemplatesPage.sTemplateBody, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.sTemplateBody, "*Required!")
+                                                }
+                                            </div>
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                        
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                         
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

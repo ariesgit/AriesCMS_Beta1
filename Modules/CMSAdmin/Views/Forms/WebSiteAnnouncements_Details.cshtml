@@ -1,57 +1,23 @@
-@model AriesCMSDefinition.DEF_WebSiteAnnouncements.RecordObject
+@model AriesCMS.Models.WebSiteAnnouncementsDBView
 
 
 <script type="text/javascript">
     
 
-    function on_Select_Changed() {
+    function on_Select_WebSiteAnnouncements_iTypeID_Changed() {
         try {
-        var cboControl = document.getElementById("WebSiteAnnouncements_FIELDID");
+            var cboControl = document.getElementById("WebSiteAnnouncements_iTypeID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteAnnouncements_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteAnnouncements_sTypeID");
             oHiddenField.value = selectedText;
-
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
-        }
-        catch (e) {
-            alert(e);
-        }
-    }
-
-
-    function Buildcbo_SelectBasedOnParentID(_Id) {
-        try {
-
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebSiteAnnouncements_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
             
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebSiteAnnouncements_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
-
         }
         catch (e) {
             alert(e);
-            $("#WebSiteAnnouncements_FIELDID").html("error").show();
         }
     }
-
+    
 </script>   
                     
 
@@ -70,7 +36,7 @@
             else
             {
                  <h2>You are editing - 
-                   @Model.sName
+                   @Model.WebSiteAnnouncements.sName
                  </h2>
             }   
         </div>
@@ -107,47 +73,132 @@
     </div>
     <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
-@using (Html.BeginForm("WebSiteAnnouncements_AddUpdate", "", FormMethod.Post))
-                                   {                             
+@using (Html.BeginForm("WebSiteAnnouncements_AddUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
                                         @Html.ValidationSummary(true);
-                         @Html.HiddenFor(model => model.ID)  
-                         @Html.HiddenFor(model => model.sControl)  
-                         @Html.HiddenFor(model => model.sSync)  
-                         @Html.HiddenFor(model => model.iParentID)  
-                         @Html.HiddenFor(model => model.sParentID)  
-                         @Html.HiddenFor(model => model.dtDateCreated)  
-                         @Html.HiddenFor(model => model.dtLastUpdated)  
-                         @Html.HiddenFor(model => model.iCreatedByID)  
-                         @Html.HiddenFor(model => model.sCreatedByID)  
-                         @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.ID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sUpdatedByID)  
 
-                         @Html.HiddenFor(model => model.sContent)  
-                         @Html.HiddenFor(model => model.sVersion)  
-                         @Html.HiddenFor(model => model.bRemoved)  
-                         @Html.HiddenFor(model => model.bAnswered)  
-                         @Html.HiddenFor(model => model.iAnsweredByID)  
-                         @Html.HiddenFor(model => model.sAnsweredByID)  
-                         @Html.HiddenFor(model => model.iAnsweredByResponseID)  
-                         @Html.HiddenFor(model => model.sAnsweredByResponseID)  
-      
-      
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sContent)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sVersion)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.bRemoved)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.bAnswered)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.iAnsweredByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sAnsweredByID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.iAnsweredByResponseID)  
+                         @Html.HiddenFor(model => model.WebSiteAnnouncements.sAnsweredByResponseID)
+    @Html.HiddenFor(model => model.WebSiteAnnouncements.sTypeID)
+
+
                                         <fieldset> 
                                             <legend></legend>
 
 
                                             <div class="form-group">
-                                                <label for="sName">Title :</label>
-                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sName)</span>
+                                                <label for="WebSiteAnnouncements_sName">Title :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteAnnouncements.sName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteAnnouncements.sName)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="sDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDescription)</span>
+                                                <label for="WebSiteAnnouncements_iSponsorShipTypeID">Type :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteAnnouncements.iTypeID, Model.WebSiteAnnouncementsType, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSiteAnnouncements_iTypeID_Changed();" })
                                             </div>
 
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sDescription">Description :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteAnnouncements.sDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteAnnouncements.sDescription)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sURL1">URL :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteAnnouncements.sURL1, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sURL2">URL (2) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteAnnouncements.sURL2, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sURL3">URL (3) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteAnnouncements.sURL3, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sImageURL">Image Thumbnail :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteAnnouncements.sImageURL" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sImageURL2">Image Medium :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteAnnouncements.sImageURL2" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles2" id="UploadFiles2" class="form-control" />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_sImageURL3">Image Large :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteAnnouncements.sImageURL3" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles3" id="UploadFiles3" class="form-control" />
+                                            </div>
+                                            
+
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteAnnouncements.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteAnnouncements.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteAnnouncements.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteAnnouncements.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteAnnouncements.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteAnnouncements.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteAnnouncements_bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteAnnouncements.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteAnnouncements.bHidden, "*Required!")
+                                                }
+                                            </div>
 
 
 

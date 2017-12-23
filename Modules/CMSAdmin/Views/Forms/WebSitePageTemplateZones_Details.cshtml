@@ -163,7 +163,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageTemplateZones_sDefaultValue">Defautl body :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
-                        @Html.TextAreaFor(model => model.WebSitePageTemplateZones.sDefaultValue, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageTemplateZones.sDefaultValue, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageTemplateZones.sDefaultValue, "*Required!")

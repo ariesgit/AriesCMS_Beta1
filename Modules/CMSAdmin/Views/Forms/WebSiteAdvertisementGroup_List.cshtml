@@ -83,8 +83,13 @@
                                 @Html.ActionLink("Delete", "WebSiteAdvertisementGroup_Delete", new { id=objRec.ID}, new { onclick = "return confirm('Are you sure you wish to delete this record?');" }) 
                             </td>                                              
                             </tr>
+                            <tr>
+                                <th scope="row" colspan="3">
+                                    @Html.ActionLink("Ads", "WebSiteAdGroupAds_List", new { _iParentID = objRec.ID, _sParentID = objRec.sName })                                    
+                                </th>
+                            </tr>
                         }
-                    } 
+                    }
                     else
                     {
                             <tr>

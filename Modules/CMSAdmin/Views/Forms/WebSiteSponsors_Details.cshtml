@@ -1,0 +1,319 @@
+@model AriesCMS.Models.WebSiteSponsorsDBView
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_WebSiteSponsors_iSponsorShipTypeID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteSponsors_iSponsorShipTypeID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteSponsors_sSponsorShipTypeID");
+            oHiddenField.value = selectedText;
+            
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function on_Select_WebSiteSponsors_iAssociatedUserID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteSponsors_iAssociatedUserID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteSponsors_sAssociatedUserID");
+            oHiddenField.value = selectedText;
+            
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Sponsors</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSiteSponsors.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSiteSponsors_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteSponsors_AddUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSiteSponsors.ID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sUpdatedByID)
+
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sSponsorShipTypeID)  
+    
+                         @Html.HiddenFor(model => model.WebSiteSponsors.sAssociatedUserID)
+
+    @Html.HiddenFor(model => model.WebSiteSponsors.sImageURL)
+    @Html.HiddenFor(model => model.WebSiteSponsors.sImageURL2)
+    @Html.HiddenFor(model => model.WebSiteSponsors.sImageURL3)
+
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sName">Name :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sName, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_iSponsorShipTypeID">Type :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteSponsors.iSponsorShipTypeID, Model.Sponsorshiptypes, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSiteSponsors_iSponsorShipTypeID_Changed();" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_dtSpnsshipExpOn">Sponsorship exp. on :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.dtSpnsshipExpOn, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_iAssociatedUserID">Associated User :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteSponsors.iAssociatedUserID, Model.AssociatedUsers, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSiteSponsors_iAssociatedUserID_Changed();" })
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sURL1">URL :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sURL1, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sURL2">URL (2) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sURL2, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sURL3">URL (3) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sURL3, new { @Class = "form-control" })
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sImageURL">Image Thumbnail :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteSponsors.sImageURL" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
+                                            </div>
+                                            
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sImageURL2">Image Medium :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteSponsors.sImageURL2" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles2" id="UploadFiles2" class="form-control" />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sImageURL3">Image Large :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteSponsors.sImageURL3" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles3" id="UploadFiles3" class="form-control" />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sListingDescription">Description Listing Small :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteSponsors.sListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sLargerListingDescription">Description Listing Large :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteSponsors.sLargerListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sDetailsDescription">Description Detail Page :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteSponsors.sDetailsDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sCategories">Categories (separated by ',') :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sCategories, new { @Class = "form-control" })
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sSpecialty">Business line specialty :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sSpecialty, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sTitle">Business line category :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sTitle, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sFocus">Business line focus :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sFocus, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sContactPhone">Phone :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sContactPhone, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sContactEMail">E-Mail :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteSponsors.sContactEMail, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_sContactAddress">Address :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteSponsors.sContactAddress, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteSponsors.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteSponsors.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteSponsors.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteSponsors.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteSponsors.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteSponsors.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteSponsors_bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteSponsors.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteSponsors.bHidden, "*Required!")
+                                                }
+                                            </div>
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

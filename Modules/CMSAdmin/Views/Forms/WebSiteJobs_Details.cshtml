@@ -130,9 +130,10 @@
                          @Html.HiddenFor(model => model.sEmployerThumbURL)  
                          @Html.HiddenFor(model => model.dNumApplicants) 
                          @Html.HiddenFor(model => model.iJobTypeID)  
-                         @Html.HiddenFor(model => model.sJobTypeID)  
-      
-      
+                         @Html.HiddenFor(model => model.sJobTypeID)
+
+
+
                                         <fieldset> 
                                             <legend></legend>
 
@@ -150,7 +151,7 @@
 
                                             <div class="form-group">
                                                 <label for="bJobFilled">Filled :</label>
-                                                @Html.CheckBoxFor(model => model.bJobFilled, new { @Class = "form-control" })
+                                                @Html.CheckBoxFor(model => model.bJobFilled, new { @Class = "form-control checkbox-inline" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.bJobFilled)</span>
                                             </div>
 
@@ -174,24 +175,56 @@
 
                                             <div class="form-group">
                                                 <label for="sJobDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sJobDescription, new { @Class = "form-control textarea" })
+                                                @Html.TextAreaFor(model => model.sJobDescription, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sJobDescription)</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="sSkillRequirements">Skills required (separate by ',') :</label>
-                                                @Html.TextAreaFor(model => model.sSkillRequirements, new { @Class = "form-control textarea" })
+                                                @Html.TextAreaFor(model => model.sSkillRequirements, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillRequirements)</span>
                                             </div>
 
 
                                             <div class="form-group">
                                                 <label for="sSkillsNeeded">Skills good to have (separate by ',') :</label>
-                                                @Html.TextAreaFor(model => model.sSkillsNeeded, new { @Class = "form-control textarea" })
+                                                @Html.TextAreaFor(model => model.sSkillsNeeded, new { @Class = "form-control textarea_admin" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillsNeeded)</span>
                                             </div>
 
 
+                                            <div class="form-group">
+                                                <label for="bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
+                                                }
+                                            </div>
 
                                         </fieldset>
                                         <div class="form-group">

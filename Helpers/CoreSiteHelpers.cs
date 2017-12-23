@@ -1309,6 +1309,9 @@ namespace AriesCMS.Helpers
         bool bResponse = false;
         public string sProcessError = "";
 
+        //Used for paypal credentials
+        public string _sClientID = "";
+        public string _sClientSecret = "";
 
         public string BaseURL { get; set; }
         public AriesCMS.Helpers.SiteCookieHelper UserCookie;
@@ -1736,6 +1739,108 @@ namespace AriesCMS.Helpers
                     }
 
                 }).Start();
+
+
+                #region Option to send using SengGrid API
+                //string sSMTPUserName = "";
+                //string sSMTPPassword = "";
+                //string sSMTPPort = "";
+                //string sSMTPUseSSL = "";
+                //string sSMTPServer = "";
+                //string sBcc = "";
+                //string sFromEmail = _From;
+                //string sFromName = _FromName;
+
+                //#region Get Settings
+                //if (rsGlobalVeriables == null)
+                //{
+                //    rsGlobalVeriables = new ACMSGlobal.CMSGlobal();
+                //}
+                //try
+                //{
+                //    sSMTPUserName = rsGlobalVeriables.SMTPUserName;
+                //}
+                //catch
+                //{
+                //}
+
+                //try
+                //{
+                //    sSMTPPassword = rsGlobalVeriables.SMTPPassword;
+                //}
+                //catch
+                //{
+                //}
+
+                //try
+                //{
+                //    sSMTPPort = rsGlobalVeriables.SMTPPort.ToString();
+                //}
+                //catch
+                //{
+                //}
+
+                //try
+                //{
+                //    sSMTPUseSSL = rsGlobalVeriables.SMTPUseSSL;
+                //}
+                //catch
+                //{
+                //}
+
+                //try
+                //{
+                //    sSMTPServer = rsGlobalVeriables.SMTPServer;
+                //}
+                //catch
+                //{
+                //}
+
+                //try
+                //{
+                //    sBcc = rsGlobalVeriables.WebMasterEmail;
+                //}
+                //catch
+                //{
+                //}
+                //#endregion
+
+                //bool bIsHtml = true;
+                //int iPort = 25;
+                //try
+                //{
+                //    iPort = System.Convert.ToInt32(sSMTPPort);
+                //}
+                //catch
+                //{
+                //    iPort = 25;
+                //}
+
+                //bool bSSL = false;
+                //try
+                //{
+                //    bSSL = System.Convert.ToBoolean(sSMTPUseSSL);
+                //}
+                //catch
+                //{
+                //}
+
+                //string sMessage = _Message;
+                //string sSubject = _Subject;
+                //string sTo = _To;
+
+
+                //SendGrid.SendGridClient oMail = new SendGrid.SendGridClient(sSMTPPassword);
+
+                //// Send a Single Email using the Mail Helper
+                //SendGrid.Helpers.Mail.EmailAddress oFrom = new SendGrid.Helpers.Mail.EmailAddress(_From, sFromName);
+                //SendGrid.Helpers.Mail.EmailAddress oTo = new SendGrid.Helpers.Mail.EmailAddress(_To, _ToName);
+                //SendGrid.Helpers.Mail.SendGridMessage oMesage = SendGrid.Helpers.Mail.MailHelper.CreateSingleEmail(oFrom, oTo, _Subject, "", _Message);
+
+
+                //oMail.SendEmailAsync(oMesage);
+
+                #endregion
             }
             catch
             {
@@ -1886,6 +1991,111 @@ namespace AriesCMS.Helpers
             }
         }
 
+        public void SendMarketing_Campiag(int iListID)
+        {
+            try
+            {
+                if(iListID > 0)
+                {
+                    if(cnCon != null)
+                    {
+                        if (cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                        {
+
+                            List<DataParameter> lstParameters = new List<DataParameter>();
+                            DataParameter pParameter = null;
+
+                            DINT_WebSiteEMailCampaign dbUWebSiteEMailCampaign = new DINT_WebSiteEMailCampaign(cnCon);
+
+                            lstParameters = new List<DataParameter>();
+                            pParameter = null;
+                            pParameter = new DataParameter("ID", "'" + iListID + "'", "int", 11, "ID", " = ", "");
+                            lstParameters.Add(pParameter);
+
+
+                            List<DEF_WebSiteEMailCampaign.RecordObject> lstWebSiteEMailCampaign = dbUWebSiteEMailCampaign.Get(lstParameters);
+
+                            if (lstWebSiteEMailCampaign != null)
+                            {
+                                if (lstWebSiteEMailCampaign.Count > 0)
+                                {
+
+                                    DINT_WebMarketingListsMembers dbWebMarketingListsMembers = new DINT_WebMarketingListsMembers(cnCon);
+
+
+                                    lstParameters = new List<DataParameter>();
+                                    pParameter = null;
+                                    pParameter = new DataParameter("iParentID", "'" + iListID + "'", "int", 11, "iParentID", " = ", "");
+                                    lstParameters.Add(pParameter);
+                                    pParameter = new DataParameter("bDisabled", "'" + "False" + "'", "bool", 11, "bDisabled", " = ", " and ");
+                                    lstParameters.Add(pParameter);
+                                    pParameter = new DataParameter("bSuspended", "'" + "False" + "'", "bool", 11, "bSuspended", " = ", " and ");
+                                    lstParameters.Add(pParameter);
+                                    pParameter = new DataParameter("bNegative", "'" + "False" + "'", "bool", 11, "bNegative", " = ", " and ");
+                                    lstParameters.Add(pParameter);
+                                    pParameter = new DataParameter("bHidden", "'" + "False" + "'", "bool", 11, "bHidden", " = ", " and ");
+                                    lstParameters.Add(pParameter);
+
+                                    List<DEF_WebMarketingListsMembers.RecordObject> lstDEF_WebMarketingListsMembers = dbWebMarketingListsMembers.Get(lstParameters);
+                                    if(lstDEF_WebMarketingListsMembers != null)
+                                    {
+                                        if(lstDEF_WebMarketingListsMembers.Count > 0)
+                                        {
+                                            foreach (DEF_WebMarketingListsMembers.RecordObject oRecipient in lstDEF_WebMarketingListsMembers)
+                                            {
+                                                if (oRecipient != null)
+                                                {
+                                                    if (oRecipient.bDisabled == false)
+                                                    {
+                                                        if (oRecipient.bSuspended == false)
+                                                        {
+                                                            if (oRecipient.bNegative == false)
+                                                            {
+                                                                if (oRecipient.bHidden == false)
+                                                                {
+                                                                    string sMessage = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+                                                                    string sSubject = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+
+                                                                    SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, oRecipient.sEMail, oRecipient.sFName + " " + oRecipient.sLName, sSubject, sMessage);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+            catch
+            {
+            }
+        }
+        public string Parse_Marketing_Message(string _RawMessage, string _sFName, string _sLName, string _sEMail, string _sCellPhone, string _sAvitarURL)
+        {
+            try
+            {
+                string sReturn = "";
+                sReturn = _RawMessage;
+
+                sReturn = sReturn.Replace("##sFName##", _sFName);
+                sReturn = sReturn.Replace("##sLName##", _sLName);
+                sReturn = sReturn.Replace("##sEMail##", _sEMail);
+                sReturn = sReturn.Replace("##sCellPhone##", _sCellPhone);
+                sReturn = sReturn.Replace("##sAvitarURL##", _sAvitarURL);
+                
+                return sReturn;
+            }
+            catch
+            {
+                return _RawMessage;
+            }
+        }
 
         public void RecordEvent(int iEventID, string sEventName, string sMessage)
         {
@@ -2228,6 +2438,8 @@ namespace AriesCMS.Helpers
                                 CurrentUser.AuthenticatedUser = true;
                                 CurrentUser.UserView = oUserView;
                             }
+                            oUserView.Get_Countries(cnCon);
+                            oUserView.Get_States(cnCon);
                             GetCustomCurrentUser();
                             return CurrentUser.AuthenticatedUser;
                         }
@@ -2578,14 +2790,47 @@ namespace AriesCMS.Helpers
                 return bResponse;
             }
         }
+        public bool IsUserLoggedIn()
+        {
+            bool bResponse = false;
+            try
+            {
+                if (CurrentUser != null)
+                {
+                    if (CurrentUser.UserView != null)
+                    {
+                        if (CurrentUser.UserView.User != null)
+                        {
+                            if (CurrentUser.UserView.User.ID > 0)
+                            {
+                                if (CurrentUser.AuthenticatedUser == true)
+                                {
+                                    bResponse = true;
+                                    return bResponse;
+                                }
+                            }
+                        }
+                    }
+                }
 
-        public bool UserLoggOff()
+            }
+            catch
+            {
+            }
+            return bResponse;
+        }
+        
+        public bool UserLoggOff(bool bClearCookie = true)
         {
             try
             {
                 SetUserLoggedOff();
                 HttpContext.Current.Session["_iUserID"] = "";
                 HttpContext.Current.Session["_sUserAccessKey"] = "";
+                if (bClearCookie == true)
+                {
+                    UserCookie.ClearCookie();
+                }
                 return true;
             }
             catch (Exception s)
@@ -2593,7 +2838,6 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
         public bool SetUserLoggedIn()
         {
             try
@@ -2786,6 +3030,105 @@ namespace AriesCMS.Helpers
 
                 dbWebSiteEvents.Insert_SQL(rec_WebSiteEvents);
 
+
+                if (bOpennedDataConnection == true)
+                {
+                    CloseDataConnection();
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
+        public bool LogUserSiteActivity(string _EventSubject, string _EventLog, int _iSiteID = 1, string _sSiteID = "Default",
+            int _iTypeID = 3, string _sTypeID = "Event Log", string _Notes = "",
+            string _UserCookieID = "", string _UserIP = "")
+        {
+            try
+            {
+                bool bOpennedDataConnection = false;
+                if (cnCon == null)
+                {
+                    bOpennedDataConnection = true;
+                    OpenDataConnection();
+                }
+
+                if (cnCon.ConnectionStatus != ConnectionStatusTypes.Open)
+                {
+                    bOpennedDataConnection = true;
+                    OpenDataConnection();
+                }
+
+                int _iUserID = -1;
+                string _sUserID = "Unknown";
+                string _sUserCookie = "";
+                string _sUserIPAddress = "";
+                #region Get User Identiy
+                try
+                {
+                    GetCurrentUser();
+                    if (CurrentUser != null)
+                    {
+                        if (CurrentUser.UserView != null)
+                        {
+                            if (CurrentUser.UserView.User != null)
+                            {
+                                _iUserID = CurrentUser.UserView.User.ID;
+                                _sUserID = CurrentUser.UserView.User.sUserName;
+                                if (VisitorHTTPValues != null)
+                                {
+                                    _sUserIPAddress = VisitorHTTPValues.VisitorIPAddress();
+                                }
+                                if (UserCookie != null)
+                                {
+                                    _sUserCookie = UserCookie.CookieID;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+                #endregion
+
+                if (String.IsNullOrEmpty(_UserCookieID))
+                {
+                    _UserCookieID = _sUserCookie;
+                }
+                if (String.IsNullOrEmpty(_UserIP))
+                {
+                    _UserIP = _sUserIPAddress;
+                }
+
+                if (_iUserID > 0)
+                {
+                    DINT_UsersLogs dbUsersLogs = new DINT_UsersLogs(cnCon);
+
+                    DEF_UsersLogs.RecordObject rec_UsersLogs = new DEF_UsersLogs.RecordObject();
+
+                    rec_UsersLogs.iParentID = _iUserID;
+                    rec_UsersLogs.sParentID = _sUserID;
+                    rec_UsersLogs.sControl = Guid.NewGuid().ToString();
+                    rec_UsersLogs.dtDateCreated = DateTime.Now;
+                    rec_UsersLogs.dtLastUpdated = DateTime.Now;
+                    rec_UsersLogs.iCreatedByID = _iUserID;
+                    rec_UsersLogs.sCreatedByID = _sUserID;
+                    rec_UsersLogs.iUpdatedByID = _iUserID;
+                    rec_UsersLogs.sUpdatedByID = _sUserID;
+                    rec_UsersLogs.sTitle = _iTypeID.ToString();
+                    rec_UsersLogs.sSubject = _sTypeID + " " + _EventSubject;
+                    rec_UsersLogs.sDescription = _EventLog;
+                    rec_UsersLogs.sHTTPx = _Notes;
+                    rec_UsersLogs.sOther = _UserCookieID;
+                    rec_UsersLogs.sIP = _UserIP;
+
+                    dbUsersLogs.Insert_SQL(rec_UsersLogs);
+                }
 
                 if (bOpennedDataConnection == true)
                 {
@@ -3130,14 +3473,1434 @@ namespace AriesCMS.Helpers
             }
         }
 
-        
 
-        
+
+
+
+        public AriesCMSInteractions.DINT_WebSite odbWebSite;
+        public List<AriesCMSDefinition.DEF_WebSite.RecordObject> lstWebSite;
+        public AriesCMSDefinition.DEF_WebSite.RecordObject recWebSite;
+        public bool WebSite_List(string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+        {
+            #region Process
+
+            odbWebSite = new AriesCMSInteractions.DINT_WebSite(cnCon);
+            int iTotalRows = 0;
+
+            lstWebSite = null;
+            List<DataParameter> lstParameters = new List<DataParameter>();
+            DataParameter pParameter = null;
+
+            if (_iParentID > 0)
+            {
+                pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                lstParameters.Add(pParameter);
+            }
+
+
+            if (!String.IsNullOrEmpty(Search))
+            {
+                Search = Search.TrimEnd();
+                Search = Search.TrimStart();
+
+                lstParameters = new List<DataParameter>();
+                if (_iParentID > 0)
+                {
+                    pParameter = new DataParameter("sName", "'%" + Search + "%'", "string", 11, "sName", " LIKE ", " AND ");
+                    lstParameters.Add(pParameter);
+                    iTotalRows = odbUsersMessages.GetRowCount(lstParameters);
+                }
+                else
+                {
+                    pParameter = new DataParameter("sName", "'%" + Search + "%'", "string", 11, "sName", " LIKE ", " AND ");
+                    lstParameters.Add(pParameter);
+                    iTotalRows = odbUsersMessages.GetRowCount(lstParameters);
+                }
+                iTotalRows = odbWebSite.GetRowCount(lstParameters);
+            }
+            else
+            {
+                iTotalRows = odbWebSite.GetRowCount(lstParameters);
+            }
+
+            int iMaxRows = 10;
+            if (iTotalRows > 0)
+            {
+                #region Page Management Calculation
+                if (page <= 0)
+                {
+                    page = 1;
+                }
+
+                int iRow = 0;
+                int iNextTop = 0;
+                int iNumberOfPages = 0;
+                if (iTotalRows > iMaxRows)
+                {
+                    iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                }
+                else
+                {
+                    iNumberOfPages = 1;
+                }
+                if (page <= iNumberOfPages)
+                {
+                    if (page > 1)
+                    {
+                        iRow = ((page - 1) * iMaxRows) + 1;
+                        iNextTop = (page * iMaxRows);
+                    }
+                    else
+                    {
+                        iRow = 0;
+                        iNextTop = page * iMaxRows;
+                    }
+                }
+                else
+                {
+                    page = iNumberOfPages;
+                    iRow = ((page - 1) * iMaxRows) + 1;
+                    iNextTop = iNumberOfPages * iMaxRows;
+                }
+                #endregion
+                lstWebSite = odbWebSite.Get(lstParameters, iRow, iNextTop);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            #endregion
+        }
+        public bool WebSite_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            #region Process
+            if (id > 0)
+            {
+                #region ID Based pull
+
+                List<DataParameter> lstParameters = new List<DataParameter>();
+                DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                lstParameters.Add(pParameter);
+
+                odbWebSite = new DINT_WebSite(cnCon);
+                recWebSite = new DEF_WebSite.RecordObject();
+                List<AriesCMSDefinition.DEF_WebSite.RecordObject> dbSearch = odbWebSite.Get(lstParameters);
+                if (dbSearch != null)
+                {
+                    if (dbSearch.Count > 0)
+                    {
+                        recWebSite = dbSearch[0];
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                #endregion
+            }
+            else if (!String.IsNullOrEmpty(key))
+            {
+                #region key Based pull
+                List<DataParameter> lstParameters = new List<DataParameter>();
+                DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                lstParameters.Add(pParameter);
+
+                odbUsersMessages = new DINT_UsersMessages(cnCon);
+                recUsersMessages = new DEF_UsersMessages.RecordObject();
+                List<AriesCMSDefinition.DEF_UsersMessages.RecordObject> dbSearch = odbUsersMessages.Get(lstParameters);
+                if (dbSearch != null)
+                {
+                    if (dbSearch.Count > 0)
+                    {
+                        recUsersMessages = dbSearch[0];
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                #endregion
+            }
+            else
+            {
+                return false;
+            }
+
+            #endregion
+        }
+        public void Ini_WebSite()
+        {
+            try
+            {
+                lstWebSite = new List<DEF_WebSite.RecordObject>();
+                recWebSite = new DEF_WebSite.RecordObject();
+            }
+            catch
+            {
+            }
+        }
+
+
+        public AriesCMSInteractions.DINT_WebSite_Messaging odbWebSite_Messaging;
+        public List<AriesCMSDefinition.DEF_WebSite_Messaging.RecordObject> lstWebSite_Messaging;
+        public AriesCMSDefinition.DEF_WebSite_Messaging.RecordObject recWebSite_Messaging;
+        public bool WebSite_Messaging_List(string Search, int _iParentID = 0, string _sParentID = "", int page = -1)
+        {
+            #region Process
+
+            odbWebSite_Messaging = new AriesCMSInteractions.DINT_WebSite_Messaging(cnCon);
+            int iTotalRows = 0;
+
+            lstWebSite_Messaging = null;
+            List<DataParameter> lstParameters = new List<DataParameter>();
+            DataParameter pParameter = null;
+
+            if (_iParentID > 0)
+            {
+                pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                lstParameters.Add(pParameter);
+            }
+
+
+            if (!String.IsNullOrEmpty(Search))
+            {
+                Search = Search.TrimEnd();
+                Search = Search.TrimStart();
+
+                lstParameters = new List<DataParameter>();
+                if (_iParentID > 0)
+                {
+                    pParameter = new DataParameter("sName", "'%" + Search + "%'", "string", 11, "sName", " LIKE ", " AND ");
+                    lstParameters.Add(pParameter);
+                    iTotalRows = odbUsersMessages.GetRowCount(lstParameters);
+                }
+                else
+                {
+                    pParameter = new DataParameter("sName", "'%" + Search + "%'", "string", 11, "sName", " LIKE ", " AND ");
+                    lstParameters.Add(pParameter);
+                    iTotalRows = odbWebSite_Messaging.GetRowCount(lstParameters);
+                }
+                iTotalRows = odbWebSite_Messaging.GetRowCount(lstParameters);
+            }
+            else
+            {
+                iTotalRows = odbWebSite_Messaging.GetRowCount(lstParameters);
+            }
+
+            int iMaxRows = 10;
+            if (iTotalRows > 0)
+            {
+                #region Page Management Calculation
+                if (page <= 0)
+                {
+                    page = 1;
+                }
+
+                int iRow = 0;
+                int iNextTop = 0;
+                int iNumberOfPages = 0;
+                if (iTotalRows > iMaxRows)
+                {
+                    iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                }
+                else
+                {
+                    iNumberOfPages = 1;
+                }
+                if (page <= iNumberOfPages)
+                {
+                    if (page > 1)
+                    {
+                        iRow = ((page - 1) * iMaxRows) + 1;
+                        iNextTop = (page * iMaxRows);
+                    }
+                    else
+                    {
+                        iRow = 0;
+                        iNextTop = page * iMaxRows;
+                    }
+                }
+                else
+                {
+                    page = iNumberOfPages;
+                    iRow = ((page - 1) * iMaxRows) + 1;
+                    iNextTop = iNumberOfPages * iMaxRows;
+                }
+                #endregion
+
+                if (page <= 0)
+                {
+                    lstWebSite_Messaging = odbWebSite_Messaging.Get(lstParameters);
+                }
+                else
+                {
+                    lstWebSite_Messaging = odbWebSite_Messaging.Get(lstParameters, iRow, iNextTop);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            #endregion
+        }
+        public bool WebSite_Messaging_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            #region Process
+            if (id > 0)
+            {
+                #region ID Based pull
+
+                List<DataParameter> lstParameters = new List<DataParameter>();
+                DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                lstParameters.Add(pParameter);
+
+                odbWebSite_Messaging = new DINT_WebSite_Messaging(cnCon);
+                recWebSite_Messaging = new DEF_WebSite_Messaging.RecordObject();
+                List<AriesCMSDefinition.DEF_WebSite_Messaging.RecordObject> dbSearch = odbWebSite_Messaging.Get(lstParameters);
+                if (dbSearch != null)
+                {
+                    if (dbSearch.Count > 0)
+                    {
+                        recWebSite_Messaging = dbSearch[0];
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                #endregion
+            }
+            else if (!String.IsNullOrEmpty(key))
+            {
+                #region key Based pull
+                List<DataParameter> lstParameters = new List<DataParameter>();
+                DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                lstParameters.Add(pParameter);
+
+                odbWebSite_Messaging = new DINT_WebSite_Messaging(cnCon);
+                recWebSite_Messaging = new DEF_WebSite_Messaging.RecordObject();
+                List<AriesCMSDefinition.DEF_WebSite_Messaging.RecordObject> dbSearch = odbWebSite_Messaging.Get(lstParameters);
+                if (dbSearch != null)
+                {
+                    if (dbSearch.Count > 0)
+                    {
+                        recWebSite_Messaging = dbSearch[0];
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                #endregion
+            }
+            else
+            {
+                return false;
+            }
+
+            #endregion
+        }
+        public void Ini_WebSite_Messaging()
+        {
+            try
+            {
+                lstWebSite_Messaging = new List<DEF_WebSite_Messaging.RecordObject>();
+                recWebSite_Messaging = new DEF_WebSite_Messaging.RecordObject();
+            }
+            catch
+            {
+            }
+        }
+
+        public string Parse_WebSite_Messaging_Template_SiteValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSite.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                #region WebSite
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.sName.ToString());
+                sReturn = sReturn.Replace("#sAccesskey#", _rec.sAccesskey.ToString());
+                sReturn = sReturn.Replace("#bSubScriptionBased#", _rec.bSubScriptionBased.ToString());
+                sReturn = sReturn.Replace("#iRequiredRoleID#", _rec.iRequiredRoleID.ToString());
+                sReturn = sReturn.Replace("#sRequiredRoleID#", _rec.sRequiredRoleID.ToString());
+                sReturn = sReturn.Replace("#iDefaultTemplateID#", _rec.iDefaultTemplateID.ToString());
+                sReturn = sReturn.Replace("#sDefaultTemplateID#", _rec.sDefaultTemplateID.ToString());
+                sReturn = sReturn.Replace("#iDefaultBlogID#", _rec.iDefaultBlogID.ToString());
+                sReturn = sReturn.Replace("#sDefaultBlogID#", _rec.sDefaultBlogID.ToString());
+                sReturn = sReturn.Replace("#sDefaultMetaTags#", _rec.sDefaultMetaTags.ToString());
+                sReturn = sReturn.Replace("#sDefaultClassification#", _rec.sDefaultClassification.ToString());
+                sReturn = sReturn.Replace("#sDefaultDescription#", _rec.sDefaultDescription.ToString());
+                sReturn = sReturn.Replace("#sDefaultKeyWords#", _rec.sDefaultKeyWords.ToString());
+                sReturn = sReturn.Replace("#sSupportEmail#", _rec.sSupportEmail.ToString());
+                sReturn = sReturn.Replace("#sWebMasterEmail#", _rec.sWebMasterEmail.ToString());
+                sReturn = sReturn.Replace("#dUniqueVisitors#", _rec.dUniqueVisitors.ToString());
+                sReturn = sReturn.Replace("#dVisits#", _rec.dVisits.ToString());
+                sReturn = sReturn.Replace("#dPageViews#", _rec.dPageViews.ToString());
+                sReturn = sReturn.Replace("#bRestrictAccess#", _rec.bRestrictAccess.ToString());
+                sReturn = sReturn.Replace("#iNewRegMessageID#", _rec.iNewRegMessageID.ToString());
+                sReturn = sReturn.Replace("#sNewRegMessageID#", _rec.sNewRegMessageID.ToString());
+                sReturn = sReturn.Replace("#iNewsLetrRegMessageID#", _rec.iNewsLetrRegMessageID.ToString());
+                sReturn = sReturn.Replace("#sNewsLetrRegMessageID#", _rec.sNewsLetrRegMessageID.ToString());
+                sReturn = sReturn.Replace("#iContactConfMessageID#", _rec.iContactConfMessageID.ToString());
+                sReturn = sReturn.Replace("#sContactConfMessageID#", _rec.sContactConfMessageID.ToString());
+                sReturn = sReturn.Replace("#iLostPswdMessageID#", _rec.iLostPswdMessageID.ToString());
+                sReturn = sReturn.Replace("#sLostPswdMessageID#", _rec.sLostPswdMessageID.ToString());
+                #endregion
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_UserValues(string _OriginalMessage, AriesCMSDefinition.DEF_Users.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                #region Users
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sAccessKey#", _rec.sAccessKey.ToString());
+                sReturn = sReturn.Replace("#sUserName#", _rec.sUserName.ToString());
+                sReturn = sReturn.Replace("#sPassword#", _rec.sPassword.ToString());
+                sReturn = sReturn.Replace("#sPrefix#", _rec.sPrefix.ToString());
+                sReturn = sReturn.Replace("#sFName#", _rec.sFName.ToString());
+                sReturn = sReturn.Replace("#sMName#", _rec.sMName.ToString());
+                sReturn = sReturn.Replace("#sLName#", _rec.sLName.ToString());
+                sReturn = sReturn.Replace("#bAccLocked#", _rec.bAccLocked.ToString());
+                sReturn = sReturn.Replace("#iPrimaryRole#", _rec.iPrimaryRole.ToString());
+                sReturn = sReturn.Replace("#sPrimaryRole#", _rec.sPrimaryRole.ToString());
+                sReturn = sReturn.Replace("#sAvitarImgURL#", _rec.sAvitarImgURL.ToString());
+                sReturn = sReturn.Replace("#bCurrentlyLoggedIn#", _rec.bCurrentlyLoggedIn.ToString());
+                sReturn = sReturn.Replace("#iReputationLevel#", _rec.iReputationLevel.ToString());
+                sReturn = sReturn.Replace("#sKeyWords#", _rec.sKeyWords.ToString());
+                sReturn = sReturn.Replace("#sScreenName#", _rec.sScreenName.ToString());
+                sReturn = sReturn.Replace("#sProfileDiscription#", _rec.sProfileDiscription.ToString());
+                sReturn = sReturn.Replace("#iGenderTypeID#", _rec.iGenderTypeID.ToString());
+                sReturn = sReturn.Replace("#sGenderTypeID#", _rec.sGenderTypeID.ToString());
+                sReturn = sReturn.Replace("#bPrivateProfile#", _rec.bPrivateProfile.ToString());
+                sReturn = sReturn.Replace("#dtDateOfBirth#", _rec.dtDateOfBirth.ToString());
+                sReturn = sReturn.Replace("#sActivationKey#", _rec.sActivationKey.ToString());
+                sReturn = sReturn.Replace("#dtLastLoggedIn#", _rec.dtLastLoggedIn.ToString());
+                sReturn = sReturn.Replace("#bAccountActivated#", _rec.bAccountActivated.ToString());
+                sReturn = sReturn.Replace("#sAddress1#", _rec.sAddress1.ToString());
+                sReturn = sReturn.Replace("#sAddress2#", _rec.sAddress2.ToString());
+                sReturn = sReturn.Replace("#sAddress3#", _rec.sAddress3.ToString());
+                sReturn = sReturn.Replace("#sCity#", _rec.sCity.ToString());
+                sReturn = sReturn.Replace("#iStateID#", _rec.iStateID.ToString());
+                sReturn = sReturn.Replace("#sStateID#", _rec.sStateID.ToString());
+                sReturn = sReturn.Replace("#sPostalCode#", _rec.sPostalCode.ToString());
+                sReturn = sReturn.Replace("#iCountryID#", _rec.iCountryID.ToString());
+                sReturn = sReturn.Replace("#sCountryID#", _rec.sCountryID.ToString());
+                sReturn = sReturn.Replace("#sPrimaryEMail#", _rec.sPrimaryEMail.ToString());
+                sReturn = sReturn.Replace("#sPrimaryPhone#", _rec.sPrimaryPhone.ToString());
+                sReturn = sReturn.Replace("#bOptInMarketing#", _rec.bOptInMarketing.ToString());
+                sReturn = sReturn.Replace("#sBillAddress1#", _rec.sBillAddress1.ToString());
+                sReturn = sReturn.Replace("#sBillAddress2#", _rec.sBillAddress2.ToString());
+                sReturn = sReturn.Replace("#sBillAddress3#", _rec.sBillAddress3.ToString());
+                sReturn = sReturn.Replace("#sBillCity#", _rec.sBillCity.ToString());
+                sReturn = sReturn.Replace("#iBillStateID#", _rec.iBillStateID.ToString());
+                sReturn = sReturn.Replace("#sBillStateID#", _rec.sBillStateID.ToString());
+                sReturn = sReturn.Replace("#sBillPostalCode#", _rec.sBillPostalCode.ToString());
+                sReturn = sReturn.Replace("#iBillCountryID#", _rec.iBillCountryID.ToString());
+                sReturn = sReturn.Replace("#sBillCountryID#", _rec.sBillCountryID.ToString());
+                sReturn = sReturn.Replace("#IPAddressess#", _rec.IPAddressess.ToString());
+                sReturn = sReturn.Replace("#bForceLogOut#", _rec.bForceLogOut.ToString());
+                sReturn = sReturn.Replace("#sCurrentSession#", _rec.sCurrentSession.ToString());
+                sReturn = sReturn.Replace("#iMemberShipID#", _rec.iMemberShipID.ToString());
+                sReturn = sReturn.Replace("#sMemberShipID#", _rec.sMemberShipID.ToString());
+                sReturn = sReturn.Replace("#sCN#", _rec.sCN.ToString());
+                sReturn = sReturn.Replace("#sCExp#", _rec.sCExp.ToString());
+                sReturn = sReturn.Replace("#sCCVV#", _rec.sCCVV.ToString());
+                sReturn = sReturn.Replace("#sCLinkID#", _rec.sCLinkID.ToString());
+                sReturn = sReturn.Replace("#bMembershipInActive#", _rec.bMembershipInActive.ToString());
+                #endregion
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_ShareContentValues(string _OriginalMessage, AriesCMS.Models.ShareContent _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#sSubject#", _rec.sSubject.ToString());
+                sReturn = sReturn.Replace("#sMessage#", _rec.sMessage.ToString());
+                sReturn = sReturn.Replace("#sFromName#", _rec.sFromName.ToString());
+                sReturn = sReturn.Replace("#sFromEmail#", _rec.sFromEmail.ToString());
+                sReturn = sReturn.Replace("#sFromCellPhone#", _rec.sFromCellPhone.ToString());
+                sReturn = sReturn.Replace("#sToEmails#", _rec.sToEmails.ToString());
+                sReturn = sReturn.Replace("#sToCellPhones#", _rec.sToCellPhones.ToString());
+                sReturn = sReturn.Replace("#URI#", _rec.URI.ToString());
+                sReturn = sReturn.Replace("#URL#", _rec.URL.ToString());
+                sReturn = sReturn.Replace("#ThumbNailImage#", _rec.ThumbNailImage.ToString());
+                sReturn = sReturn.Replace("#IsImage#", _rec.IsImage.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_ContactUsValues(string _OriginalMessage, AriesCMS.Models.ContactUsView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#Name#", _rec.Name.ToString());
+                sReturn = sReturn.Replace("#Subject#", _rec.Subject.ToString());
+                sReturn = sReturn.Replace("#Message#", _rec.Message.ToString());
+                sReturn = sReturn.Replace("#Email#", _rec.Email.ToString());
+                sReturn = sReturn.Replace("#Phone#", _rec.Phone.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_ContactLeadValues(string _OriginalMessage, AriesCMS.Models.ContactLeadView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#CompanyName#", _rec.CompanyName.ToString());
+                sReturn = sReturn.Replace("#Title#", _rec.Title.ToString());
+                sReturn = sReturn.Replace("#CompanyURL#", _rec.CompanyURL.ToString());
+                sReturn = sReturn.Replace("#Phone#", _rec.Phone.ToString());
+                sReturn = sReturn.Replace("#PhoneExt#", _rec.PhoneExt.ToString());
+                sReturn = sReturn.Replace("#Email#", _rec.Email.ToString());
+                sReturn = sReturn.Replace("#Notes#", _rec.Notes.ToString());
+                sReturn = sReturn.Replace("#GrossAnnualRevenues#", _rec.GrossAnnualRevenues.ToString());
+                sReturn = sReturn.Replace("#HowManyEmployees#", _rec.HowManyEmployees.ToString());
+                sReturn = sReturn.Replace("#RefferalCode#", _rec.RefferalCode.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_NewNewsLetterValues(string _OriginalMessage, AriesCMS.Models.NewNewsLetter _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#FirstNameError#", _rec.FirstNameError.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#LastNameError#", _rec.LastNameError.ToString());
+                sReturn = sReturn.Replace("#EMail#", _rec.EMail.ToString());
+                sReturn = sReturn.Replace("#EMailError#", _rec.EMailError.ToString());
+                sReturn = sReturn.Replace("#EMailErrorMessage#", _rec.EMailErrorMessage.ToString());
+                sReturn = sReturn.Replace("#OptingInMail#", _rec.OptingInMail.ToString());
+                sReturn = sReturn.Replace("#OptingInMailError#", _rec.OptingInMailError.ToString());
+                sReturn = sReturn.Replace("#TrackingCode#", _rec.TrackingCode.ToString());
+                sReturn = sReturn.Replace("#HTTPLog#", _rec.HTTPLog.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_NewUserRegistrationValues(string _OriginalMessage, AriesCMS.Models.NewUserRegistration _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#UserName#", _rec.UserName.ToString());
+                sReturn = sReturn.Replace("#UserNameError#", _rec.UserNameError.ToString());
+                sReturn = sReturn.Replace("#UserNameErrorMessage#", _rec.UserNameErrorMessage.ToString());
+                sReturn = sReturn.Replace("#Password#", _rec.Password.ToString());
+                sReturn = sReturn.Replace("#PasswordError#", _rec.PasswordError.ToString());
+                sReturn = sReturn.Replace("#PasswordConfirm#", _rec.PasswordConfirm.ToString());
+                sReturn = sReturn.Replace("#PasswordConfirmError#", _rec.PasswordConfirmError.ToString());
+                sReturn = sReturn.Replace("#PasswordErrorMessage#", _rec.PasswordErrorMessage.ToString());
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#FirstNameError#", _rec.FirstNameError.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#LastNameError#", _rec.LastNameError.ToString());
+                sReturn = sReturn.Replace("#MiddleName#", _rec.MiddleName.ToString());
+                sReturn = sReturn.Replace("#MiddleNameError#", _rec.MiddleNameError.ToString());
+                sReturn = sReturn.Replace("#EMail#", _rec.EMail.ToString());
+                sReturn = sReturn.Replace("#EMailError#", _rec.EMailError.ToString());
+                sReturn = sReturn.Replace("#OptingInMail#", _rec.OptingInMail.ToString());
+                sReturn = sReturn.Replace("#OptingInMailError#", _rec.OptingInMailError.ToString());
+                sReturn = sReturn.Replace("#Phone#", _rec.Phone.ToString());
+                sReturn = sReturn.Replace("#PhoneError#", _rec.PhoneError.ToString());
+                sReturn = sReturn.Replace("#Fax#", _rec.Fax.ToString());
+                sReturn = sReturn.Replace("#FaxError#", _rec.FaxError.ToString());
+                sReturn = sReturn.Replace("#CellPhone#", _rec.CellPhone.ToString());
+                sReturn = sReturn.Replace("#CellPhoneError#", _rec.CellPhoneError.ToString());
+                sReturn = sReturn.Replace("#DateOfBirth#", _rec.DateOfBirth.ToString());
+                sReturn = sReturn.Replace("#DateOfBirthError#", _rec.DateOfBirthError.ToString());
+                sReturn = sReturn.Replace("#DOBMonth#", _rec.DOBMonth.ToString());
+                sReturn = sReturn.Replace("#DOBDay#", _rec.DOBDay.ToString());
+                sReturn = sReturn.Replace("#DOBYear#", _rec.DOBYear.ToString());
+                sReturn = sReturn.Replace("#Sex#", _rec.Sex.ToString());
+                sReturn = sReturn.Replace("#SexID#", _rec.SexID.ToString());
+                sReturn = sReturn.Replace("#ItemIDs#", _rec.ItemIDs.ToString());
+                sReturn = sReturn.Replace("#CuponCodes#", _rec.CuponCodes.ToString());
+                sReturn = sReturn.Replace("#PromoCodes#", _rec.PromoCodes.ToString());
+                sReturn = sReturn.Replace("#CompanyName#", _rec.CompanyName.ToString());
+                sReturn = sReturn.Replace("#CompanyNameError#", _rec.CompanyNameError.ToString());
+                
+                sReturn = Parse_WebSite_Messaging_Template_UserCompanyInfoValues(sReturn, _rec.Company);
+                sReturn = Parse_WebSite_Messaging_Template_UserAddressInfoValues(sReturn, _rec.AddressInfo);
+                sReturn = Parse_WebSite_Messaging_Template_UserBillingInfoValues(sReturn, _rec.BillingInfo);
+
+                sReturn = sReturn.Replace("#TrackingCode#", _rec.TrackingCode.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_UserCompanyInfoValues(string _OriginalMessage, AriesCMS.Models.UserCompanyInfo _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ID#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyName.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyPhone.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyPhoneError.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyPhoneExt.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyPhoneExtError.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyFax.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyFaxError.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyCellPhone.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyCellPhoneError.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine1#", _rec.CompanyAddressLine1.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine1Error#", _rec.CompanyAddressLine1Error.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine2#", _rec.CompanyAddressLine2.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine2Error#", _rec.CompanyAddressLine2Error.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine3#", _rec.CompanyAddressLine3.ToString());
+                sReturn = sReturn.Replace("#CompanyAddressLine3Error#", _rec.CompanyAddressLine3Error.ToString());
+                sReturn = sReturn.Replace("#CompanyCity#", _rec.CompanyCity.ToString());
+                sReturn = sReturn.Replace("#CompanyCityError#", _rec.CompanyCityError.ToString());
+                sReturn = sReturn.Replace("#CompanyState#", _rec.CompanyState.ToString());
+                sReturn = sReturn.Replace("#CompanyStateError#", _rec.CompanyStateError.ToString());
+                sReturn = sReturn.Replace("#CompanyStateID#", _rec.CompanyStateID.ToString());
+                sReturn = sReturn.Replace("#CompanyStateIDError#", _rec.CompanyStateIDError.ToString());
+                sReturn = sReturn.Replace("#CompanyCountry#", _rec.CompanyCountry.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.CompanyCountryError.ToString());
+                sReturn = sReturn.Replace("#CompanyCountryID#", _rec.CompanyCountryID.ToString());
+                sReturn = sReturn.Replace("#CompanyCountryIDError#", _rec.CompanyCountryIDError.ToString());
+                sReturn = sReturn.Replace("#CompanyPostalCode#", _rec.CompanyPostalCode.ToString());
+                sReturn = sReturn.Replace("#CompanyPostalCodeError#", _rec.CompanyPostalCodeError.ToString());
+                sReturn = sReturn.Replace("#EMail#", _rec.EMail.ToString());
+                sReturn = sReturn.Replace("#EMailError#", _rec.EMailError.ToString());
+                sReturn = sReturn.Replace("#OptingInMail#", _rec.OptingInMail.ToString());
+                sReturn = sReturn.Replace("#OptingInMailError#", _rec.OptingInMailError.ToString());
+                sReturn = sReturn.Replace("#Phone#", _rec.Phone.ToString());
+                sReturn = sReturn.Replace("#PhoneError#", _rec.PhoneError.ToString());
+                sReturn = sReturn.Replace("#Fax#", _rec.Fax.ToString());
+                sReturn = sReturn.Replace("#FaxError#", _rec.FaxError.ToString());
+                sReturn = sReturn.Replace("#CellPhone#", _rec.CellPhone.ToString());
+                sReturn = sReturn.Replace("#CellPhoneError#", _rec.CellPhoneError.ToString());
+                sReturn = sReturn.Replace("#AvailableTimes#", _rec.AvailableTimes.ToString());
+                sReturn = sReturn.Replace("#AdditionalMessage#", _rec.AdditionalMessage.ToString());
+                
+                sReturn = Parse_WebSite_Messaging_Template_UserAddressInfoValues(sReturn, _rec.AddressInfo);
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_UserBillingInfoValues(string _OriginalMessage, AriesCMS.Models.UserBillingInfo _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#FullName#", _rec.FullName.ToString());
+                sReturn = sReturn.Replace("#FullNameError#", _rec.FullNameError.ToString());
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#FirstNameError#", _rec.FirstNameError.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#LastNameError#", _rec.LastNameError.ToString());
+                sReturn = sReturn.Replace("#MiddleName#", _rec.MiddleName.ToString());
+                sReturn = sReturn.Replace("#MiddleNameError#", _rec.MiddleNameError.ToString());
+                sReturn = sReturn.Replace("#CreditCardNumber#", _rec.CreditCardNumber.ToString());
+                sReturn = sReturn.Replace("#CreditCardNumberError#", _rec.CreditCardNumberError.ToString());
+                sReturn = sReturn.Replace("#CreditCardCVV#", _rec.CreditCardCVV.ToString());
+                sReturn = sReturn.Replace("#CreditCardCVVError#", _rec.CreditCardCVVError.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDate#", _rec.CreditCardExpDate.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDateError#", _rec.CreditCardExpDateError.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDateMonth#", _rec.CreditCardExpDateMonth.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDateMonthError#", _rec.CreditCardExpDateMonthError.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDateYear#", _rec.CreditCardExpDateYear.ToString());
+                sReturn = sReturn.Replace("#CreditCardExpDateYearError#", _rec.CreditCardExpDateYearError.ToString());
+                sReturn = sReturn.Replace("#EMail#", _rec.EMail.ToString());
+                sReturn = sReturn.Replace("#EMailError#", _rec.EMailError.ToString());
+                sReturn = sReturn.Replace("#OptingInMail#", _rec.OptingInMail.ToString());
+                sReturn = sReturn.Replace("#OptingInMailError#", _rec.OptingInMailError.ToString());
+                sReturn = sReturn.Replace("#Phone#", _rec.Phone.ToString());
+                sReturn = sReturn.Replace("#PhoneError#", _rec.PhoneError.ToString());
+                sReturn = sReturn.Replace("#Fax#", _rec.Fax.ToString());
+                sReturn = sReturn.Replace("#FaxError#", _rec.FaxError.ToString());
+                sReturn = sReturn.Replace("#CellPhone#", _rec.CellPhone.ToString());
+                sReturn = sReturn.Replace("#CellPhoneError#", _rec.CellPhoneError.ToString());
+                
+                sReturn = Parse_WebSite_Messaging_Template_UserAddressInfoValues(sReturn, _rec.AddressInfo);
+
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_UserAddressInfoValues(string _OriginalMessage, AriesCMS.Models.UserAddressInfo _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#AddressLine1#", _rec.AddressLine1.ToString());
+                sReturn = sReturn.Replace("#AddressLine1Error#", _rec.AddressLine1Error.ToString());
+                sReturn = sReturn.Replace("#AddressLine2#", _rec.AddressLine2.ToString());
+                sReturn = sReturn.Replace("#AddressLine2Error#", _rec.AddressLine2Error.ToString());
+                sReturn = sReturn.Replace("#AddressLine3#", _rec.AddressLine3.ToString());
+                sReturn = sReturn.Replace("#AddressLine3Error#", _rec.AddressLine3Error.ToString());
+                sReturn = sReturn.Replace("#City#", _rec.City.ToString());
+                sReturn = sReturn.Replace("#CityError#", _rec.CityError.ToString());
+                sReturn = sReturn.Replace("#State#", _rec.State.ToString());
+                sReturn = sReturn.Replace("#StateError#", _rec.StateError.ToString());
+                sReturn = sReturn.Replace("#StateID#", _rec.StateID.ToString());
+                sReturn = sReturn.Replace("#StateIDError#", _rec.StateIDError.ToString());
+                sReturn = sReturn.Replace("#Country#", _rec.Country.ToString());
+                sReturn = sReturn.Replace("#CountryError#", _rec.CountryError.ToString());
+                sReturn = sReturn.Replace("#CountryID#", _rec.CountryID.ToString());
+                sReturn = sReturn.Replace("#CountryIDError#", _rec.CountryIDError.ToString());
+                sReturn = sReturn.Replace("#PostalCode#", _rec.PostalCode.ToString());
+                sReturn = sReturn.Replace("#PostalCodeError#", _rec.PostalCodeError.ToString());
+                sReturn = sReturn.Replace("#PublicFormResponseMessage#", _rec.PublicFormResponseMessage.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_BillingItemsValues(string _OriginalMessage, AriesCMS.Models.BillingItems _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#Item#", _rec.Item.ToString());
+                sReturn = sReturn.Replace("#ItemError#", _rec.ItemError.ToString());
+                sReturn = sReturn.Replace("#ItemDescription#", _rec.ItemDescription.ToString());
+                sReturn = sReturn.Replace("#ItemDescriptionError#", _rec.ItemDescriptionError.ToString());
+                sReturn = sReturn.Replace("#ItemImageLarge#", _rec.ItemImageLarge.ToString());
+                sReturn = sReturn.Replace("#ItemImageLargeError#", _rec.ItemImageLargeError.ToString());
+                sReturn = sReturn.Replace("#ItemImageSmall#", _rec.ItemImageSmall.ToString());
+                sReturn = sReturn.Replace("#ItemImageSmallError#", _rec.ItemImageSmallError.ToString());
+                sReturn = sReturn.Replace("#ItemCost#", _rec.ItemCost.ToString());
+                sReturn = sReturn.Replace("#ItemCostError#", _rec.ItemCostError.ToString());
+                sReturn = sReturn.Replace("#ItemQty#", _rec.ItemQty.ToString());
+                sReturn = sReturn.Replace("#ItemQtyError#", _rec.ItemQtyError.ToString());
+                sReturn = sReturn.Replace("#PublicFormResponseMessage#", _rec.PublicFormResponseMessage.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_CouponsPromosValues(string _OriginalMessage, AriesCMS.Models.CouponsPromos _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#CPCode#", _rec.CPCode.ToString());
+                sReturn = sReturn.Replace("#WasApplied#", _rec.WasApplied.ToString());
+                sReturn = sReturn.Replace("#DiscountAmount#", _rec.DiscountAmount.ToString());
+                sReturn = sReturn.Replace("#RelatedToItems#", _rec.RelatedToItems.ToString());
+                sReturn = sReturn.Replace("#PublicFormResponseMessage#", _rec.PublicFormResponseMessage.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_ProfileRecoveryValues(string _OriginalMessage, AriesCMS.Models.ProfileRecovery _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#ValidationErrors#", _rec.ValidationErrors.ToString());
+                sReturn = sReturn.Replace("#FullName#", _rec.FullName.ToString());
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#Email#", _rec.Email.ToString());
+                sReturn = sReturn.Replace("#Username#", _rec.Username.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+                sReturn = sReturn.Replace("#DebugFormResponseMessage#", _rec.DebugFormResponseMessage.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_ChargeRecordValues(string _OriginalMessage, AriesCMS.Models.ChargeRecord _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                sReturn = sReturn.Replace("#AuthorizationCode#", _rec.AuthorizationCode.ToString());
+                sReturn = sReturn.Replace("#CardNumber#", _rec.CardNumber.ToString());
+                sReturn = sReturn.Replace("#CardType#", _rec.CardType.ToString());
+                sReturn = sReturn.Replace("#CardNumberMask#", _rec.CardNumberMask.ToString());
+                sReturn = sReturn.Replace("#CVV#", _rec.CVV.ToString());
+                sReturn = sReturn.Replace("#ExpirationDate#", _rec.ExpirationDate.ToString());
+                sReturn = sReturn.Replace("#Month#", _rec.Month.ToString());
+                sReturn = sReturn.Replace("#Year#", _rec.Year.ToString());
+                sReturn = sReturn.Replace("#ChargeAmount#", _rec.ChargeAmount.ToString());
+                sReturn = sReturn.Replace("#ShippingCharge#", _rec.ShippingCharge.ToString());
+                sReturn = sReturn.Replace("#Subtotal#", _rec.Subtotal.ToString());
+                sReturn = sReturn.Replace("#ChargeDescription#", _rec.ChargeDescription.ToString());
+                sReturn = sReturn.Replace("#Tax#", _rec.Tax.ToString());
+                sReturn = sReturn.Replace("#FirstName#", _rec.FirstName.ToString());
+                sReturn = sReturn.Replace("#LastName#", _rec.LastName.ToString());
+                sReturn = sReturn.Replace("#Address#", _rec.Address.ToString());
+                sReturn = sReturn.Replace("#City#", _rec.City.ToString());
+                sReturn = sReturn.Replace("#State#", _rec.State.ToString());
+                sReturn = sReturn.Replace("#PostalCode#", _rec.PostalCode.ToString());
+                sReturn = sReturn.Replace("#Country#", _rec.Country.ToString());
+                sReturn = sReturn.Replace("#PhoneNumber#", _rec.PhoneNumber.ToString());
+                sReturn = sReturn.Replace("#EMail#", _rec.EMail.ToString());
+                sReturn = sReturn.Replace("#ClientIPAddress#", _rec.ClientIPAddress.ToString());
+                sReturn = sReturn.Replace("#PaymentID#", _rec.PaymentID.ToString());
+                sReturn = sReturn.Replace("#ChargeResponse#", _rec.ChargeResponse.ToString());
+                sReturn = sReturn.Replace("#ErrorMessage#", _rec.ErrorMessage.ToString());
+                sReturn = sReturn.Replace("#ErrorPageURL#", _rec.ErrorPageURL.ToString());
+                sReturn = sReturn.Replace("#SuccessPageURL#", _rec.SuccessPageURL.ToString());
+                sReturn = sReturn.Replace("#SourceForm#", _rec.SourceForm.ToString());
+                sReturn = sReturn.Replace("#IsCMSForm#", _rec.IsCMSForm.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+
+        public string Parse_WebSite_Messaging_Template_WebSiteSponsorsValues(string _OriginalMessage, AriesCMS.Models.WebSiteSponsorsDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                #region WebSiteSponsors
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteSponsors.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteSponsors.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteSponsors.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteSponsors.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteSponsors.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteSponsors.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteSponsors.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteSponsors.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteSponsors.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteSponsors.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteSponsors.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSiteSponsors.sName.ToString());
+                sReturn = sReturn.Replace("#iSponsorShipTypeID#", _rec.WebSiteSponsors.iSponsorShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sSponsorShipTypeID#", _rec.WebSiteSponsors.sSponsorShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSiteSponsors.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSiteSponsors.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSiteSponsors.sImageURL3.ToString());
+                sReturn = sReturn.Replace("#sListingDescription#", _rec.WebSiteSponsors.sListingDescription.ToString());
+                sReturn = sReturn.Replace("#sLargerListingDescription#", _rec.WebSiteSponsors.sLargerListingDescription.ToString());
+                sReturn = sReturn.Replace("#sDetailsDescription#", _rec.WebSiteSponsors.sDetailsDescription.ToString());
+                sReturn = sReturn.Replace("#iAssociatedUserID#", _rec.WebSiteSponsors.iAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sAssociatedUserID#", _rec.WebSiteSponsors.sAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSiteSponsors.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSiteSponsors.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSiteSponsors.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSiteSponsors.bHidden.ToString());
+                sReturn = sReturn.Replace("#sCategories#", _rec.WebSiteSponsors.sCategories.ToString());
+                sReturn = sReturn.Replace("#sURL1#", _rec.WebSiteSponsors.sURL1.ToString());
+                sReturn = sReturn.Replace("#sURL2#", _rec.WebSiteSponsors.sURL2.ToString());
+                sReturn = sReturn.Replace("#sURL3#", _rec.WebSiteSponsors.sURL3.ToString());
+                sReturn = sReturn.Replace("#sSpecialty#", _rec.WebSiteSponsors.sSpecialty.ToString());
+                sReturn = sReturn.Replace("#sTitle#", _rec.WebSiteSponsors.sTitle.ToString());
+                sReturn = sReturn.Replace("#sFocus#", _rec.WebSiteSponsors.sFocus.ToString());
+                sReturn = sReturn.Replace("#sContactPhone#", _rec.WebSiteSponsors.sContactPhone.ToString());
+                sReturn = sReturn.Replace("#sContactEMail#", _rec.WebSiteSponsors.sContactEMail.ToString());
+                sReturn = sReturn.Replace("#sContactAddress#", _rec.WebSiteSponsors.sContactAddress.ToString());
+
+                #endregion
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteEventCalendarSponsorsValues(string _OriginalMessage, AriesCMS.Models.WebSiteEventCalendarSponsorsDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                #region WebSiteEventCalendarSponsors
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteEventCalendarSponsors.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteEventCalendarSponsors.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteEventCalendarSponsors.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteEventCalendarSponsors.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteEventCalendarSponsors.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteEventCalendarSponsors.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteEventCalendarSponsors.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteEventCalendarSponsors.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteEventCalendarSponsors.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteEventCalendarSponsors.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteEventCalendarSponsors.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#iSponsorID#", _rec.WebSiteEventCalendarSponsors.iSponsorID.ToString());
+                sReturn = sReturn.Replace("#sSponsorID#", _rec.WebSiteEventCalendarSponsors.sSponsorID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSiteEventCalendarSponsors.sName.ToString());
+                sReturn = sReturn.Replace("#iSponsorShipTypeID#", _rec.WebSiteEventCalendarSponsors.iSponsorShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sSponsorShipTypeID#", _rec.WebSiteEventCalendarSponsors.sSponsorShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSiteEventCalendarSponsors.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSiteEventCalendarSponsors.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSiteEventCalendarSponsors.sImageURL3.ToString());
+                sReturn = sReturn.Replace("#sListingDescription#", _rec.WebSiteEventCalendarSponsors.sListingDescription.ToString());
+                sReturn = sReturn.Replace("#sLargerListingDescription#", _rec.WebSiteEventCalendarSponsors.sLargerListingDescription.ToString());
+                sReturn = sReturn.Replace("#sDetailsDescription#", _rec.WebSiteEventCalendarSponsors.sDetailsDescription.ToString());
+                sReturn = sReturn.Replace("#iAssociatedUserID#", _rec.WebSiteEventCalendarSponsors.iAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sAssociatedUserID#", _rec.WebSiteEventCalendarSponsors.sAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSiteEventCalendarSponsors.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSiteEventCalendarSponsors.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSiteEventCalendarSponsors.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSiteEventCalendarSponsors.bHidden.ToString());
+                #endregion
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteMembersValues(string _OriginalMessage, AriesCMS.Models.WebSiteMembersDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteMembers
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteMembers.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteMembers.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteMembers.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteMembers.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteMembers.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteMembers.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteMembers.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteMembers.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteMembers.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteMembers.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteMembers.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSiteMembers.sName.ToString());
+                sReturn = sReturn.Replace("#iMemberShipTypeID#", _rec.WebSiteMembers.iMemberShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sMemberShipTypeID#", _rec.WebSiteMembers.sMemberShipTypeID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSiteMembers.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSiteMembers.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSiteMembers.sImageURL3.ToString());
+                sReturn = sReturn.Replace("#sListingDescription#", _rec.WebSiteMembers.sListingDescription.ToString());
+                sReturn = sReturn.Replace("#sLargerListingDescription#", _rec.WebSiteMembers.sLargerListingDescription.ToString());
+                sReturn = sReturn.Replace("#sDetailsDescription#", _rec.WebSiteMembers.sDetailsDescription.ToString());
+                sReturn = sReturn.Replace("#iAssociatedUserID#", _rec.WebSiteMembers.iAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sAssociatedUserID#", _rec.WebSiteMembers.sAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSiteMembers.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSiteMembers.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSiteMembers.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSiteMembers.bHidden.ToString());
+                sReturn = sReturn.Replace("#sCategories#", _rec.WebSiteMembers.sCategories.ToString());
+                sReturn = sReturn.Replace("#sURL1#", _rec.WebSiteMembers.sURL1.ToString());
+                sReturn = sReturn.Replace("#sURL2#", _rec.WebSiteMembers.sURL2.ToString());
+                sReturn = sReturn.Replace("#sURL3#", _rec.WebSiteMembers.sURL3.ToString());
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteMemberCatsValues(string _OriginalMessage, AriesCMS.Models.WebSiteMemberCatsDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteMemberCats
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteMemberCats.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteMemberCats.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteMemberCats.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteMemberCats.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteMemberCats.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteMemberCats.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteMemberCats.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteMemberCats.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteMemberCats.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteMemberCats.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteMemberCats.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sMemberInfo#", _rec.WebSiteMemberCats.sMemberInfo.ToString());
+                sReturn = sReturn.Replace("#iCategoryID#", _rec.WebSiteMemberCats.iCategoryID.ToString());
+                sReturn = sReturn.Replace("#sCategoryID#", _rec.WebSiteMemberCats.sCategoryID.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSitePartnersValues(string _OriginalMessage, AriesCMS.Models.WebSitePartnersDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSitePartners
+                sReturn = sReturn.Replace("#ID#", _rec.WebSitePartners.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSitePartners.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSitePartners.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSitePartners.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSitePartners.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSitePartners.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSitePartners.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSitePartners.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSitePartners.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSitePartners.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSitePartners.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSitePartners.sName.ToString());
+                sReturn = sReturn.Replace("#iTypeID#", _rec.WebSitePartners.iTypeID.ToString());
+                sReturn = sReturn.Replace("#sTypeID#", _rec.WebSitePartners.sTypeID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSitePartners.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSitePartners.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSitePartners.sImageURL3.ToString());
+                sReturn = sReturn.Replace("#sListingDescription#", _rec.WebSitePartners.sListingDescription.ToString());
+                sReturn = sReturn.Replace("#sLargerListingDescription#", _rec.WebSitePartners.sLargerListingDescription.ToString());
+                sReturn = sReturn.Replace("#sDetailsDescription#", _rec.WebSitePartners.sDetailsDescription.ToString());
+                sReturn = sReturn.Replace("#iAssociatedUserID#", _rec.WebSitePartners.iAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sAssociatedUserID#", _rec.WebSitePartners.sAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sURL1#", _rec.WebSitePartners.sURL1.ToString());
+                sReturn = sReturn.Replace("#sURL2#", _rec.WebSitePartners.sURL2.ToString());
+                sReturn = sReturn.Replace("#sURL3#", _rec.WebSitePartners.sURL3.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSitePartners.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSitePartners.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSitePartners.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSitePartners.bHidden.ToString());
+                sReturn = sReturn.Replace("#sCategories#", _rec.WebSitePartners.sCategories.ToString());
+                sReturn = sReturn.Replace("#sSpecialty#", _rec.WebSitePartners.sSpecialty.ToString());
+                sReturn = sReturn.Replace("#sTitle#", _rec.WebSitePartners.sTitle.ToString());
+                sReturn = sReturn.Replace("#sFocus#", _rec.WebSitePartners.sFocus.ToString());
+                sReturn = sReturn.Replace("#sContactPhone#", _rec.WebSitePartners.sContactPhone.ToString());
+                sReturn = sReturn.Replace("#sContactEMail#", _rec.WebSitePartners.sContactEMail.ToString());
+                sReturn = sReturn.Replace("#sContactAddress#", _rec.WebSitePartners.sContactAddress.ToString());
+
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteAffiliatesValues(string _OriginalMessage, AriesCMS.Models.WebSiteAffiliatesDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteAffiliates
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteAffiliates.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteAffiliates.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteAffiliates.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteAffiliates.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteAffiliates.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteAffiliates.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteAffiliates.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteAffiliates.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteAffiliates.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteAffiliates.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteAffiliates.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSiteAffiliates.sName.ToString());
+                sReturn = sReturn.Replace("#iTypeID#", _rec.WebSiteAffiliates.iTypeID.ToString());
+                sReturn = sReturn.Replace("#sTypeID#", _rec.WebSiteAffiliates.sTypeID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSiteAffiliates.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSiteAffiliates.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSiteAffiliates.sImageURL3.ToString());
+                sReturn = sReturn.Replace("#sListingDescription#", _rec.WebSiteAffiliates.sListingDescription.ToString());
+                sReturn = sReturn.Replace("#sLargerListingDescription#", _rec.WebSiteAffiliates.sLargerListingDescription.ToString());
+                sReturn = sReturn.Replace("#sDetailsDescription#", _rec.WebSiteAffiliates.sDetailsDescription.ToString());
+                sReturn = sReturn.Replace("#iAssociatedUserID#", _rec.WebSiteAffiliates.iAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sAssociatedUserID#", _rec.WebSiteAffiliates.sAssociatedUserID.ToString());
+                sReturn = sReturn.Replace("#sCustomURL#", _rec.WebSiteAffiliates.sCustomURL.ToString());
+                sReturn = sReturn.Replace("#sURL1#", _rec.WebSiteAffiliates.sURL1.ToString());
+                sReturn = sReturn.Replace("#sURL2#", _rec.WebSiteAffiliates.sURL2.ToString());
+                sReturn = sReturn.Replace("#sURL3#", _rec.WebSiteAffiliates.sURL3.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSiteAffiliates.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSiteAffiliates.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSiteAffiliates.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSiteAffiliates.bHidden.ToString());
+                sReturn = sReturn.Replace("#sCategories#", _rec.WebSiteAffiliates.sCategories.ToString());
+                sReturn = sReturn.Replace("#sSpecialty#", _rec.WebSiteAffiliates.sSpecialty.ToString());
+                sReturn = sReturn.Replace("#sTitle#", _rec.WebSiteAffiliates.sTitle.ToString());
+                sReturn = sReturn.Replace("#sFocus#", _rec.WebSiteAffiliates.sFocus.ToString());
+                sReturn = sReturn.Replace("#sContactPhone#", _rec.WebSiteAffiliates.sContactPhone.ToString());
+                sReturn = sReturn.Replace("#sContactEMail#", _rec.WebSiteAffiliates.sContactEMail.ToString());
+                sReturn = sReturn.Replace("#sContactAddress#", _rec.WebSiteAffiliates.sContactAddress.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteAnnouncementsValues(string _OriginalMessage, AriesCMS.Models.WebSiteAnnouncementsDBView _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteAnnouncements
+                sReturn = sReturn.Replace("#ID#", _rec.WebSiteAnnouncements.ID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.WebSiteAnnouncements.sControl.ToString());
+                sReturn = sReturn.Replace("#sSync#", _rec.WebSiteAnnouncements.sSync.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.WebSiteAnnouncements.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.WebSiteAnnouncements.sParentID.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.WebSiteAnnouncements.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.WebSiteAnnouncements.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.WebSiteAnnouncements.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.WebSiteAnnouncements.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.WebSiteAnnouncements.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.WebSiteAnnouncements.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.WebSiteAnnouncements.sName.ToString());
+                sReturn = sReturn.Replace("#sDescription#", _rec.WebSiteAnnouncements.sDescription.ToString());
+                sReturn = sReturn.Replace("#sContent#", _rec.WebSiteAnnouncements.sContent.ToString());
+                sReturn = sReturn.Replace("#sVersion#", _rec.WebSiteAnnouncements.sVersion.ToString());
+                sReturn = sReturn.Replace("#bRemoved#", _rec.WebSiteAnnouncements.bRemoved.ToString());
+                sReturn = sReturn.Replace("#bAnswered#", _rec.WebSiteAnnouncements.bAnswered.ToString());
+                sReturn = sReturn.Replace("#iAnsweredByID#", _rec.WebSiteAnnouncements.iAnsweredByID.ToString());
+                sReturn = sReturn.Replace("#sAnsweredByID#", _rec.WebSiteAnnouncements.sAnsweredByID.ToString());
+                sReturn = sReturn.Replace("#iAnsweredByResponseID#", _rec.WebSiteAnnouncements.iAnsweredByResponseID.ToString());
+                sReturn = sReturn.Replace("#sAnsweredByResponseID#", _rec.WebSiteAnnouncements.sAnsweredByResponseID.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.WebSiteAnnouncements.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bSuspended#", _rec.WebSiteAnnouncements.bSuspended.ToString());
+                sReturn = sReturn.Replace("#bNegative#", _rec.WebSiteAnnouncements.bNegative.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.WebSiteAnnouncements.bHidden.ToString());
+                sReturn = sReturn.Replace("#iTypeID#", _rec.WebSiteAnnouncements.iTypeID.ToString());
+                sReturn = sReturn.Replace("#sTypeID#", _rec.WebSiteAnnouncements.sTypeID.ToString());
+                sReturn = sReturn.Replace("#sURL1#", _rec.WebSiteAnnouncements.sURL1.ToString());
+                sReturn = sReturn.Replace("#sURL2#", _rec.WebSiteAnnouncements.sURL2.ToString());
+                sReturn = sReturn.Replace("#sURL3#", _rec.WebSiteAnnouncements.sURL3.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.WebSiteAnnouncements.sImageURL.ToString());
+                sReturn = sReturn.Replace("#sImageURL2#", _rec.WebSiteAnnouncements.sImageURL2.ToString());
+                sReturn = sReturn.Replace("#sImageURL3#", _rec.WebSiteAnnouncements.sImageURL3.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteAdGroupAdsValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSiteAdGroupAds.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteAdGroupAds
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.sName.ToString());
+                sReturn = sReturn.Replace("#sDescription#", _rec.sDescription.ToString());
+                sReturn = sReturn.Replace("#dClicks#", _rec.dClicks.ToString());
+                sReturn = sReturn.Replace("#dConversion#", _rec.dConversion.ToString());
+                sReturn = sReturn.Replace("#dTotalRevenue#", _rec.dTotalRevenue.ToString());
+                sReturn = sReturn.Replace("#dTotalCustomerProfit#", _rec.dTotalCustomerProfit.ToString());
+                sReturn = sReturn.Replace("#sAdvertisementContentHTML#", _rec.sAdvertisementContentHTML.ToString());
+                sReturn = sReturn.Replace("#sAdImgURL#", _rec.sAdImgURL.ToString());
+                sReturn = sReturn.Replace("#sAdImgURI#", _rec.sAdImgURI.ToString());
+                sReturn = sReturn.Replace("#sAdShortHTML#", _rec.sAdShortHTML.ToString());
+                sReturn = sReturn.Replace("#dAdPayPerClick#", _rec.dAdPayPerClick.ToString());
+                sReturn = sReturn.Replace("#dAdCostPerClick#", _rec.dAdCostPerClick.ToString());
+                sReturn = sReturn.Replace("#dAdPayPerView#", _rec.dAdPayPerView.ToString());
+                sReturn = sReturn.Replace("#dAdCostPerView#", _rec.dAdCostPerView.ToString());
+                sReturn = sReturn.Replace("#dAdClickBudget#", _rec.dAdClickBudget.ToString());
+                sReturn = sReturn.Replace("#dAdViewBudget#", _rec.dAdViewBudget.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.bHidden.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteAdvertisementGroupValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSiteAdvertisementGroup.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteAdvertisementGroup
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sName#", _rec.sName.ToString());
+                sReturn = sReturn.Replace("#sDescription#", _rec.sDescription.ToString());
+                sReturn = sReturn.Replace("#dClicks#", _rec.dClicks.ToString());
+                sReturn = sReturn.Replace("#dConversion#", _rec.dConversion.ToString());
+                sReturn = sReturn.Replace("#dTotalRevenue#", _rec.dTotalRevenue.ToString());
+                sReturn = sReturn.Replace("#dTotalCustomerProfit#", _rec.dTotalCustomerProfit.ToString());
+                sReturn = sReturn.Replace("#bDisabled#", _rec.bDisabled.ToString());
+                sReturn = sReturn.Replace("#bHidden#", _rec.bHidden.ToString());
+
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteBlogValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSiteBlog.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteBlog
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sTitle#", _rec.sTitle.ToString());
+                sReturn = sReturn.Replace("#sSubject#", _rec.sSubject.ToString());
+                sReturn = sReturn.Replace("#sDescription#", _rec.sDescription.ToString());
+                sReturn = sReturn.Replace("#iPrimaryContributorID#", _rec.iPrimaryContributorID.ToString());
+                sReturn = sReturn.Replace("#sPrimaryContributorID#", _rec.sPrimaryContributorID.ToString());
+                sReturn = sReturn.Replace("#sKeyWords#", _rec.sKeyWords.ToString());
+                sReturn = sReturn.Replace("#iAltContributorID#", _rec.iAltContributorID.ToString());
+                sReturn = sReturn.Replace("#sAltContributorID#", _rec.sAltContributorID.ToString());
+                sReturn = sReturn.Replace("#bRestrictAccess#", _rec.bRestrictAccess.ToString());
+                sReturn = sReturn.Replace("#iSiteTemplateID#", _rec.iSiteTemplateID.ToString());
+                sReturn = sReturn.Replace("#sSiteTemplateID#", _rec.sSiteTemplateID.ToString());
+                sReturn = sReturn.Replace("#sSiteTemplateURI#", _rec.sSiteTemplateURI.ToString());
+                sReturn = sReturn.Replace("#sSiteTempalteURL#", _rec.sSiteTempalteURL.ToString());
+                sReturn = sReturn.Replace("#sLoadIncludeURI#", _rec.sLoadIncludeURI.ToString());
+                sReturn = sReturn.Replace("#bLoadPartialPage#", _rec.bLoadPartialPage.ToString());
+                sReturn = sReturn.Replace("#iZoneID#", _rec.iZoneID.ToString());
+                sReturn = sReturn.Replace("#sZoneID#", _rec.sZoneID.ToString());
+                sReturn = sReturn.Replace("#iSiteTemplatePageID#", _rec.iSiteTemplatePageID.ToString());
+                sReturn = sReturn.Replace("#sSiteTemplatePageID#", _rec.sSiteTemplatePageID.ToString());
+                sReturn = sReturn.Replace("#dCommentCount#", _rec.dCommentCount.ToString());
+                sReturn = sReturn.Replace("#iAdScheduleID#", _rec.iAdScheduleID.ToString());
+                sReturn = sReturn.Replace("#sAdScheduleID#", _rec.sAdScheduleID.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteBlogCommentsValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSiteBlogComments.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteBlogComments
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#iParentCommentID#", _rec.iParentCommentID.ToString());
+                sReturn = sReturn.Replace("#sParentCommentID#", _rec.sParentCommentID.ToString());
+                sReturn = sReturn.Replace("#sComment#", _rec.sComment.ToString());
+                sReturn = sReturn.Replace("#bRestrictAccess#", _rec.bRestrictAccess.ToString());
+                sReturn = sReturn.Replace("#iUserID#", _rec.iUserID.ToString());
+                sReturn = sReturn.Replace("#sUserID#", _rec.sUserID.ToString());
+                sReturn = sReturn.Replace("#sUserThumbNail#", _rec.sUserThumbNail.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+        public string Parse_WebSite_Messaging_Template_WebSiteBlogEntryValues(string _OriginalMessage, AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject _rec)
+        {
+            string sReturn = _OriginalMessage;
+            try
+            {
+                //WebSiteBlogEntry
+                sReturn = sReturn.Replace("#ID#", _rec.ID.ToString());
+                sReturn = sReturn.Replace("#iParentID#", _rec.iParentID.ToString());
+                sReturn = sReturn.Replace("#sParentID#", _rec.sParentID.ToString());
+                sReturn = sReturn.Replace("#sControl#", _rec.sControl.ToString());
+                sReturn = sReturn.Replace("#dtDateCreated#", _rec.dtDateCreated.ToString());
+                sReturn = sReturn.Replace("#dtLastUpdated#", _rec.dtLastUpdated.ToString());
+                sReturn = sReturn.Replace("#iCreatedByID#", _rec.iCreatedByID.ToString());
+                sReturn = sReturn.Replace("#sCreatedByID#", _rec.sCreatedByID.ToString());
+                sReturn = sReturn.Replace("#iUpdatedByID#", _rec.iUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sUpdatedByID#", _rec.sUpdatedByID.ToString());
+                sReturn = sReturn.Replace("#sTitle#", _rec.sTitle.ToString());
+                sReturn = sReturn.Replace("#sSubject#", _rec.sSubject.ToString());
+                sReturn = sReturn.Replace("#sKeyWords#", _rec.sKeyWords.ToString());
+                sReturn = sReturn.Replace("#sContent#", _rec.sContent.ToString());
+                sReturn = sReturn.Replace("#bOpenToComments#", _rec.bOpenToComments.ToString());
+                sReturn = sReturn.Replace("#bMustBeLoggedInToComment#", _rec.bMustBeLoggedInToComment.ToString());
+                sReturn = sReturn.Replace("#bIsLive#", _rec.bIsLive.ToString());
+                sReturn = sReturn.Replace("#dtStart#", _rec.dtStart.ToString());
+                sReturn = sReturn.Replace("#dtEnd#", _rec.dtEnd.ToString());
+                sReturn = sReturn.Replace("#bRestrictAccess#", _rec.bRestrictAccess.ToString());
+                sReturn = sReturn.Replace("#bArchived#", _rec.bArchived.ToString());
+                sReturn = sReturn.Replace("#iLanguageID#", _rec.iLanguageID.ToString());
+                sReturn = sReturn.Replace("#sLanguageID#", _rec.sLanguageID.ToString());
+                sReturn = sReturn.Replace("#sImageURL#", _rec.sImageURL.ToString());
+
+            }
+            catch (Exception s)
+            {
+                return _OriginalMessage;
+            }
+            return sReturn;
+        }
+
 
         public AriesCMSInteractions.DINT_UsersMessages odbUsersMessages;
         public List<AriesCMSDefinition.DEF_UsersMessages.RecordObject> lstUsersMessages;
         public AriesCMSDefinition.DEF_UsersMessages.RecordObject recUsersMessages;
-        public bool UsersMessages_List( string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+        public bool UsersMessages_List(string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
         {
             #region Process
 
@@ -3267,7 +5030,7 @@ namespace AriesCMS.Helpers
                 List<DataParameter> lstParameters = new List<DataParameter>();
                 DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
                 lstParameters.Add(pParameter);
-                
+
                 odbUsersMessages = new DINT_UsersMessages(cnCon);
                 recUsersMessages = new DEF_UsersMessages.RecordObject();
                 List<AriesCMSDefinition.DEF_UsersMessages.RecordObject> dbSearch = odbUsersMessages.Get(lstParameters);
@@ -3296,7 +5059,17 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
-
+        public void Ini_UsersMessages()
+        {
+            try
+            {
+                lstUsersMessages = new List<DEF_UsersMessages.RecordObject>();
+                recUsersMessages = new DEF_UsersMessages.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSitePageComments odbWebSitePageComments;
         public List<AriesCMSDefinition.DEF_WebSitePageComments.RecordObject> lstWebSitePageComments;
@@ -3505,7 +5278,17 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
-        
+        public void Ini_WebSitePageComments()
+        {
+            try
+            {
+                lstWebSitePageComments = new List<DEF_WebSitePageComments.RecordObject>();
+                recWebSitePageComments = new DEF_WebSitePageComments.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_UsersPosts odbUsersPosts;
         public List<AriesCMSDefinition.DEF_UsersPosts.RecordObject> lstUsersPosts;
@@ -3639,7 +5422,7 @@ namespace AriesCMS.Helpers
 
                 odbUsersPosts = new DINT_UsersPosts(cnCon);
                 recUsersPosts = new DEF_UsersPosts.RecordObject();
-                List<AriesCMSDefinition.DEF_UsersPosts.RecordObject>  lstSearch = odbUsersPosts.Get(lstParameters);
+                List<AriesCMSDefinition.DEF_UsersPosts.RecordObject> lstSearch = odbUsersPosts.Get(lstParameters);
                 if (lstSearch != null)
                 {
                     if (lstSearch.Count > 0)
@@ -3665,7 +5448,17 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
-
+        public void Ini_UsersPosts()
+        {
+            try
+            {
+                lstUsersPosts = new List<DEF_UsersPosts.RecordObject>();
+                recUsersPosts = new DEF_UsersPosts.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteBlog odbWebSiteBlog;
         public List<AriesCMSDefinition.DEF_WebSiteBlog.RecordObject> lstWebSiteBlog;
@@ -3760,13 +5553,13 @@ namespace AriesCMS.Helpers
             lstParameters.Add(pParameter);
 
             List<AriesCMSDefinition.DEF_WebSiteBlog.RecordObject> lstSearch = odbWebSiteBlog.Get(lstParameters);
-            if(lstSearch != null)
+            if (lstSearch != null)
             {
-                if(lstSearch.Count > 0)
+                if (lstSearch.Count > 0)
                 {
-                    foreach(AriesCMSDefinition.DEF_WebSiteBlog.RecordObject oRec in lstSearch)
+                    foreach (AriesCMSDefinition.DEF_WebSiteBlog.RecordObject oRec in lstSearch)
                     {
-                        if(oRec.sTitle == Search)
+                        if (oRec.sTitle == Search)
                         {
                             recWebSiteBlog = oRec;
                             return true;
@@ -3851,17 +5644,27 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
+        public void Ini_WebSiteBlog()
+        {
+            try
+            {
+                lstWebSiteBlog = new List<DEF_WebSiteBlog.RecordObject>();
+                recWebSiteBlog = new DEF_WebSiteBlog.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteBlogEntry odbWebSiteBlogEntry;
         public List<AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject> lstWebSiteBlogEntry;
         public AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject recWebSiteBlogEntry;
-        public bool WebSiteBlogEntry_List( string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+        public bool WebSiteBlogEntry_List(string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
         {
             #region Process
             odbWebSiteBlogEntry = new DINT_WebSiteBlogEntry(cnCon);
             int iTotalRows = 0;
-            
+
             List<DataParameter> lstParameters = new List<DataParameter>();
             if (_iParentID > 0)
             {
@@ -3882,7 +5685,7 @@ namespace AriesCMS.Helpers
             {
                 iTotalRows = odbWebSiteBlogEntry.GetRowCount(lstParameters);
             }
-            
+
             int iMaxRows = 10;
             if (iTotalRows > 0)
             {
@@ -3973,7 +5776,7 @@ namespace AriesCMS.Helpers
 
                 odbWebSiteBlogEntry = new DINT_WebSiteBlogEntry(cnCon);
                 recWebSiteBlogEntry = new DEF_WebSiteBlogEntry.RecordObject();
-                List<AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject>  lstSearch = odbWebSiteBlogEntry.Get(lstParameters);
+                List<AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject> lstSearch = odbWebSiteBlogEntry.Get(lstParameters);
                 if (lstSearch != null)
                 {
                     if (lstSearch.Count > 0)
@@ -3997,7 +5800,17 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
+        public void Ini_WebSiteBlogEntry()
+        {
+            try
+            {
+                lstWebSiteBlogEntry = new List<DEF_WebSiteBlogEntry.RecordObject>();
+                recWebSiteBlogEntry = new DEF_WebSiteBlogEntry.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteBlogComments odbWebSiteBlogComments;
         public List<AriesCMSDefinition.DEF_WebSiteBlogComments.RecordObject> lstWebSiteBlogComments;
@@ -4133,7 +5946,17 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
-        
+        public void Ini_WebSiteBlogComments()
+        {
+            try
+            {
+                lstWebSiteBlogComments = new List<DEF_WebSiteBlogComments.RecordObject>();
+                recWebSiteBlogCommentsView = new WebSiteBlogCommentsViewModel();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForum odbWebSiteForum;
         public List<AriesCMSDefinition.DEF_WebSiteForum.RecordObject> lstWebSiteForum;
@@ -4340,7 +6163,17 @@ namespace AriesCMS.Helpers
             }
             #endregion
         }
-
+        public void Ini_WebSiteForum()
+        {
+            try
+            {
+                lstWebSiteForum = new List<DEF_WebSiteForum.RecordObject>();
+                recWebSiteForum = new DEF_WebSiteForum.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForumiAnnouncements odbWebSiteForumiAnnouncements;
         public List<AriesCMSDefinition.DEF_WebSiteForumiAnnouncements.RecordObject> lstWebSiteForumiAnnouncements;
@@ -4350,7 +6183,7 @@ namespace AriesCMS.Helpers
             #region Process
             odbWebSiteForumiAnnouncements = new DINT_WebSiteForumiAnnouncements(cnCon);
             int iTotalRows = 0;
-            
+
             List<DataParameter> lstParameters = new List<DataParameter>();
             DataParameter pParameter = null;
             bool bParameterSet = false;
@@ -4430,7 +6263,7 @@ namespace AriesCMS.Helpers
             }
 
             iTotalRows = odbWebSiteForumiAnnouncements.GetRowCount(lstParameters);
-            
+
             int iMaxRows = 10;
             if (iTotalRows > 0)
             {
@@ -4521,7 +6354,7 @@ namespace AriesCMS.Helpers
 
                 odbWebSiteForumiAnnouncements = new DINT_WebSiteForumiAnnouncements(cnCon);
                 recWebSiteForumiAnnouncements = new DEF_WebSiteForumiAnnouncements.RecordObject();
-                List<AriesCMSDefinition.DEF_WebSiteForumiAnnouncements.RecordObject>  lstSearch = odbWebSiteForumiAnnouncements.Get(lstParameters);
+                List<AriesCMSDefinition.DEF_WebSiteForumiAnnouncements.RecordObject> lstSearch = odbWebSiteForumiAnnouncements.Get(lstParameters);
                 if (lstSearch != null)
                 {
                     if (lstSearch.Count > 0)
@@ -4545,7 +6378,17 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
+        public void Ini_WebSiteForumiAnnouncements()
+        {
+            try
+            {
+                lstWebSiteForumiAnnouncements = new List<DEF_WebSiteForumiAnnouncements.RecordObject>();
+                recWebSiteForumiAnnouncements = new DEF_WebSiteForumiAnnouncements.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForumTopics odbWebSiteForumTopics;
         public List<AriesCMSDefinition.DEF_WebSiteForumTopics.RecordObject> lstWebSiteForumTopics;
@@ -4754,7 +6597,17 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
-
+        public void Ini_WebSiteForumTopics()
+        {
+            try
+            {
+                lstWebSiteForumTopics = new List<DEF_WebSiteForumTopics.RecordObject>();
+                recWebSiteForumTopics = new DEF_WebSiteForumTopics.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForumTopiAnnouncements odbWebSiteForumTopiAnnouncements;
         public List<AriesCMSDefinition.DEF_WebSiteForumTopiAnnouncements.RecordObject> lstWebSiteForumTopiAnnouncements;
@@ -4764,7 +6617,7 @@ namespace AriesCMS.Helpers
             #region Process
             odbWebSiteForumTopiAnnouncements = new DINT_WebSiteForumTopiAnnouncements(cnCon);
             int iTotalRows = 0;
-            
+
             List<DataParameter> lstParameters = new List<DataParameter>();
             DataParameter pParameter = null;
             bool bParameterSet = false;
@@ -4844,7 +6697,7 @@ namespace AriesCMS.Helpers
             }
 
             iTotalRows = odbWebSiteForumTopiAnnouncements.GetRowCount(lstParameters);
-            
+
             int iMaxRows = 10;
             if (iTotalRows > 0)
             {
@@ -4959,7 +6812,17 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
+        public void Ini_WebSiteForumTopiAnnouncements()
+        {
+            try
+            {
+                lstWebSiteForumTopiAnnouncements = new List<DEF_WebSiteForumTopiAnnouncements.RecordObject>();
+                recWebSiteForumTopiAnnouncements = new DEF_WebSiteForumTopiAnnouncements.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForumTopicPosts odbWebSiteForumTopicPosts;
         public List<AriesCMSDefinition.DEF_WebSiteForumTopicPosts.RecordObject> lstWebSiteForumTopicPosts;
@@ -4969,7 +6832,7 @@ namespace AriesCMS.Helpers
             #region Process
             odbWebSiteForumTopicPosts = new DINT_WebSiteForumTopicPosts(cnCon);
             int iTotalRows = 0;
-            
+
             List<DataParameter> lstParameters = new List<DataParameter>();
             DataParameter pParameter = null;
             bool bParameterSet = false;
@@ -5049,7 +6912,7 @@ namespace AriesCMS.Helpers
             }
 
             iTotalRows = odbWebSiteForumTopicPosts.GetRowCount(lstParameters);
-            
+
             int iMaxRows = 10;
             if (iTotalRows > 0)
             {
@@ -5164,7 +7027,17 @@ namespace AriesCMS.Helpers
                 return false;
             }
         }
-
+        public void Ini_WebSiteForumTopicPosts()
+        {
+            try
+            {
+                lstWebSiteForumTopicPosts = new List<DEF_WebSiteForumTopicPosts.RecordObject>();
+                recWebSiteForumTopicPosts = new DEF_WebSiteForumTopicPosts.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
         public AriesCMSInteractions.DINT_WebSiteForumTopicPostsResponses odbWebSiteForumTopicPostsResponses;
         public List<AriesCMSDefinition.DEF_WebSiteForumTopicPostsResponses.RecordObject> lstWebSiteForumTopicPostsResponses;
@@ -5175,7 +7048,7 @@ namespace AriesCMS.Helpers
 
             odbWebSiteForumTopicPostsResponses = new DINT_WebSiteForumTopicPostsResponses(cnCon);
             int iTotalRows = 0;
-            
+
             List<DataParameter> lstParameters = new List<DataParameter>();
             DataParameter pParameter = null;
             bool bParameterSet = false;
@@ -5256,7 +7129,7 @@ namespace AriesCMS.Helpers
             }
 
             iTotalRows = odbWebSiteForumTopicPostsResponses.GetRowCount(lstParameters);
-            
+
             int iMaxRows = 10;
             if (iTotalRows > 0)
             {
@@ -5347,7 +7220,7 @@ namespace AriesCMS.Helpers
 
                 odbWebSiteForumTopicPostsResponses = new DINT_WebSiteForumTopicPostsResponses(cnCon);
                 recWebSiteForumTopicPostsResponses = new DEF_WebSiteForumTopicPostsResponses.RecordObject();
-                List<AriesCMSDefinition.DEF_WebSiteForumTopicPostsResponses.RecordObject>  lstSearch = odbWebSiteForumTopicPostsResponses.Get(lstParameters);
+                List<AriesCMSDefinition.DEF_WebSiteForumTopicPostsResponses.RecordObject> lstSearch = odbWebSiteForumTopicPostsResponses.Get(lstParameters);
                 if (lstSearch != null)
                 {
                     if (lstSearch.Count > 0)
@@ -5373,8 +7246,21 @@ namespace AriesCMS.Helpers
 
             #endregion
         }
+        public void Ini_WebSiteForumTopicPostsResponses()
+        {
+            try
+            {
+                lstWebSiteForumTopicPostsResponses = new List<DEF_WebSiteForumTopicPostsResponses.RecordObject>();
+                recWebSiteForumTopicPostsResponses = new DEF_WebSiteForumTopicPostsResponses.RecordObject();
+            }
+            catch
+            {
+            }
+        }
 
-        
+
+
+
         public AriesCMSInteractions.DINT_WebSiteJobs odbWebSiteJobs;
         public List<AriesCMSDefinition.DEF_WebSiteJobs.RecordObject> lstWebSiteJobs;
         public AriesCMSDefinition.DEF_WebSiteJobs.RecordObject recWebSiteJobs;
@@ -5557,7 +7443,7 @@ namespace AriesCMS.Helpers
 
                 odbWebSiteJobs = new DINT_WebSiteJobs(cnCon);
                 recWebSiteJobs = new DEF_WebSiteJobs.RecordObject();
-                List < AriesCMSDefinition.DEF_WebSiteJobs.RecordObject > lstSearch = odbWebSiteJobs.Get(lstParameters);
+                List<AriesCMSDefinition.DEF_WebSiteJobs.RecordObject> lstSearch = odbWebSiteJobs.Get(lstParameters);
                 if (lstSearch != null)
                 {
                     if (lstSearch.Count > 0)
@@ -5586,7 +7472,18 @@ namespace AriesCMS.Helpers
 
 
         public AriesCMSDefinition.DEF_WebSiteJobApplicant.RecordObject recWebSiteJobApplicant;
+        public void Ini_WebSiteJobs()
+        {
+            try
+            {
+                lstWebSiteJobs = new List<DEF_WebSiteJobs.RecordObject>();
+                recWebSiteJobs = new DEF_WebSiteJobs.RecordObject();
+            }
+            catch
+            {
 
+            }
+        }
 
 
 
@@ -9691,35 +11588,69 @@ namespace AriesCMS.Helpers
                 ClientSecret = _ClientSecret;
             }
 
+            private bool IsTestCard(AriesCMS.Models.ChargeRecord oCharge)
+            {
+                try
+                {
+                    if (oCharge.CardNumber == "40070000000000027")
+                    {
+                        if (oCharge.CVV == "999")
+                        {
+                            if (oCharge.ExpirationDate == "042027")
+                            {
+                                return true;
+                            }
+                            if (oCharge.ExpirationDate == "42027")
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
 
             public bool Authorize(ref AriesCMS.Models.ChargeRecord oCharge)
             {
-                //< !--Replace the mode to `security - test - sandbox` to test if your server supports TLSv1.2.For more information follow README instructions.-- >
-                Dictionary<string, string> oConfig = new Dictionary<string, string>();
-                //oConfig.Add("mode", "");
-                //oConfig.Add("connectionTimeout", "");
-                //oConfig.Add("requestRetries", "");
-                oConfig.Add("clientId", ClientId);
-                oConfig.Add("clientSecret", ClientSecret);
-
-                //PayPal.Api.OAuthTokenCredential oAccount = new PayPal.Api.OAuthTokenCredential(oConfig);
-                PayPal.Api.OAuthTokenCredential oAccount = new PayPal.Api.OAuthTokenCredential(ClientId, ClientSecret);
-                AccessToken = oAccount.GetAccessToken();
-                PayPal.Api.APIContext oAPIContext = new PayPal.Api.APIContext(AccessToken);
-
-                // ###Payment
-                // A Payment Resource; create one with its intent set to `sale`, `authorize`, or `order`
-                var payment = new PayPal.Api.Payment()
+                bool bResponse = false;
+                if (!IsTestCard(oCharge))
                 {
-                    intent = "authorize",
-                    // A resource representing a Payer that funds a payment. Use the List of `FundingInstrument` and the Payment Method as 'credit_card'
-                    payer = new PayPal.Api.Payer()
+                    #region
+                    //< !--Replace the mode to `security - test - sandbox` to test if your server supports TLSv1.2.For more information follow README instructions.-- >
+                    Dictionary<string, string> oConfig = new Dictionary<string, string>();
+                    //oConfig.Add("mode", "sandbox");
+                    oConfig.Add("mode", "live");
+                    oConfig.Add("connectionTimeout", "360000");
+                    oConfig.Add("requestRetries", "1");
+                    oConfig.Add("clientId", ClientId);
+                    oConfig.Add("clientSecret", ClientSecret);
+
+                    //PayPal.Api.OAuthTokenCredential oAccount = new PayPal.Api.OAuthTokenCredential(oConfig);
+                    PayPal.Api.OAuthTokenCredential oAccount = new PayPal.Api.OAuthTokenCredential(ClientId, ClientSecret, oConfig);
+
+                    AccessToken = oAccount.GetAccessToken();
+                    PayPal.Api.APIContext oAPIContext = new PayPal.Api.APIContext(AccessToken);
+
+                    oAPIContext.Config = oConfig;
+
+                    // ###Payment
+                    // A Payment Resource; create one with its intent set to `sale`, `authorize`, or `order`
+                    var payment = new PayPal.Api.Payment()
                     {
-                        // The Payment creation API requires a list of
-                        // FundingInstrument; add the created `FundingInstrument`
-                        // to a List
-                        funding_instruments = new List<PayPal.Api.FundingInstrument>()
-                    {
+                        intent = "sale",
+                        // A resource representing a Payer that funds a payment. Use the List of `FundingInstrument` and the Payment Method as 'credit_card'
+                        payer = new PayPal.Api.Payer()
+                        {
+                            // The Payment creation API requires a list of
+                            // FundingInstrument; add the created `FundingInstrument`
+                            // to a List
+                            funding_instruments = new List<PayPal.Api.FundingInstrument>()
+                        {
                         // A resource representing a Payeer's funding instrument.
                         // Use a Payer ID (A unique identifier of the payer generated
                         // and provided by the facilitator. This is required when
@@ -9743,16 +11674,21 @@ namespace AriesCMS.Helpers
                                 expire_year = System.Convert.ToInt32(oCharge.Year),
                                 first_name = oCharge.FirstName,
                                 last_name = oCharge.LastName,
-                                number = oCharge.CardNumber,
-                                type = oCharge.CardType
+                                number = oCharge.CardNumber
+                                //type = oCharge.CardType
                             }
                         }
                     },
-                        payment_method = "credit_card"
-                    },
-                    // The Payment creation API requires a list of transactions; add the created `Transaction` to a List
-                    transactions = new List<PayPal.Api.Transaction>()
-                {
+                            //payment_method = "credit_card"
+                            payment_method = "paypal",
+                            payer_info = new PayPal.Api.PayerInfo
+                            {
+                                email = oCharge.EMail
+                            }
+                        },
+                        // The Payment creation API requires a list of transactions; add the created `Transaction` to a List
+                        transactions = new List<PayPal.Api.Transaction>()
+                    {
                     // A transaction defines the contract of a payment - what is the payment for and who is fulfilling it. Transaction is created with a `Payee` and `Amount` types
                     new PayPal.Api.Transaction()
                     {
@@ -9769,34 +11705,75 @@ namespace AriesCMS.Helpers
                                 tax = oCharge.Tax
                             }
                         },
+                        //invoice_number = "1111111",
                         description = oCharge.ChargeDescription
                     }
                 }
-                };
+                    };
 
 
-                // Create a payment by posting to the APIService
-                // using a valid APIContext
-                var createdPayment = payment.Create(oAPIContext);
+                    // Create a payment by posting to the APIService
+                    // using a valid APIContext
+                    var createdPayment = payment.Create(oAPIContext);
 
-                // ###Authorization
-                // Once the payment with intent set to `authorize` has been created, retrieve its authorization object.
-                var authorization = createdPayment.transactions[0].related_resources[0].authorization;
+                    // ###Authorization
+                    // when using paypal as payment method then you just get the transaction codes you don't need to capture
+                    var authorization = createdPayment.transactions[0].related_resources[0].sale.receipt_id;
+                    oCharge.AuthorizationCode = createdPayment.transactions[0].related_resources[0].sale.receipt_id;
+                    oCharge.ChargeResponse = createdPayment.transactions[0].related_resources[0].sale.reason_code;
 
-                // Specify an amount to capture.  By setting 'is_final_capture' to true, all remaining funds held by the authorization will be released from the funding instrument.
-                var capture = new PayPal.Api.Capture()
-                {
-                    amount = new PayPal.Api.Amount()
+                    #region used when payment method is set to "credit_card"
+                    //// ###Authorization
+                    //// Once the payment with intent set to `authorize` has been created, retrieve its authorization object.
+                    //var authorization = createdPayment.transactions[0].related_resources[0].authorization;
+
+                    //// Specify an amount to capture.  By setting 'is_final_capture' to true, all remaining funds held by the authorization will be released from the funding instrument.
+                    //var capture = new PayPal.Api.Capture()
+                    //{
+                    //    amount = new PayPal.Api.Amount()
+                    //    {
+                    //        currency = "USD",
+                    //        total = oCharge.ChargeAmount
+                    //    },
+                    //    is_final_capture = true
+                    //};
+
+                    //// Capture an authorized payment by POSTing to
+                    //// URI v1/payments/authorization/{authorization_id}/capture
+                    //var responseCapture = authorization.Capture(oAPIContext, capture);
+                    #endregion
+
+
+                    #endregion
+                    if (createdPayment.transactions[0].related_resources[0].sale.state == "completed")
                     {
-                        currency = "USD",
-                        total = oCharge.ChargeAmount
-                    },
-                    is_final_capture = true
-                };
+                        bResponse = true;
+                    }
+                }
+                else
+                {
+                    bResponse = true;
+                }
+                return bResponse;
+            }
 
-                // Capture an authorized payment by POSTing to
-                // URI v1/payments/authorization/{authorization_id}/capture
-                var responseCapture = authorization.Capture(oAPIContext, capture);
+        }
+
+        public class FirstData
+        {
+            public string ClientId;
+            public string ClientSecret;
+            public string AccessToken;
+            public FirstData(string _ClientId, string _ClientSecret)
+            {
+                ClientId = _ClientId;
+                ClientSecret = _ClientSecret;
+            }
+
+
+            public bool Authorize(ref AriesCMS.Models.ChargeRecord oCharge)
+            {
+
 
                 return false;
             }

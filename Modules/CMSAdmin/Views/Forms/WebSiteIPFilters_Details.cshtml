@@ -92,7 +92,7 @@
 
                     <div class="form-group">
                         <label for="bBlock">Block :</label>
-                        @Html.CheckBoxFor(model => model.bBlock, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bBlock, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bBlock, "*Required!")
@@ -101,7 +101,7 @@
 
                     <div class="form-group">
                         <label for="bRestrict">Restrict :</label>
-                        @Html.CheckBoxFor(model => model.bRestrict, new { @Class = "form-control" })
+                        @Html.CheckBoxFor(model => model.bRestrict, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.bRestrict, "*Required!")

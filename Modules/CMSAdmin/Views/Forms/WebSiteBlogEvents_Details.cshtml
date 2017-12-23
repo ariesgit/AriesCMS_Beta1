@@ -172,7 +172,7 @@
 
                                             <div class="form-group">
                                                 <label for="sEvent">Event :</label>
-                                                @Html.TextBoxFor(model => model.sEvent, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sEvent, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 @if (ViewBag.bError == true)
                                                 {
                                                     @Html.ValidationMessageFor(model => model.sEvent, "*Required!")
@@ -181,7 +181,7 @@
 
                                             <div class="form-group">
                                                 <label for="sLog">Log :</label>
-                                                @Html.TextAreaFor(model => model.sLog, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sLog, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 @if (ViewBag.bError == true)
                                                 {
                                                     @Html.ValidationMessageFor(model => model.sLog, "*Required!")
@@ -190,7 +190,7 @@
 
                                             <div class="form-group">
                                                 <label for="sNotes">Note :</label>
-                                                @Html.TextAreaFor(model => model.sNotes, new { @Class = "form-control", @readonly = "readonly" })
+                                                @Html.TextAreaFor(model => model.sNotes, new { @Class = "form-control textarea_admin", @readonly = "readonly" })
                                                 @if (ViewBag.bError == true)
                                                 {
                                                     @Html.ValidationMessageFor(model => model.sNotes, "*Required!")

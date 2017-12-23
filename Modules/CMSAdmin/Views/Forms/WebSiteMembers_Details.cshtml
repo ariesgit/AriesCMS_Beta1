@@ -1,0 +1,332 @@
+@model AriesCMS.Models.WebSiteMembersDBView
+
+
+<script type="text/javascript">
+    
+
+    function on_WebSiteMembers_iMemberShipTypeID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteMembers_iMemberShipTypeID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteMembers_sMemberShipTypeID");
+            oHiddenField.value = selectedText;
+            
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+    function on_WebSiteMembers_iAssociatedUserID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteMembers_iAssociatedUserID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteMembers_sAssociatedUserID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Site Members</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSiteMembers.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSiteMembers_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteMembers_AddUpdate", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSiteMembers.ID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteMembers.sUpdatedByID)  
+            
+                         @Html.HiddenFor(model => model.WebSiteMembers.sMemberShipTypeID) 
+                          
+                         @Html.HiddenFor(model => model.WebSiteMembers.sAssociatedUserID)
+
+
+    @Html.HiddenFor(model => model.WebSiteMembers.sImageURL)
+    @Html.HiddenFor(model => model.WebSiteMembers.sImageURL2)
+    @Html.HiddenFor(model => model.WebSiteMembers.sImageURL3)
+
+                                        <fieldset> 
+                                            <legend></legend>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sName">Name :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sName, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.sName, "*Required!")
+                                                }
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_iMemberShipTypeID">Membership :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteMembers.iMemberShipTypeID, Model.WebSiteMemberShips, new { @Class = "form-control", @onchange = "javascript:on_WebSiteMembers_iMemberShipTypeID_Changed(this.value);" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.iMemberShipTypeID, "*Required!")
+                                                }
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_dtMembershipExpOn">Membership exp. on :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.dtMembershipExpOn, new { @Class = "form-control" })
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_iAssociatedUserID">Associated User :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteMembers.iAssociatedUserID, Model.AssociatedUsers, new { @Class = "form-control", @onchange = "javascript:on_WebSiteMembers_iAssociatedUserID_Changed(this.value);" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.iAssociatedUserID, "*Required!")
+                                                }
+                                            </div>
+
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sURL1">URL :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sURL1, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sURL2">URL (2) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sURL2, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sURL3">URL (3) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sURL3, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sImageURL">Image Thumbnail :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteMembers.sImageURL" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
+                                            </div>
+                                            
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sImageURL2">Image Medium :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteMembers.sImageURL2" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles2" id="UploadFiles2" class="form-control" />
+                                            </div>
+                                            
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sImageURL3">Image Large :</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <img src="~/@Model.WebSiteMembers.sImageURL3" alt="" class="img-fluid" />
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="file" name="UploadFiles3" id="UploadFiles3" class="form-control" />
+                                            </div>
+                                            
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sListingDescription">Description Listing Small :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteMembers.sListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sLargerListingDescription">Description Listing Large :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteMembers.sLargerListingDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sDetailsDescription">Description Detail Page :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteMembers.sDetailsDescription, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sCategories">Categories (separated by ',') :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sCategories, new { @Class = "form-control" })
+                                            </div>
+
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sSpecialty">Business line specialty :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sSpecialty, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sTitle">Business line category :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sTitle, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sFocus">Business line focus :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sFocus, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sContactPhone">Phone :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sContactPhone, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sContactEMail">E-Mail :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sContactEMail, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sContactAddress">Address :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteMembers.sContactAddress, new { @Class = "form-control textarea_admin" })
+                                            </div>
+
+
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteMembers.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.bDisabled, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteMembers.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.bSuspended, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteMembers.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.bNegative, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteMembers.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.bHidden, "*Required!")
+                                                }
+                                            </div>
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

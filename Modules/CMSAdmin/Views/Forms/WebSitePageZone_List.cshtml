@@ -58,7 +58,7 @@
             <table class="table">
                 <thead>
                     <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
-                        <th>Zone<</th>
+                        <th>Zone</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -74,7 +74,12 @@
                                 <td>
                                     @Html.ActionLink("Edit", "WebSitePageZone_Details", new { id = objRec.ID })
                                     @Html.Raw("|")
-                                    @Html.ActionLink("Delete", "WebSitePageZone_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+                                    @Html.ActionLink("Delete", "WebSitePageZone_Delete", new { id = objRec.ID }, new { onclick = "return confirm('Are you sure you wish to delete this record?');" })                                   
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    @Html.ActionLink("Change History", "WebSitePageZone_History_List", new { _iParentID = objRec.ID, _sParentID = objRec.sZoneID })
                                 </td>
                             </tr>
                         }

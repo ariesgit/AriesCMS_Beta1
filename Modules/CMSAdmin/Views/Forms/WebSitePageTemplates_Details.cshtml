@@ -83,7 +83,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageTemplates_sDescription"> Description :</label>
-                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sDescription, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sDescription, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sDescription, "*Required!")
@@ -101,7 +101,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageTemplates_sLocationURL">Default view location (URL):</label>
-                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURL, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURL, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sLocationURL, "*Required!")
@@ -110,7 +110,7 @@
 
                     <div class="form-group">
                         <label for="WebSitePageTemplates_sLocationURI">Default view location (URI) :</label>
-                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURI, new { @Class = "form-control" })
+                        @Html.TextAreaFor(model => model.WebSitePageTemplates.sLocationURI, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
                             @Html.ValidationMessageFor(model => model.WebSitePageTemplates.sLocationURI, "*Required!")

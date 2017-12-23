@@ -67,12 +67,15 @@
                     <li>
                         @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
                         {
-                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=@ViewBag.iSiteID">Site Announcements</a></h6>
+                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=@ViewBag.iSiteID">Announcements</a></h6>
                         }
                         else
                         {
-                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=1">Site Announcements</a></h6>
+                            <h6><a href="~/admin/home/WebSiteAnnouncements_List?_iParentID=1">Announcements</a></h6>
                         }
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteEventCalendar_List">Event Calendar</a></h6>
                     </li>
                 </ul>
             </div>
@@ -156,7 +159,7 @@
                         <h6><a href="~/admin/home/Roles_List?_iParentID=1">Security Roles</a></h6>
                     </li>
                     <li>
-                        <h6><a href="~/admin/home/WebSiteScreen_List?_iParentID=1">System Screens</a></h6>
+                        <h6><a href="~/admin/home/WebSite_Messaging_List">Messaging</a></h6>
                     </li>
                     <li>
                         @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
@@ -169,14 +172,38 @@
                         }
                     </li>
                     <li>
-                        <h6><a href="~/admin/home/Users_List?_iParentID=1">Site Users</a></h6>
+                        <h6><a href="~/admin/home/WebSiteEvents_List">Event Log</a></h6>
                     </li>
                     <li>
-                        <h6><a href="~/admin/home/Countries_List">List of Countries</a></h6>
+                        <h6><a href="~/admin/home/Users_List?_iParentID=1">Users</a></h6>
                     </li>
                     <li>
-                        <h6><a href="~/admin/home/CountryLanguages_List">List of Languages</a></h6>
+                        <h6><a href="~/admin/home/Countries_List">Countries</a></h6>
                     </li>
+                    <li>
+                        <h6><a href="~/admin/home/CountryLanguages_List">Languages</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteAnnouncementsType_List">Announcement Types</a></h6>
+                    </li> 
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteMemberShips_List">Membership Types</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteMemberShipsCategories_List">Member Categories</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteSponsorShipTypes_List">Sponsorship Types</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteAffiliateTypes_List">Affiliate Types</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSitePartnerTypes_List">Partner Types</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteScreen_List?_iParentID=1">System Screens</a></h6>
+                    </li>                   
                 </ul>
             </div>
             <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Community</h3>
@@ -217,6 +244,24 @@
                             <h6><a href="~/admin/home/WebSiteAdvertisementGroup_List?_iParentID=1">Ad Groups</a></h6>
                         }
                     </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteEMailCampaign_List">E-Mail Campaigns</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebMarketingLists_List">Marketing Lists</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteSponsors_List">Sponsors</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteMembers_List">Members</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSiteAffiliates_List">Affiliates</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/WebSitePartners_List">Partners</a></h6>
+                    </li>
                 </ul>
             </div>
             <h3 class="text-lg-left text-md-left text-sm-left text-xs-left portal_ul_header"> Job Board</h3>
@@ -242,6 +287,10 @@
     }
 </div>
 
+
+<script type="text/javascript">
+    var oActiveNode = @Html.Raw(ViewBag.iActiveNode + ";")
+</script>
 <script type="text/javascript">
 	$("#accordion").accordion({heightStyle: "content"});
 

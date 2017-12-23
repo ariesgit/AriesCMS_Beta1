@@ -1,0 +1,263 @@
+@model AriesCMS.Models.WebSite_MessagingDBView
+
+
+<script type="text/javascript">
+    
+
+    function on_Select_WebSite_Messaging_iLanguageID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSite_Messaging_iLanguageID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSite_Messaging_sLanguageID");
+            oHiddenField.value = selectedText;
+            
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Web Site Messaging</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSite_Messaging.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSite_Messaging_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSite_Messaging_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSite_Messaging.ID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.iParentID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sParentID)  
+
+                         @Html.HiddenFor(model => model.WebSite_Messaging.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sLoadIncludeURI)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.bLoadPartialPage)  
+
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sLanguageID)
+
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL1)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI2)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL2)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI3)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL3)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI4)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL4)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI5)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL5)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI6)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL6)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURI7)  
+                         @Html.HiddenFor(model => model.WebSite_Messaging.sAttachementURL7)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Messaging_sName">Title :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Messaging.sName, new { @Class = "form-control" })
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSite_Messaging_sSubject">Subject line :</label>
+                                                @Html.TextBoxFor(model => model.WebSite_Messaging.sSubject, new { @Class = "form-control" })
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                                    <ul class="nav nav-tabs" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a id="tabHTMLContent" class="nav-link active" href="#pnlHTMLContent" role="tab" data-toggle="tab">HTML Message</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabTextContent" class="nav-link" href="#pnlTextContent" role="tab" data-toggle="tab">Text Message</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabProperties" class="nav-link" href="#pnlProperties" role="tab" data-toggle="tab">Properties</a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a id="tabCodeHelp" class="nav-link" href="#pnlCodeHelp" role="tab" data-toggle="tab">Code Help</a>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="tab-content">
+                                                        <div role="tabpanel" class="tab-pane fadein active" id="pnlHTMLContent">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                                                                
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sMessageBody">Message body (HTML) :</label>
+                                                                    @Html.TextAreaFor(model => model.WebSite_Messaging.sMessageBody, new { @Class = "form-control textarea_admin" })
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlTextContent">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sContent">Message body (Text) :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.sContent, new { @Class = "form-control" })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlProperties">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sContent">Message For (function name) :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.sAttachementURI1, new { @Class = "form-control" })
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sFromName">From :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.sFromName, new { @Class = "form-control" })
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sFromEmail">From E-Mail :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.sFromEmail, new { @Class = "form-control" })
+                                                                </div>
+                                                                
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_ID">ID :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.ID, new { @Class = "form-control", @readonly = "readonly" })
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="WebSite_Messaging_sControl">GUID :</label>
+                                                                    @Html.TextBoxFor(model => model.WebSite_Messaging.sControl, new { @Class = "form-control", @readonly = "readonly" })
+                                                                </div>
+
+
+                                                                <div class="form-group">
+                                                                    <label for="WebSiteAffiliates_iSponsorShipTypeID">Language :</label>
+                                                                    @Html.DropDownListFor(model => model.WebSite_Messaging.iLanguageID, Model.CountryLanguages, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSite_Messaging_iLanguageID_Changed();" })
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div role="tabpanel" class="tab-pane fadein fade" id="pnlCodeHelp">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+                                                            <p>
+                                                                Person's First Name:
+                                                                <span class="CodeMirror-lines"><##sFName##></##sFName##></span>
+                                                            </p>
+                                                            <p>
+                                                                Person's Last Name:
+                                                                <span class="CodeMirror-lines"><##sLName##></##sLName##></span>
+                                                            </p>
+                                                            <p>
+                                                                Person's E-Mail:
+                                                                <span class="CodeMirror-lines"><##sEMail##></##sEMail##></span>
+                                                            </p>
+                                                            <p>
+                                                                Person's Cell Phone:
+                                                                <span class="CodeMirror-lines"><##sCellPhone##></##sCellPhone##></span>
+                                                            </p>
+                                                            <p>
+                                                                Person's Avitar URL:
+                                                                <span class="CodeMirror-lines"><##sAvitarURL##></##sAvitarURL##></span>
+                                                            </p>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                            <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
