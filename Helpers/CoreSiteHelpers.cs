@@ -1309,9 +1309,8 @@ namespace AriesCMS.Helpers
         bool bResponse = false;
         public string sProcessError = "";
 
-        //Used for paypal credentials
-        public string _sClientID = "";
-        public string _sClientSecret = "";
+        public string _sClientID = "info_api1.westonbar.org";
+        public string _sClientSecret = "AFcWxV21C7fd0v3bYYYRCpSSRl31AnXZyOImS8YfwKW.X5qxvHfDj1Yf";
 
         public string BaseURL { get; set; }
         public AriesCMS.Helpers.SiteCookieHelper UserCookie;
@@ -2001,7 +2000,6 @@ namespace AriesCMS.Helpers
                     {
                         if (cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
                         {
-
                             List<DataParameter> lstParameters = new List<DataParameter>();
                             DataParameter pParameter = null;
 
@@ -2019,60 +2017,132 @@ namespace AriesCMS.Helpers
                             {
                                 if (lstWebSiteEMailCampaign.Count > 0)
                                 {
-
-                                    DINT_WebMarketingListsMembers dbWebMarketingListsMembers = new DINT_WebMarketingListsMembers(cnCon);
-
+                                    DINT_WebSiteEMailCampaignLists dbWebSiteEMailCampaignLists = new DINT_WebSiteEMailCampaignLists(cnCon);
 
                                     lstParameters = new List<DataParameter>();
                                     pParameter = null;
                                     pParameter = new DataParameter("iParentID", "'" + iListID + "'", "int", 11, "iParentID", " = ", "");
                                     lstParameters.Add(pParameter);
-                                    pParameter = new DataParameter("bDisabled", "'" + "False" + "'", "bool", 11, "bDisabled", " = ", " and ");
-                                    lstParameters.Add(pParameter);
-                                    pParameter = new DataParameter("bSuspended", "'" + "False" + "'", "bool", 11, "bSuspended", " = ", " and ");
-                                    lstParameters.Add(pParameter);
-                                    pParameter = new DataParameter("bNegative", "'" + "False" + "'", "bool", 11, "bNegative", " = ", " and ");
-                                    lstParameters.Add(pParameter);
-                                    pParameter = new DataParameter("bHidden", "'" + "False" + "'", "bool", 11, "bHidden", " = ", " and ");
-                                    lstParameters.Add(pParameter);
 
-                                    List<DEF_WebMarketingListsMembers.RecordObject> lstDEF_WebMarketingListsMembers = dbWebMarketingListsMembers.Get(lstParameters);
-                                    if(lstDEF_WebMarketingListsMembers != null)
+                                    List<DEF_WebSiteEMailCampaignLists.RecordObject> lstWebSiteEMailCampaignLists = dbWebSiteEMailCampaignLists.Get(lstParameters);
+
+                                    if (lstWebSiteEMailCampaignLists != null)
                                     {
-                                        if(lstDEF_WebMarketingListsMembers.Count > 0)
+                                        if (lstWebSiteEMailCampaignLists.Count > 0)
                                         {
-                                            foreach (DEF_WebMarketingListsMembers.RecordObject oRecipient in lstDEF_WebMarketingListsMembers)
+                                            foreach (DEF_WebSiteEMailCampaignLists.RecordObject oCampList in lstWebSiteEMailCampaignLists)
                                             {
-                                                if (oRecipient != null)
+                                                if (oCampList.iListID > 0)
                                                 {
-                                                    if (oRecipient.bDisabled == false)
+                                                    #region Send to each member
+                                                    try
                                                     {
-                                                        if (oRecipient.bSuspended == false)
-                                                        {
-                                                            if (oRecipient.bNegative == false)
-                                                            {
-                                                                if (oRecipient.bHidden == false)
-                                                                {
-                                                                    string sMessage = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
-                                                                    string sSubject = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+                                                        DINT_WebMarketingListsMembers dbWebMarketingListsMembers = new DINT_WebMarketingListsMembers(cnCon);
 
-                                                                    SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, oRecipient.sEMail, oRecipient.sFName + " " + oRecipient.sLName, sSubject, sMessage);
+                                                        #region Filter
+                                                        lstParameters = new List<DataParameter>();
+                                                        pParameter = null;
+                                                        pParameter = new DataParameter("iParentID", "'" + oCampList.iListID + "'", "int", 11, "iParentID", " = ", "");
+                                                        lstParameters.Add(pParameter);
+                                                        pParameter = new DataParameter("bDisabled", "'" + "False" + "'", "bool", 11, "bDisabled", " = ", " and ");
+                                                        lstParameters.Add(pParameter);
+                                                        pParameter = new DataParameter("bSuspended", "'" + "False" + "'", "bool", 11, "bSuspended", " = ", " and ");
+                                                        lstParameters.Add(pParameter);
+                                                        pParameter = new DataParameter("bNegative", "'" + "False" + "'", "bool", 11, "bNegative", " = ", " and ");
+                                                        lstParameters.Add(pParameter);
+                                                        pParameter = new DataParameter("bHidden", "'" + "False" + "'", "bool", 11, "bHidden", " = ", " and ");
+                                                        lstParameters.Add(pParameter);
+                                                        #endregion
+
+                                                        List<DEF_WebMarketingListsMembers.RecordObject> lstDEF_WebMarketingListsMembers = dbWebMarketingListsMembers.Get(lstParameters);
+                                                        if (lstDEF_WebMarketingListsMembers != null)
+                                                        {
+                                                            if (lstDEF_WebMarketingListsMembers.Count > 0)
+                                                            {
+                                                                #region Send to each member of the list
+                                                                foreach (DEF_WebMarketingListsMembers.RecordObject oRecipient in lstDEF_WebMarketingListsMembers)
+                                                                {
+                                                                    if (oRecipient != null)
+                                                                    {
+                                                                        if (oRecipient.bDisabled == false)
+                                                                        {
+                                                                            if (oRecipient.bSuspended == false)
+                                                                            {
+                                                                                if (oRecipient.bNegative == false)
+                                                                                {
+                                                                                    if (oRecipient.bHidden == false)
+                                                                                    {
+                                                                                        string sMessage = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+                                                                                        string sSubject = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+
+                                                                                        SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, oRecipient.sEMail, oRecipient.sFName + " " + oRecipient.sLName, sSubject, sMessage);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
+                                                                #endregion
+                                                            }
+                                                            else
+                                                            {
+                                                                //No list members
+
                                                             }
                                                         }
+                                                        else
+                                                        {
+                                                            //No members of the campaign
+                                                        }
                                                     }
+                                                    catch(Exception s1)
+                                                    {
+
+                                                    }
+                                                    #endregion
                                                 }
                                             }
                                         }
+                                        else
+                                        {
+                                            //No Associated lists to send to
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //No Associated lists to send to
+
                                     }
                                 }
+                                else
+                                {
+                                    //Could not find campaign
+
+                                }
+                            }
+                            else
+                            {
+                                //Could not find campaign
                             }
                         }
+                        else
+                        {
+                            //Connection not open
+                        }
+                    }
+                    else
+                    {
+                        //Null connection
                     }
                 }
-                
+                else
+                {
+                    //Invalid List Id
+                }
+
             }
-            catch
+            catch(Exception s)
             {
             }
         }

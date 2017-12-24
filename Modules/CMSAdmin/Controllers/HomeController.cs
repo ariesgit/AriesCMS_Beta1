@@ -1460,12 +1460,12 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                             ViewBag.iActiveNode = sPanel_SystemManagement;
                             break;
                         case "WebSite_Messaging":
-                            Session["_NavNodeIndex"] = sPanel_ContentManagement;
-                            ViewBag.iActiveNode = sPanel_ContentManagement;
+                            Session["_NavNodeIndex"] = sPanel_SystemManagement;
+                            ViewBag.iActiveNode = sPanel_SystemManagement;
                             break;
                         case "WebSite_Messaging_History":
-                            Session["_NavNodeIndex"] = sPanel_ContentManagement;
-                            ViewBag.iActiveNode = sPanel_ContentManagement;
+                            Session["_NavNodeIndex"] = sPanel_SystemManagement;
+                            ViewBag.iActiveNode = sPanel_SystemManagement;
                             break;
                         case "WebSiteMemberShips":
                             Session["_NavNodeIndex"] = sPanel_SystemManagement;
@@ -53108,6 +53108,87 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
         }
 
 
+        [HttpPost]
+        public JsonResult WebSiteEMailCampaign_TestSend(int Id, string _ToEmail, string _ToCellPhone, string _ToFName, string _ToLName)
+        {
+            Set_ViewBag_UserInfo_Defaults();
+            string sRESPONSE = "false";
+            string sRESPONSEMESSAGE = "Error";
+
+            if (oSystem.OpenDataConnection())
+            {
+                #region
+                if (oSystem.GetCurrentUser())
+                {
+                    if (Id > 0)
+                    {
+                        try
+                        {
+                            List<DataParameter> lstParameters = new List<DataParameter>();
+                            DataParameter pParameter = null;
+
+                            DINT_WebSiteEMailCampaign dbUWebSiteEMailCampaign = new DINT_WebSiteEMailCampaign(oSystem.cnCon);
+
+                            lstParameters = new List<DataParameter>();
+                            pParameter = null;
+                            pParameter = new DataParameter("ID", "'" + Id + "'", "int", 11, "ID", " = ", "");
+                            lstParameters.Add(pParameter);
+
+
+                            List<DEF_WebSiteEMailCampaign.RecordObject> lstWebSiteEMailCampaign = dbUWebSiteEMailCampaign.Get(lstParameters);
+
+                            if (lstWebSiteEMailCampaign != null)
+                            {
+                                if (lstWebSiteEMailCampaign.Count > 0)
+                                {
+                                    string sMessage = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "");
+                                    string sSubject = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "");
+
+                                    oSystem.SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, _ToEmail, _ToFName + " " + _ToLName, sSubject, sMessage);
+
+
+                                    sRESPONSE = "true";
+                                    sRESPONSEMESSAGE = "";
+                                }
+                                else
+                                {
+                                    sRESPONSE = "false";
+                                    sRESPONSEMESSAGE = "Sorry could not find any records!";
+                                }
+                            }
+                            else
+                            {
+                                sRESPONSE = "false";
+                                sRESPONSEMESSAGE = "Sorry could not find any records!";
+                            }
+
+                        }
+                        catch
+                        {
+                            sRESPONSE = "false";
+                            sRESPONSEMESSAGE = "Sorry could not find any records!";
+                        }
+                    }
+                    else
+                    {
+                        sRESPONSE = "false";
+                        sRESPONSEMESSAGE = "Invalid Campaign ID!";
+                    }
+                }
+                else
+                {
+                    sRESPONSE = "false";
+                    sRESPONSEMESSAGE = "System error occured please contact system administrator!";
+                }
+                #endregion
+
+            }
+            oSystem.CloseDataConnection();
+            var oResponse = Json(new { RESPONSE = sRESPONSE, MESSAGE = sRESPONSEMESSAGE });
+            return oResponse;
+        }
+
+
         #endregion
 
         #region Form WebSiteEMailCampaignMembers
@@ -54965,6 +55046,9 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     recRecord.WebSiteEMailCampaignLists.iParentID = _iParentID;
                     recRecord.WebSiteEMailCampaignLists.sParentID = _sParentID;
 
+                    recRecord.WebSiteEMailCampaignLists.dtLastsendouton = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteEMailCampaignLists.dtsentouton = DateTime.Parse("01/01/1901");
+
                     recRecord.Get_WebMarketingLists(oSystem.cnCon);
 
 
@@ -56544,7 +56628,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 {
                     #region Process
                     ViewBag.bLoggedIn = true;
-                    string sLocalDefaultView = sModuleBase + sWebSite_Messaging_Details;
+                    string sLocalDefaultView = sModuleBase + sWebSitePageZone_Details;
                     #region If View is not set try to get it
                     if (String.IsNullOrEmpty(_sViewToLoad))
                     {
