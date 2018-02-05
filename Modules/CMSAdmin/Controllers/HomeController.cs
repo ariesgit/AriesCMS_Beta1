@@ -1,4 +1,4 @@
- 
+
 #region Copyright
 // 
 // Aries TCO, Inc.® - http://www.ariestco.com
@@ -1531,12 +1531,14 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                             Session["_NavNodeIndex"] = sPanel_SalesMarketing;
                             ViewBag.iActiveNode = sPanel_SalesMarketing;
                             break;
-
-
-
-
-
-
+                        case "ProcessPaymentPost":
+                            Session["_NavNodeIndex"] = sPanel_SalesMarketing;
+                            ViewBag.iActiveNode = sPanel_SalesMarketing;
+                            break;
+                        case "PaymentProcessing":
+                            Session["_NavNodeIndex"] = sPanel_SalesMarketing;
+                            ViewBag.iActiveNode = sPanel_SalesMarketing;
+                            break;
                         #endregion
                         default:
                             Session["_NavNodeIndex"] = sPanel_Dashboard;
@@ -2017,6 +2019,234 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+
+
+        string sPaymentProcessingScreen = "/Views/Forms/PaymentProcessing.cshtml";
+        public ActionResult PaymentProcessing()
+        {
+            Set_Client_NavSettings("PaymentProcessing");
+            //string sView = Request.UrlReferrer.ToString();
+            oSystem.OpenDataConnection();
+            Set_ViewBag_UserInfo_Defaults();
+            Set_ViewBag_Global_Defaults();
+            ViewBag.bGoodCharge = false;
+            ViewBag.bError = false;
+
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CurrentUser != null)
+                {
+                    Set_ViewBag_UserInfo();
+
+                    if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                    {
+                        Set_ViewBag_UserInfo();
+                        Set_ViewBag_Global();
+
+                        AriesCMS.Models.UserBillingInfo oNewCharge = new Models.UserBillingInfo();
+                        oNewCharge.AddressInfo = new Models.UserAddressInfo();
+
+                        oNewCharge.Build_ExpMonth();
+                        oNewCharge.Build_ExpYear();
+
+                        oSystem.CurrentUser.UserView.Get_States(oSystem.cnCon);
+                        oNewCharge.AddressInfo.States = oSystem.CurrentUser.UserView.States;
+
+                        oSystem.CurrentUser.UserView.Get_Countries(oSystem.cnCon);
+                        oNewCharge.AddressInfo.Countries = oSystem.CurrentUser.UserView.Countries;
+
+
+                        oPage.DataModelsPrimary = oNewCharge;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = sModuleBase + sPaymentProcessingScreen;
+                        oSystem.CloseDataConnection();//Forms
+                        return View(sModuleBase + sBasePage, oPage);
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return Redirect("~/admin/home");
+                    }
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    return Redirect("~/admin/home");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return Redirect("~/admin/home");
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult ProcessPaymentPost(FormCollection fc, AriesCMS.Models.UserBillingInfo oRec)
+        {
+            Set_Client_NavSettings("ProcessPaymentPost");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            ViewBag.bGoodCharge = false;
+            ViewBag.bError = false;
+
+
+            string sBaseULR = Request.Url.Scheme + "://" + Request.Url.Authority + "/";
+            string sRootPath = Request.PhysicalApplicationPath.ToString();
+            string sRefURL = Request.UrlReferrer.AbsoluteUri.ToString();
+            string sFileUploadResults = "";
+
+            bool bFileUploadError1 = false;
+
+            string sImageURL1 = "";
+            string sPrefix = "";
+            if (oSystem.GetCurrentUser())
+            {
+                ViewBag.iSiteID = oSystem.rsGlobalVeriables.SiteID;
+
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+
+                    //Validate and process charge here
+
+                    #region Peform credt card processing
+                    AriesCMS.Models.ChargeRecord oChargeObject = new Models.ChargeRecord();
+
+                    oChargeObject.FirstName = oRec.FirstName;
+                    oChargeObject.LastName = oRec.LastName;
+                    oChargeObject.EMail = oRec.EMail;
+                    oChargeObject.PhoneNumber = oRec.Phone;
+
+                    oChargeObject.PaymentID = "1";
+                    oChargeObject.CardNumber = oRec.CreditCardNumber;
+                    oChargeObject.CardNumberMask = "";
+                    oChargeObject.CVV = oRec.CreditCardCVV;
+                    oChargeObject.Tax = "0.00";
+                    oChargeObject.Subtotal = "0.00";
+                    //oChargeObject.Subtotal = oSystem.rec_WebSiteMemberShips.dCost.ToString();
+                    oChargeObject.ShippingCharge = "0.00";
+                    oChargeObject.ChargeAmount = oRec.ChargeAmount.ToString("#.00");
+                    oChargeObject.ChargeDescription = "Test Charge";
+                    oChargeObject.CardType = "";
+                    oChargeObject.ExpirationDate = oRec.CreditCardExpDateMonth + "/20/" + oRec.CreditCardExpDateYear;
+                    oChargeObject.Month = oRec.CreditCardExpDateMonth;
+                    oChargeObject.Year = oRec.CreditCardExpDateYear;
+
+                    oChargeObject.ClientIPAddress = oSystem.VisitorHTTPValues.VisitorIPAddress();
+
+                    oChargeObject.Address = oRec.AddressInfo.AddressLine1;
+                    oChargeObject.City = oRec.AddressInfo.City;
+                    oChargeObject.State = oRec.AddressInfo.State;
+                    oChargeObject.Country = "USA";
+                    oChargeObject.PostalCode = oRec.AddressInfo.PostalCode;
+
+                    oChargeObject.IsCMSForm = "";
+                    oChargeObject.ChargeResponse = "";
+                    oChargeObject.SourceForm = "";
+                    oChargeObject.SuccessPageURL = "";
+
+                    // Good record creating now process credit card to enable account
+                    AriesCMS.Helpers.CreditCardProcessing.PayPalProcess oCCProcessing = new Helpers.CreditCardProcessing.PayPalProcess(oSystem._sClientID, oSystem._sClientSecret, oSystem._sClientPassword);
+
+                    bool bChargeResults = false;
+                    string sChargeResults = "";
+
+                    string _EventSubject = "Test Transaction";
+                    string _EventLog = "Test Transaction";
+                    int _iSiteID = 1;
+                    string _sSiteID = "Default";
+                    int _iTypeID = 3;
+                    string _sTypeID = "Event Log";
+                    string _Notes = "Test Transaction";
+                    string _UserCookieID = oSystem.UserCookie.CookieID.ToString();
+                    string _UserIP = oSystem.VisitorHTTPValues.VisitorIPAddress();
+
+                    oSystem.LogUserSiteActivity(_EventSubject, _EventLog, _iSiteID, _sSiteID, _iTypeID, _sTypeID, _Notes, _UserCookieID, _UserIP);
+
+                    try
+                    {
+                        bChargeResults = oCCProcessing.Authorize2(ref oChargeObject);
+                    }
+                    catch (Exception ssq)
+                    {
+                        sChargeResults += " " + ssq.ToString();
+                    }
+                    sChargeResults += oChargeObject.ChargeResponse;
+
+
+                    _EventSubject = "Test Transaction";
+                    _EventLog = "Test Transaction " + " result was Charge: " + bChargeResults + " response message from merchant bank was: " + sChargeResults;
+                    _iSiteID = 1;
+                    _sSiteID = "Default";
+                    _iTypeID = 3;
+                    _sTypeID = "Event Log";
+                    _Notes = "Test Transaction " + " result was Charge: " + bChargeResults + " response message from merchant bank was: " + sChargeResults;
+                    _UserCookieID = oSystem.UserCookie.CookieID.ToString();
+                    _UserIP = oSystem.VisitorHTTPValues.VisitorIPAddress();
+
+                    oSystem.LogUserSiteActivity(_EventSubject, _EventLog, _iSiteID, _sSiteID, _iTypeID, _sTypeID, _Notes, _UserCookieID, _UserIP);
+
+
+                    if (bChargeResults)
+                    {
+
+                        ViewBag.bGoodCharge = true;
+                        ViewBag.bError = false;
+
+
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.bGoodCharge = false;
+                        ViewBag.ErrorMessage = "Your pruchase failed! " + "Your credit card was declined.  Here is the message we got from the bank: " + sChargeResults;
+
+                    }
+                    #endregion
+
+
+                    oRec.Build_ExpMonth();
+                    oRec.Build_ExpYear();
+
+                    oSystem.CurrentUser.UserView.Get_States(oSystem.cnCon);
+                    oRec.AddressInfo.States = oSystem.CurrentUser.UserView.States;
+
+                    oSystem.CurrentUser.UserView.Get_Countries(oSystem.cnCon);
+                    oRec.AddressInfo.Countries = oSystem.CurrentUser.UserView.Countries;
+
+
+                    oPage.DataModelsPrimary = oRec;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = sModuleBase + sPaymentProcessingScreen;
+                    oSystem.CloseDataConnection();//Forms
+                    return View(sModuleBase + sBasePage, oPage);
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();//Forms
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();//Forms
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+
+
+
 
 
         [HttpPost]
@@ -15504,7 +15734,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
-        
+
         public ActionResult WebMarketingListsMembers_Create(int _iParentID = 0, string _sParentID = "")
         {
             Set_Client_NavSettings("WebMarketingListsMembers");
@@ -15815,7 +16045,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
-        
+
 
         [HttpPost]
         public JsonResult WebMarketingListsMembers_AddNewUser(int _ID, int _LeadID, int _UserID)
@@ -15861,7 +16091,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                     oListMember.bReceived = false;
                                     oListMember.bSent = false;
                                     oListMember.bSuspended = false;
-                                    
+
 
                                     List<DataParameter> lstParameters = new List<DataParameter>();
                                     DataParameter pParameter = null;
@@ -15875,9 +16105,9 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                         lstParameters.Add(pParameter);
 
                                         lstWebSite_Leads_Search = dbWebSite_Leads.Get(lstParameters);
-                                        if(lstWebSite_Leads_Search != null)
+                                        if (lstWebSite_Leads_Search != null)
                                         {
-                                            if(lstWebSite_Leads_Search.Count > 0)
+                                            if (lstWebSite_Leads_Search.Count > 0)
                                             {
                                                 oListMember.iLeadID = lstWebSite_Leads_Search[0].ID;
                                                 oListMember.sLeadID = lstWebSite_Leads_Search[0].sPrimaryEMail;
@@ -15896,14 +16126,14 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                             }
                                         }
                                     }
-                                    else if(_UserID > 0)
+                                    else if (_UserID > 0)
                                     {
                                         DINT_Users dbUsers = new DINT_Users(oSystem.cnCon);
                                         List<DEF_Users.RecordObject> lstUser_Search = null;
 
                                         pParameter = new DataParameter("ID", "'" + _UserID + "'", "int", 0, "ID", " = ", "");
                                         lstParameters.Add(pParameter);
-                                        
+
                                         lstUser_Search = dbUsers.Get(lstParameters);
                                         if (lstUser_Search != null)
                                         {
@@ -15929,7 +16159,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                             }
                                         }
                                     }
-                                                                        
+
                                 }
                                 catch
                                 {
@@ -15958,7 +16188,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                 }
             }
-            catch(Exception s)
+            catch (Exception s)
             {
                 sRESPONSEMESSAGE += " Exception: " + s.ToString();
             }
@@ -16014,7 +16244,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                         lstParameters.Add(pParameter);
 
                                         lstWebMarketingListsMembers = dbWebMarketingListsMembers.Get(lstParameters);
-                                        
+
                                     }
 
                                     if (lstWebMarketingListsMembers != null)
@@ -16084,11 +16314,11 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                 DataParameter pParameter = null;
 
                                 DINT_WebMarketingListsMembers dbWebMarketingListsMembers = new DINT_WebMarketingListsMembers(oSystem.cnCon);
-                                
+
                                 DINT_WebSite_Leads dbWebSite_Leads = new DINT_WebSite_Leads(oSystem.cnCon);
                                 List<DEF_WebSite_Leads.RecordObject> lstWebSite_Leads_Search = null;
 
-                                
+
                                 lstWebSite_Leads_Search = dbWebSite_Leads.Get();
                                 if (lstWebSite_Leads_Search != null)
                                 {
@@ -16291,7 +16521,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
             var oResponse = Json(new { RESPONSE = sRESPONSE, MESSAGE = sRESPONSEMESSAGE });
             return oResponse;
         }
-        
+
 
         [HttpPost]
         public JsonResult WebMarketingListsMembers_SearchForUser(string _Search)
@@ -16308,7 +16538,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 if (oSystem.GetCurrentUser())
                 {
                     try
-                    {                   
+                    {
 
                         List<DataParameter> lstParameters = new List<DataParameter>();
                         DataParameter pParameter = null;
@@ -16354,7 +16584,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             pParameter = new DataParameter("dtMembershipExpOn", "'" + _Search + "'", "DateTime", 11, "dtMembershipExpOn", " = ", " or ");
                             lstParameters.Add(pParameter);
-                            
+
                             pParameter = new DataParameter("dtLastLoggedIn", "'" + _Search + "'", "DateTime", 11, "dtLastLoggedIn", " = ", " or ");
                             lstParameters.Add(pParameter);
 
@@ -18144,6 +18374,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                     return HttpNotFound();
                                 }
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                                 recRecord.Get_WebSiteAnnouncementsType(oSystem.cnCon);
 
                                 ViewBag.iParentID = recRecord.WebSiteAnnouncements.iParentID;
@@ -18205,6 +18436,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                     return HttpNotFound();
                                 }
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                                 recRecord.Get_WebSiteAnnouncementsType(oSystem.cnCon);
 
                                 ViewBag.iParentID = recRecord.WebSiteAnnouncements.iParentID;
@@ -18297,6 +18529,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     AriesCMS.Models.WebSiteAnnouncementsDBView recRecord = new Models.WebSiteAnnouncementsDBView();
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                     recRecord.Get_WebSiteAnnouncementsType(oSystem.cnCon);
 
                     recRecord.WebSiteAnnouncements.iParentID = _iParentID;
@@ -21855,13 +22088,19 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteBlogEntry.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteBlogEntry.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteBlogEntryViewModel recRecord = new WebSiteBlogEntryViewModel();
+                                recRecord.WebSiteBlogEntry = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+
+
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
+
+                                ViewBag.iParentID = recRecord.WebSiteBlogEntry.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteBlogEntry.sParentID;
                                 oSystem.CloseDataConnection();
 
 
@@ -21910,13 +22149,19 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteBlogEntry.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteBlogEntry.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteBlogEntryViewModel recRecord = new WebSiteBlogEntryViewModel();
+                                recRecord.WebSiteBlogEntry = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+
+
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
+
+                                ViewBag.iParentID = recRecord.WebSiteBlogEntry.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteBlogEntry.sParentID;
                                 oSystem.CloseDataConnection();
 
 
@@ -21994,16 +22239,22 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteBlogEntry.RecordObject recRecord = new DEF_WebSiteBlogEntry.RecordObject();
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
-                    recRecord.dtStart = DateTime.Parse("01/01/1901");
-                    recRecord.dtEnd = DateTime.Parse("01/01/1901");
 
 
+                    ACMSDBView.WebSiteBlogEntryViewModel recRecord = new WebSiteBlogEntryViewModel();
+                    //DEF_WebSiteBlogEntry.RecordObject recRecord = new DEF_WebSiteBlogEntry.RecordObject();
 
-                    recRecord.iLanguageID = 205;
-                    recRecord.sLanguageID = "United States English";
+
+                    recRecord.WebSiteBlogEntry.iParentID = _iParentID;
+                    recRecord.WebSiteBlogEntry.sParentID = _sParentID;
+                    recRecord.WebSiteBlogEntry.dtStart = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteBlogEntry.dtEnd = DateTime.Parse("01/01/1901");
+
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
+
+
+                    recRecord.WebSiteBlogEntry.iLanguageID = 205;
+                    recRecord.WebSiteBlogEntry.sLanguageID = "United States English";
 
 
                     oSystem.CloseDataConnection();
@@ -22030,7 +22281,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteBlogEntry_AddUpdate(FormCollection fc, HttpPostedFileBase UploadFiles1, DEF_WebSiteBlogEntry.RecordObject _rec)
+        public ActionResult WebSiteBlogEntry_AddUpdate(FormCollection fc, HttpPostedFileBase UploadFiles1, ACMSDBView.WebSiteBlogEntryViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteBlogEntry_AddUpdate");
             Set_ViewBag_Global_Defaults();
@@ -22070,17 +22321,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteBlogEntry.ID == null) || (_rec.WebSiteBlogEntry.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteBlogEntry.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteBlogEntry.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteBlogEntry.sParentID;
                             if (ViewBag.bAddNew == true)
                             {
                                 #region
@@ -22108,7 +22359,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                                     UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sOriginalfileName1);
                                                     sImageURL1 = "Uploads/" + sOriginalfileName1;
                                                     sFileUploadResults = "File Uploaded! - " + "Themes\\" + sOriginalfileName1;
-                                                    _rec.sImageURL = sImageURL1;
+                                                    _rec.WebSiteBlogEntry.sImageURL = sImageURL1;
                                                     bFileUploadError1 = false;
                                                 }
                                                 else
@@ -22119,7 +22370,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                                     sImageURL1 = "Uploads/" + sPrefix + sOriginalfileName1;
                                                     UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sPrefix + sOriginalfileName1);
                                                     sFileUploadResults = "File Uploaded! - " + "Themes\\" + sPrefix + sOriginalfileName1;
-                                                    _rec.sImageURL = sImageURL1;
+                                                    _rec.WebSiteBlogEntry.sImageURL = sImageURL1;
                                                     bFileUploadError1 = false;
                                                 }
                                             }
@@ -22133,22 +22384,22 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                 }
                                 #endregion
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteBlogEntry.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteBlogEntry.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteBlogEntry.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteBlogEntry);
 
                                 oSystem.CloseDataConnection();
                                 //return RedirectToAction("StatesDetails", new { id = _rec.ID, _bOverrideScreenMessage = true });
                                 #endregion
-                                return RedirectToAction("WebSiteBlogEntry_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteBlogEntry_Details", new { key = _rec.WebSiteBlogEntry.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 //return View(_sViewToLoad, _rec);
                                 //return View(_rec);
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteBlogEntry.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -22176,7 +22427,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                                         UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sOriginalfileName1);
                                                         sImageURL1 = "Uploads/" + sOriginalfileName1;
                                                         sFileUploadResults = "File Uploaded! - " + "Themes\\" + sOriginalfileName1;
-                                                        _rec.sImageURL = sImageURL1;
+                                                        _rec.WebSiteBlogEntry.sImageURL = sImageURL1;
                                                         bFileUploadError1 = false;
                                                     }
                                                     else
@@ -22187,7 +22438,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                                         sImageURL1 = "Uploads/" + sPrefix + sOriginalfileName1;
                                                         UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sPrefix + sOriginalfileName1);
                                                         sFileUploadResults = "File Uploaded! - " + "Themes\\" + sPrefix + sOriginalfileName1;
-                                                        _rec.sImageURL = sImageURL1;
+                                                        _rec.WebSiteBlogEntry.sImageURL = sImageURL1;
                                                         bFileUploadError1 = false;
                                                     }
                                                 }
@@ -22201,13 +22452,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                     }
                                     #endregion
 
-                                    _rec.dtLastUpdated = DateTime.Now;
-                                    dbInteraction.Update_SQL(_rec);
+                                    _rec.WebSiteBlogEntry.dtLastUpdated = DateTime.Now;
+                                    dbInteraction.Update_SQL(_rec.WebSiteBlogEntry);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
                                     //return View(_sViewToLoad, _rec);
-                                    return RedirectToAction("WebSiteBlogEntry_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteBlogEntry_Details", new { id = _rec.WebSiteBlogEntry.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                     //return View(_rec);
                                 }
                                 else
@@ -25814,15 +26065,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForum.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForum.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumViewModel recRecord = new WebSiteForumViewModel();
+                                recRecord.WebSiteForum = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForum.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForum.sParentID;
 
-
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
                                 oPage.DataModelsPrimary = recRecord;
                                 oPage.DataModelsSub.Add(oSystem);
@@ -25870,15 +26123,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForum.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForum.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumViewModel recRecord = new WebSiteForumViewModel();
+                                recRecord.WebSiteForum = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForum.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForum.sParentID;
 
-
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
                                 oPage.DataModelsPrimary = recRecord;
                                 oPage.DataModelsSub.Add(oSystem);
@@ -25961,13 +26216,16 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteForum.RecordObject recRecord = new DEF_WebSiteForum.RecordObject();
+
+                    //DEF_WebSiteForum.RecordObject recRecord = new DEF_WebSiteForum.RecordObject();
+
+                    ACMSDBView.WebSiteForumViewModel recRecord = new WebSiteForumViewModel();
+
+                    recRecord.WebSiteForum.iParentID = _iParentID;
+                    recRecord.WebSiteForum.sParentID = _sParentID;
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
-
-
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -25995,7 +26253,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteForum_AddUpdate(DEF_WebSiteForum.RecordObject _rec)
+        public ActionResult WebSiteForum_AddUpdate(ACMSDBView.WebSiteForumViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteForum");
             Set_ViewBag_Global_Defaults();
@@ -26024,17 +26282,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteForum.ID == null) || (_rec.WebSiteForum.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteForum.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteForum.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteForum.sParentID;
 
 
 
@@ -26049,21 +26307,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteForum dbInteraction = new DINT_WebSiteForum(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteForum.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteForum.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteForum.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteForum);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteForum_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteForum_Details", new { key = _rec.WebSiteForum.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteForum.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -26074,13 +26332,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteForum dbInteraction = new DINT_WebSiteForum(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteForum.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteForum);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteForum_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteForum_Details", new { id = _rec.WebSiteForum.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -26522,14 +26780,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumiAnnouncementsViewModel recRecord = new WebSiteForumiAnnouncementsViewModel();
+                                recRecord.WebSiteForumiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumiAnnouncements.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -26578,13 +26839,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumiAnnouncementsViewModel recRecord = new WebSiteForumiAnnouncementsViewModel();
+                                recRecord.WebSiteForumiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumiAnnouncements.sParentID;
+
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -26669,13 +26934,15 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteForumiAnnouncements.RecordObject recRecord = new DEF_WebSiteForumiAnnouncements.RecordObject();
+                    //DEF_WebSiteForumiAnnouncements.RecordObject recRecord = new DEF_WebSiteForumiAnnouncements.RecordObject();
+
+                    ACMSDBView.WebSiteForumiAnnouncementsViewModel recRecord = new WebSiteForumiAnnouncementsViewModel();
+
+                    recRecord.WebSiteForumiAnnouncements.iParentID = _iParentID;
+                    recRecord.WebSiteForumiAnnouncements.sParentID = _sParentID;
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
-
-
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -26703,7 +26970,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteForumiAnnouncements_AddUpdate(DEF_WebSiteForumiAnnouncements.RecordObject _rec)
+        public ActionResult WebSiteForumiAnnouncements_AddUpdate(ACMSDBView.WebSiteForumiAnnouncementsViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteForumiAnnouncements");
             Set_ViewBag_Global_Defaults();
@@ -26732,17 +26999,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteForumiAnnouncements.ID == null) || (_rec.WebSiteForumiAnnouncements.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteForumiAnnouncements.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteForumiAnnouncements.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteForumiAnnouncements.sParentID;
 
 
 
@@ -26757,21 +27024,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteForumiAnnouncements dbInteraction = new DINT_WebSiteForumiAnnouncements(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteForumiAnnouncements.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteForumiAnnouncements.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteForumiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteForumiAnnouncements);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteForumiAnnouncements_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteForumiAnnouncements_Details", new { key = _rec.WebSiteForumiAnnouncements.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteForumiAnnouncements.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -26782,13 +27049,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteForumiAnnouncements dbInteraction = new DINT_WebSiteForumiAnnouncements(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteForumiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteForumiAnnouncements);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteForumiAnnouncements_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteForumiAnnouncements_Details", new { id = _rec.WebSiteForumiAnnouncements.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -27230,15 +27497,18 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopiAnnouncementsViewModel recRecord = new WebSiteForumTopiAnnouncementsViewModel();
+                                recRecord.WebSiteForumTopiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopiAnnouncements.sParentID;
 
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
                                 oPage.DataModelsPrimary = recRecord;
                                 oPage.DataModelsSub.Add(oSystem);
@@ -27286,15 +27556,18 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopiAnnouncementsViewModel recRecord = new WebSiteForumTopiAnnouncementsViewModel();
+                                recRecord.WebSiteForumTopiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopiAnnouncements.sParentID;
 
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
                                 oPage.DataModelsPrimary = recRecord;
                                 oPage.DataModelsSub.Add(oSystem);
@@ -27377,13 +27650,16 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = new DEF_WebSiteForumTopiAnnouncements.RecordObject();
+
+                    ACMSDBView.WebSiteForumTopiAnnouncementsViewModel recRecord = new WebSiteForumTopiAnnouncementsViewModel();
+                    //DEF_WebSiteForumTopiAnnouncements.RecordObject recRecord = new DEF_WebSiteForumTopiAnnouncements.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSiteForumTopiAnnouncements.iParentID = _iParentID;
+                    recRecord.WebSiteForumTopiAnnouncements.sParentID = _sParentID;
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -27411,7 +27687,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteForumTopiAnnouncements_AddUpdate(DEF_WebSiteForumTopiAnnouncements.RecordObject _rec)
+        public ActionResult WebSiteForumTopiAnnouncements_AddUpdate(ACMSDBView.WebSiteForumTopiAnnouncementsViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteForumTopiAnnouncements");
             Set_ViewBag_Global_Defaults();
@@ -27440,17 +27716,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteForumTopiAnnouncements.ID == null) || (_rec.WebSiteForumTopiAnnouncements.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteForumTopiAnnouncements.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteForumTopiAnnouncements.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteForumTopiAnnouncements.sParentID;
 
 
 
@@ -27465,21 +27741,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteForumTopiAnnouncements dbInteraction = new DINT_WebSiteForumTopiAnnouncements(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteForumTopiAnnouncements.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteForumTopiAnnouncements.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteForumTopiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteForumTopiAnnouncements);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteForumTopiAnnouncements_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteForumTopiAnnouncements_Details", new { key = _rec.WebSiteForumTopiAnnouncements.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteForumTopiAnnouncements.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -27490,13 +27766,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteForumTopiAnnouncements dbInteraction = new DINT_WebSiteForumTopiAnnouncements(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteForumTopiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteForumTopiAnnouncements);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteForumTopiAnnouncements_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteForumTopiAnnouncements_Details", new { id = _rec.WebSiteForumTopiAnnouncements.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -28646,14 +28922,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopicPosts.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopicPosts.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopicPostsViewModel recRecord = new WebSiteForumTopicPostsViewModel();
+                                recRecord.WebSiteForumTopicPosts = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopicPosts.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopicPosts.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -28702,14 +28981,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopicPosts.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopicPosts.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopicPostsViewModel recRecord = new WebSiteForumTopicPostsViewModel();
+                                recRecord.WebSiteForumTopicPosts = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopicPosts.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopicPosts.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -28793,14 +29075,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteForumTopicPosts.RecordObject recRecord = new DEF_WebSiteForumTopicPosts.RecordObject();
+
+                    ACMSDBView.WebSiteForumTopicPostsViewModel recRecord = new WebSiteForumTopicPostsViewModel();
+                    //DEF_WebSiteForumTopicPosts.RecordObject recRecord = new DEF_WebSiteForumTopicPosts.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSiteForumTopicPosts.iParentID = _iParentID;
+                    recRecord.WebSiteForumTopicPosts.sParentID = _sParentID;
 
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                     oPage.DataModelsPrimary = recRecord;
@@ -28827,7 +29112,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteForumTopicPosts_AddUpdate(DEF_WebSiteForumTopicPosts.RecordObject _rec)
+        public ActionResult WebSiteForumTopicPosts_AddUpdate(ACMSDBView.WebSiteForumTopicPostsViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteForumTopicPosts");
             Set_ViewBag_Global_Defaults();
@@ -28856,17 +29141,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteForumTopicPosts.ID == null) || (_rec.WebSiteForumTopicPosts.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteForumTopicPosts.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteForumTopicPosts.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteForumTopicPosts.sParentID;
 
 
 
@@ -28881,21 +29166,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteForumTopicPosts dbInteraction = new DINT_WebSiteForumTopicPosts(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteForumTopicPosts.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteForumTopicPosts.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteForumTopicPosts.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteForumTopicPosts);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteForumTopicPosts_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteForumTopicPosts_Details", new { key = _rec.WebSiteForumTopicPosts.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteForumTopicPosts.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -28906,13 +29191,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteForumTopicPosts dbInteraction = new DINT_WebSiteForumTopicPosts(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteForumTopicPosts.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteForumTopicPosts);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteForumTopicPosts_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteForumTopicPosts_Details", new { id = _rec.WebSiteForumTopicPosts.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -30062,14 +30347,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopics.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopics.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopicsViewModel recRecord = new ACMSDBView.WebSiteForumTopicsViewModel();
+                                recRecord.WebSiteForumTopics = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopics.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopics.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -30118,14 +30406,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteForumTopics.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteForumTopics.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteForumTopicsViewModel recRecord = new ACMSDBView.WebSiteForumTopicsViewModel();
+                                recRecord.WebSiteForumTopics = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteForumTopics.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteForumTopics.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -30209,13 +30500,16 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteForumTopics.RecordObject recRecord = new DEF_WebSiteForumTopics.RecordObject();
+
+                    ACMSDBView.WebSiteForumTopicsViewModel recRecord = new ACMSDBView.WebSiteForumTopicsViewModel();
+                    //DEF_WebSiteForumTopics.RecordObject recRecord = new DEF_WebSiteForumTopics.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSiteForumTopics.iParentID = _iParentID;
+                    recRecord.WebSiteForumTopics.sParentID = _sParentID;
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -30243,7 +30537,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteForumTopics_AddUpdate(DEF_WebSiteForumTopics.RecordObject _rec)
+        public ActionResult WebSiteForumTopics_AddUpdate(ACMSDBView.WebSiteForumTopicsViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteForumTopics");
             Set_ViewBag_Global_Defaults();
@@ -30272,17 +30566,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteForumTopics.ID == null) || (_rec.WebSiteForumTopics.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteForumTopics.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteForumTopics.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteForumTopics.sParentID;
 
 
 
@@ -30297,21 +30591,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteForumTopics dbInteraction = new DINT_WebSiteForumTopics(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteForumTopics.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteForumTopics.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteForumTopics.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteForumTopics);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteForumTopics_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteForumTopics_Details", new { key = _rec.WebSiteForumTopics.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteForumTopics.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -30322,13 +30616,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteForumTopics dbInteraction = new DINT_WebSiteForumTopics(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteForumTopics.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteForumTopics);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteForumTopics_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteForumTopics_Details", new { id = _rec.WebSiteForumTopics.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -34914,6 +35208,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                 recRecord.Get_Languages(oSystem.cnCon);
                                 recRecord.Get_SiteTemplatesList(oSystem.cnCon, 1);
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                                 if (recRecord.WebSitePage.iSiteTemplateID > 0)
                                 {
                                     recRecord.Get_SiteTemplatesPages(oSystem.cnCon, recRecord.WebSitePage.iSiteTemplateID);
@@ -34977,6 +35272,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                                 recRecord.Get_Languages(oSystem.cnCon);
                                 recRecord.Get_SiteTemplatesList(oSystem.cnCon, 1);
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                                 if (recRecord.WebSitePage.iSiteTemplateID > 0)
                                 {
                                     recRecord.Get_SiteTemplatesPages(oSystem.cnCon, recRecord.WebSitePage.iSiteTemplateID);
@@ -35076,6 +35372,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     recRecord.WebSitePage.sLanguageID = "United States English";
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
                     recRecord.Get_SiteTemplatesList(oSystem.cnCon, _iParentID);
 
                     recRecord.Get_Languages(oSystem.cnCon);
@@ -37643,14 +37940,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSitePageiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSitePageiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSitePageiAnnouncementsViewModel recRecord = new WebSitePageiAnnouncementsViewModel();
+                                recRecord.WebSitePageiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSitePageiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSitePageiAnnouncements.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -37699,14 +37999,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSitePageiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSitePageiAnnouncements.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSitePageiAnnouncementsViewModel recRecord = new WebSitePageiAnnouncementsViewModel();
+                                recRecord.WebSitePageiAnnouncements = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSitePageiAnnouncements.iParentID;
+                                ViewBag.sParentID = recRecord.WebSitePageiAnnouncements.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -37790,12 +38093,15 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSitePageiAnnouncements.RecordObject recRecord = new DEF_WebSitePageiAnnouncements.RecordObject();
+
+                    ACMSDBView.WebSitePageiAnnouncementsViewModel recRecord = new WebSitePageiAnnouncementsViewModel();
+                    //DEF_WebSitePageiAnnouncements.RecordObject recRecord = new DEF_WebSitePageiAnnouncements.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSitePageiAnnouncements.iParentID = _iParentID;
+                    recRecord.WebSitePageiAnnouncements.sParentID = _sParentID;
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -37824,7 +38130,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSitePageiAnnouncements_AddUpdate(DEF_WebSitePageiAnnouncements.RecordObject _rec)
+        public ActionResult WebSitePageiAnnouncements_AddUpdate(ACMSDBView.WebSitePageiAnnouncementsViewModel _rec)
         {
             Set_Client_NavSettings("WebSitePageiAnnouncements");
             Set_ViewBag_Global_Defaults();
@@ -37853,17 +38159,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSitePageiAnnouncements.ID == null) || (_rec.WebSitePageiAnnouncements.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSitePageiAnnouncements.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSitePageiAnnouncements.iParentID;
+                            ViewBag.sParentID = _rec.WebSitePageiAnnouncements.sParentID;
 
 
 
@@ -37878,21 +38184,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSitePageiAnnouncements dbInteraction = new DINT_WebSitePageiAnnouncements(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSitePageiAnnouncements.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSitePageiAnnouncements.dtDateCreated = DateTime.Now;
+                                _rec.WebSitePageiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSitePageiAnnouncements);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSitePageiAnnouncements_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSitePageiAnnouncements_Details", new { key = _rec.WebSitePageiAnnouncements.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSitePageiAnnouncements.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -37903,13 +38209,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSitePageiAnnouncements dbInteraction = new DINT_WebSitePageiAnnouncements(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSitePageiAnnouncements.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSitePageiAnnouncements);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSitePageiAnnouncements_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSitePageiAnnouncements_Details", new { id = _rec.WebSitePageiAnnouncements.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -47869,14 +48175,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteEventCalendar.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteEventCalendar.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteEventCalendarViewModel recRecord = new WebSiteEventCalendarViewModel();
+                                recRecord.WebSiteEventCalendar = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteEventCalendar.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteEventCalendar.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -47925,14 +48234,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteEventCalendar.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteEventCalendar.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteEventCalendarViewModel recRecord = new WebSiteEventCalendarViewModel();
+                                recRecord.WebSiteEventCalendar = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteEventCalendar.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteEventCalendar.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -48013,18 +48325,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteEventCalendar.RecordObject recRecord = new DEF_WebSiteEventCalendar.RecordObject();
+
+                    ACMSDBView.WebSiteEventCalendarViewModel recRecord = new WebSiteEventCalendarViewModel();
+                    //DEF_WebSiteEventCalendar.RecordObject recRecord = new DEF_WebSiteEventCalendar.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSiteEventCalendar.iParentID = _iParentID;
+                    recRecord.WebSiteEventCalendar.sParentID = _sParentID;
 
-                    recRecord.dtDateOfEvent = DateTime.Parse("01/01/1901");
-                    recRecord.dtFirstDateOfRegistrations = DateTime.Parse("01/01/1901");
-                    recRecord.dtLastDateOfRegistrations = DateTime.Parse("01/01/1901");
-                    recRecord.dtEarlyBirdRegistrations = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteEventCalendar.dtDateOfEvent = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteEventCalendar.dtFirstDateOfRegistrations = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteEventCalendar.dtLastDateOfRegistrations = DateTime.Parse("01/01/1901");
+                    recRecord.WebSiteEventCalendar.dtEarlyBirdRegistrations = DateTime.Parse("01/01/1901");
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
                     oPage.DataModelsPrimary = recRecord;
                     oPage.DataModelsSub.Add(oSystem);
@@ -48050,7 +48365,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteEventCalendar_AddUpdate(DEF_WebSiteEventCalendar.RecordObject _rec)
+        public ActionResult WebSiteEventCalendar_AddUpdate(ACMSDBView.WebSiteEventCalendarViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteEventCalendar");
             Set_ViewBag_Global_Defaults();
@@ -48079,17 +48394,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteEventCalendar.ID == null) || (_rec.WebSiteEventCalendar.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteEventCalendar.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteEventCalendar.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteEventCalendar.sParentID;
 
 
 
@@ -48104,21 +48419,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteEventCalendar dbInteraction = new DINT_WebSiteEventCalendar(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteEventCalendar.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteEventCalendar.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteEventCalendar.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteEventCalendar);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteEventCalendar_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteEventCalendar_Details", new { key = _rec.WebSiteEventCalendar.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteEventCalendar.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -48129,13 +48444,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteEventCalendar dbInteraction = new DINT_WebSiteEventCalendar(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteEventCalendar.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteEventCalendar);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteEventCalendar_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteEventCalendar_Details", new { id = _rec.WebSiteEventCalendar.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -48291,6 +48606,120 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+
+        [HttpPost]
+        public JsonResult WebSiteEventCalendar_DownLoadAttendeeList(int Id)
+        {
+            Set_ViewBag_UserInfo_Defaults();
+            string sRESPONSE = "false";
+            string sRESPONSEMESSAGE = "Error";
+            string sDownLoadURL = "";
+
+            if (oSystem.OpenDataConnection())
+            {
+                #region
+                if (oSystem.GetCurrentUser())
+                {
+                    if (Id > 0)
+                    {
+                        try
+                        {
+                            DINT_WebSiteEventCalendarUsers odbWebSiteEventCalendarUsers = new DINT_WebSiteEventCalendarUsers(oSystem.cnCon);
+
+
+
+                            List<DataParameter> lstParameters = new List<DataParameter>();
+                            DataParameter pParameter = null;
+
+                            pParameter = new DataParameter("iParentID", "'" + Id + "'", "int", 1, "iParentID", " = ", "");
+                            lstParameters.Add(pParameter);
+
+
+
+                            List<DEF_WebSiteEventCalendarUsers.RecordObject> lstWebSiteEventCalendarUsers = odbWebSiteEventCalendarUsers.Get(lstParameters);
+
+                            if (lstWebSiteEventCalendarUsers != null)
+                            {
+                                if (lstWebSiteEventCalendarUsers.Count > 0)
+                                {
+                                    string sBaseULR = Request.Url.Scheme + "://" + Request.Url.Authority + "/";
+                                    string sRootPath = Request.PhysicalApplicationPath.ToString();
+                                    string sRefURL = Request.UrlReferrer.AbsoluteUri.ToString();
+
+                                    string sDownLoadFileName = Id + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString();
+                                    sDownLoadFileName = sDownLoadFileName.Replace("/", "");
+                                    sDownLoadFileName = sDownLoadFileName.Replace(":", "");
+                                    sDownLoadFileName = sDownLoadFileName.Replace(" ", "");
+                                    sDownLoadFileName = sDownLoadFileName.Replace("-", "");
+                                    sDownLoadFileName = sDownLoadFileName.Replace("\\", "");
+
+
+
+
+                                    System.IO.TextWriter swWriter = new StreamWriter(sRootPath + "Uploads\\" + sDownLoadFileName + ".csv");
+
+                                    swWriter.WriteLine("First Name, Last Name, Email, Phone, Status, RefCode");
+                                    try
+                                    {
+                                        foreach (DEF_WebSiteEventCalendarUsers.RecordObject oU in lstWebSiteEventCalendarUsers)
+                                        {
+                                            //swWriter.WriteLine("First Name, Last Name, Email, Phone, Status, RefCode");
+                                            swWriter.WriteLine(oU.sFName + "," + oU.sLName + "," + oU.sPrimaryEMail + "," + oU.sPrimaryPhone + "," + oU.sStatusID + "," + oU.sPaymentRef);
+                                        }
+                                    }
+                                    catch (Exception ss1)
+                                    {
+
+                                    }
+                                    swWriter.Flush();
+                                    swWriter.Close();
+                                    swWriter.Dispose();
+                                    swWriter = null;
+
+
+                                    sRESPONSE = "true";
+                                    sRESPONSEMESSAGE = "";
+                                    //sDownLoadURL = sBaseULR + "Uploads/" + sDownLoadFileName;
+                                    sDownLoadURL = "Uploads/" + sDownLoadFileName;
+                                }
+                                else
+                                {
+                                    sRESPONSE = "false";
+                                    sRESPONSEMESSAGE = "No attendees to print out!";
+                                }
+                            }
+                            else
+                            {
+                                sRESPONSE = "false";
+                                sRESPONSEMESSAGE = "No attendees to print out!";
+                            }
+                        }
+                        catch
+                        {
+                            sRESPONSE = "false";
+                            sRESPONSEMESSAGE = "Sorry could not find any records!";
+                        }
+                    }
+                    else
+                    {
+                        sRESPONSE = "false";
+                        sRESPONSEMESSAGE = "Invalid Event ID!";
+                    }
+                }
+                else
+                {
+                    sRESPONSE = "false";
+                    sRESPONSEMESSAGE = "System error occured please contact system administrator!";
+                }
+                #endregion
+
+            }
+            oSystem.CloseDataConnection();
+            var oResponse = Json(new { RESPONSE = sRESPONSE, MESSAGE = sRESPONSEMESSAGE, DOWNLOADURL = sDownLoadURL });
+            return oResponse;
+        }
+
         #endregion
 
         #region Form WebSiteEventCalendarPictures
@@ -52653,13 +53082,20 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteEMailCampaign.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteEMailCampaign.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteEMailCampaignViewModel recRecord = new ACMSDBView.WebSiteEMailCampaignViewModel();
+                                recRecord.WebSiteEMailCampaign = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
 
-
+                                recRecord.Get_WebSiteBlogEntry(oSystem.cnCon);
+                                recRecord.Get_WebSiteAnnouncements(oSystem.cnCon);
+                                recRecord.Get_WebSiteForumiAnnouncements(oSystem.cnCon);
+                                recRecord.Get_WebSitePage(oSystem.cnCon);
+                                recRecord.Get_WebSiteEventCalendar(oSystem.cnCon);
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -52708,13 +53144,20 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteEMailCampaign.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteEMailCampaign.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteEMailCampaignViewModel recRecord = new ACMSDBView.WebSiteEMailCampaignViewModel();
+                                recRecord.WebSiteEMailCampaign = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
 
-
+                                recRecord.Get_WebSiteBlogEntry(oSystem.cnCon);
+                                recRecord.Get_WebSiteAnnouncements(oSystem.cnCon);
+                                recRecord.Get_WebSiteForumiAnnouncements(oSystem.cnCon);
+                                recRecord.Get_WebSitePage(oSystem.cnCon);
+                                recRecord.Get_WebSiteEventCalendar(oSystem.cnCon);
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -52758,7 +53201,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
-        
+
 
         public ActionResult WebSiteEMailCampaign_Create()
         {
@@ -52793,11 +53236,19 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteEMailCampaign.RecordObject recRecord = new DEF_WebSiteEMailCampaign.RecordObject();
+                    //DEF_WebSiteEMailCampaign.RecordObject recRecord = new DEF_WebSiteEMailCampaign.RecordObject();
+                    ACMSDBView.WebSiteEMailCampaignViewModel recRecord = new ACMSDBView.WebSiteEMailCampaignViewModel();
 
-                    recRecord.dtRunAt = DateTime.Now;
-                    recRecord.dtSecondRunAt = DateTime.Now;
-                    
+                    recRecord.WebSiteEMailCampaign.dtRunAt = DateTime.Now;
+                    recRecord.WebSiteEMailCampaign.dtSecondRunAt = DateTime.Now;
+
+                    recRecord.Get_WebSiteBlogEntry(oSystem.cnCon);
+                    recRecord.Get_WebSiteAnnouncements(oSystem.cnCon);
+                    recRecord.Get_WebSiteForumiAnnouncements(oSystem.cnCon);
+                    recRecord.Get_WebSitePage(oSystem.cnCon);
+                    recRecord.Get_WebSiteEventCalendar(oSystem.cnCon);
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
+
 
                     oPage.DataModelsPrimary = recRecord;
                     oPage.DataModelsSub.Add(oSystem);
@@ -52823,7 +53274,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteEMailCampaign_AddUpdate(DEF_WebSiteEMailCampaign.RecordObject _rec)
+        public ActionResult WebSiteEMailCampaign_AddUpdate(ACMSDBView.WebSiteEMailCampaignViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteEMailCampaign");
             Set_ViewBag_Global_Defaults();
@@ -52850,20 +53301,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         }
                     }
                     #endregion
-                    if (_rec != null)
+                    if (_rec.WebSiteEMailCampaign != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteEMailCampaign.ID == null) || (_rec.WebSiteEMailCampaign.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteEMailCampaign.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-
-
-
 
                             if (ViewBag.bAddNew == true)
                             {
@@ -52876,21 +53324,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteEMailCampaign dbInteraction = new DINT_WebSiteEMailCampaign(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteEMailCampaign.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteEMailCampaign.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteEMailCampaign.dtLastUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteEMailCampaign);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteEMailCampaign_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteEMailCampaign_Details", new { key = _rec.WebSiteEMailCampaign.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteEMailCampaign.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -52901,13 +53349,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteEMailCampaign dbInteraction = new DINT_WebSiteEMailCampaign(oSystem.cnCon);
-                                    _rec.dtLastUpdated = DateTime.Now;
+                                    _rec.WebSiteEMailCampaign.dtLastUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteEMailCampaign);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteEMailCampaign_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteEMailCampaign_Details", new { id = _rec.WebSiteEMailCampaign.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -53141,8 +53589,107 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                             {
                                 if (lstWebSiteEMailCampaign.Count > 0)
                                 {
-                                    string sMessage = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "");
-                                    string sSubject = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "");
+
+                                    //Linked Calendar Event
+                                    DEF_WebSiteEventCalendar.RecordObject rec_WebSiteEventCalendar = null;
+                                    #region WebSiteEventCalendar
+                                    if (lstWebSiteEMailCampaign[0].iLink_WebCalEvntID > 0)
+                                    {
+                                        DINT_WebSiteEventCalendar dbWebSiteEventCalendar = new DINT_WebSiteEventCalendar(oSystem.cnCon);
+
+                                        lstParameters = new List<DataParameter>();
+                                        pParameter = null;
+                                        pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_WebCalEvntID + "'", "int", 11, "ID", " = ", "");
+                                        lstParameters.Add(pParameter);
+
+                                        List<DEF_WebSiteEventCalendar.RecordObject> lstWebSiteEventCalendar = dbWebSiteEventCalendar.Get(lstParameters);
+                                        if (lstWebSiteEventCalendar != null)
+                                        {
+                                            rec_WebSiteEventCalendar = lstWebSiteEventCalendar[0];
+                                        }
+                                    }
+                                    #endregion
+
+                                    DEF_WebSiteBlogEntry.RecordObject rec_WebSiteBlogEntry = null;
+                                    #region WebSiteBlogEntry
+                                    if (lstWebSiteEMailCampaign[0].iLink_BlogEntryID > 0)
+                                    {
+                                        DINT_WebSiteBlogEntry dbWebSiteBlogEntry = new DINT_WebSiteBlogEntry(oSystem.cnCon);
+
+                                        lstParameters = new List<DataParameter>();
+                                        pParameter = null;
+                                        pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_BlogEntryID + "'", "int", 11, "ID", " = ", "");
+                                        lstParameters.Add(pParameter);
+
+                                        List<DEF_WebSiteBlogEntry.RecordObject> lstWebSiteBlogEntry = dbWebSiteBlogEntry.Get(lstParameters);
+                                        if (rec_WebSiteBlogEntry != null)
+                                        {
+                                            rec_WebSiteBlogEntry = lstWebSiteBlogEntry[0];
+                                        }
+                                    }
+                                    #endregion
+
+                                    DEF_WebSiteAnnouncements.RecordObject rec_WebSiteAnnouncements = null;
+                                    #region WebSiteAnnouncements
+                                    if (lstWebSiteEMailCampaign[0].iLink_AnnouncementID > 0)
+                                    {
+                                        DINT_WebSiteAnnouncements dbWebSiteAnnouncements = new DINT_WebSiteAnnouncements(oSystem.cnCon);
+
+                                        lstParameters = new List<DataParameter>();
+                                        pParameter = null;
+                                        pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_AnnouncementID + "'", "int", 11, "ID", " = ", "");
+                                        lstParameters.Add(pParameter);
+
+                                        List<DEF_WebSiteAnnouncements.RecordObject> lstWebSiteAnnouncements = dbWebSiteAnnouncements.Get(lstParameters);
+                                        if (rec_WebSiteAnnouncements != null)
+                                        {
+                                            rec_WebSiteAnnouncements = lstWebSiteAnnouncements[0];
+                                        }
+                                    }
+                                    #endregion
+
+                                    DEF_WebSiteForumiAnnouncements.RecordObject rec_WebSiteForumiAnnouncements = null;
+                                    #region WebSiteForumiAnnouncements
+                                    if (lstWebSiteEMailCampaign[0].iLink_FrumAnnouncID > 0)
+                                    {
+                                        DINT_WebSiteForumiAnnouncements dbWebSiteForumiAnnouncements = new DINT_WebSiteForumiAnnouncements(oSystem.cnCon);
+
+                                        lstParameters = new List<DataParameter>();
+                                        pParameter = null;
+                                        pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_FrumAnnouncID + "'", "int", 11, "ID", " = ", "");
+                                        lstParameters.Add(pParameter);
+
+                                        List<DEF_WebSiteForumiAnnouncements.RecordObject> lstWebSiteForumiAnnouncements = dbWebSiteForumiAnnouncements.Get(lstParameters);
+                                        if (rec_WebSiteForumiAnnouncements != null)
+                                        {
+                                            rec_WebSiteForumiAnnouncements = lstWebSiteForumiAnnouncements[0];
+                                        }
+                                    }
+                                    #endregion
+
+                                    DEF_WebSitePage.RecordObject rec_WebSitePage = null;
+                                    #region WebSitePage
+                                    if (lstWebSiteEMailCampaign[0].iLink_WebPgID > 0)
+                                    {
+                                        DINT_WebSitePage dbWebSitePage = new DINT_WebSitePage(oSystem.cnCon);
+
+                                        lstParameters = new List<DataParameter>();
+                                        pParameter = null;
+                                        pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_WebPgID + "'", "int", 11, "ID", " = ", "");
+                                        lstParameters.Add(pParameter);
+
+                                        List<DEF_WebSitePage.RecordObject> lstWebSitePage = dbWebSitePage.Get(lstParameters);
+                                        if (lstWebSitePage != null)
+                                        {
+                                            rec_WebSitePage = lstWebSitePage[0];
+                                        }
+                                    }
+                                    #endregion
+
+
+
+                                    string sMessage = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "", rec_WebSiteEventCalendar, rec_WebSiteBlogEntry, rec_WebSiteAnnouncements, rec_WebSiteForumiAnnouncements, rec_WebSitePage);
+                                    string sSubject = oSystem.Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, _ToFName, _ToLName, _ToEmail, _ToCellPhone, "", rec_WebSiteEventCalendar, rec_WebSiteBlogEntry, rec_WebSiteAnnouncements, rec_WebSiteForumiAnnouncements, rec_WebSitePage);
 
                                     oSystem.SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, _ToEmail, _ToFName + " " + _ToLName, sSubject, sMessage);
 
@@ -55041,7 +55588,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
                     ACMSDBView.WebSiteEMailCampaignListsViewModel recRecord = new WebSiteEMailCampaignListsViewModel();
-                    
+
 
                     recRecord.WebSiteEMailCampaignLists.iParentID = _iParentID;
                     recRecord.WebSiteEMailCampaignLists.sParentID = _sParentID;
@@ -60425,14 +60972,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteJobs.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteJobs.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteJobsViewModel recRecord = new WebSiteJobsViewModel();
+                                recRecord.WebSiteJobs = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteJobs.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteJobs.sParentID;
 
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
                                 oPage.DataModelsPrimary = recRecord;
@@ -60481,13 +61031,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
                             if (dbSearch.Count > 0)
                             {
-                                DEF_WebSiteJobs.RecordObject recRecord = dbSearch[0];
+                                //DEF_WebSiteJobs.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteJobsViewModel recRecord = new WebSiteJobsViewModel();
+                                recRecord.WebSiteJobs = dbSearch[0];
                                 if (recRecord == null)
                                 {
                                     return HttpNotFound();
                                 }
-                                ViewBag.iParentID = recRecord.iParentID;
-                                ViewBag.sParentID = recRecord.sParentID;
+                                ViewBag.iParentID = recRecord.WebSiteJobs.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteJobs.sParentID;
+
+                                recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -60572,13 +61126,16 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     ViewBag.bAddNew = true;
                     ViewBag.bSaved = false;
                     ViewBag.sErrorMessage = "";
-                    DEF_WebSiteJobs.RecordObject recRecord = new DEF_WebSiteJobs.RecordObject();
+
+                    ACMSDBView.WebSiteJobsViewModel recRecord = new WebSiteJobsViewModel();
+                    //DEF_WebSiteJobs.RecordObject recRecord = new DEF_WebSiteJobs.RecordObject();
 
 
-                    recRecord.iParentID = _iParentID;
-                    recRecord.sParentID = _sParentID;
+                    recRecord.WebSiteJobs.iParentID = _iParentID;
+                    recRecord.WebSiteJobs.sParentID = _sParentID;
 
 
+                    recRecord.Get_WebSiteQuestionair(oSystem.cnCon);
 
 
 
@@ -60606,7 +61163,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult WebSiteJobs_AddUpdate(DEF_WebSiteJobs.RecordObject _rec)
+        public ActionResult WebSiteJobs_AddUpdate(ACMSDBView.WebSiteJobsViewModel _rec)
         {
             Set_Client_NavSettings("WebSiteJobs");
             Set_ViewBag_Global_Defaults();
@@ -60635,17 +61192,17 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     #endregion
                     if (_rec != null)
                     {
-                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        if ((_rec.WebSiteJobs.ID == null) || (_rec.WebSiteJobs.ID == 0))
                         {
                             ViewBag.bAddNew = true;
-                            _rec.ID = -1;
+                            _rec.WebSiteJobs.ID = -1;
                             ModelState.Remove("ID");
                         }
 
                         if (ModelState.IsValid)
                         {
-                            ViewBag.iParentID = _rec.iParentID;
-                            ViewBag.sParentID = _rec.sParentID;
+                            ViewBag.iParentID = _rec.WebSiteJobs.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteJobs.sParentID;
 
 
 
@@ -60660,21 +61217,21 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                                 DINT_WebSiteJobs dbInteraction = new DINT_WebSiteJobs(oSystem.cnCon);
 
-                                _rec.sControl = Guid.NewGuid().ToString();
-                                _rec.dtDateCreated = DateTime.Now;
-                                _rec.dtDateUpdated = DateTime.Now;
+                                _rec.WebSiteJobs.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteJobs.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteJobs.dtDateUpdated = DateTime.Now;
 
-                                dbInteraction.Insert_SQL(_rec);
+                                dbInteraction.Insert_SQL(_rec.WebSiteJobs);
 
 
 
                                 oSystem.CloseDataConnection();
                                 #endregion
-                                return RedirectToAction("WebSiteJobs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                return RedirectToAction("WebSiteJobs_Details", new { key = _rec.WebSiteJobs.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
                             }
                             else
                             {
-                                if (_rec.ID > 0)
+                                if (_rec.WebSiteJobs.ID > 0)
                                 {
                                     #region
                                     ViewBag.bError = false;
@@ -60685,13 +61242,13 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
 
                                     DINT_WebSiteJobs dbInteraction = new DINT_WebSiteJobs(oSystem.cnCon);
-                                    _rec.dtDateUpdated = DateTime.Now;
+                                    _rec.WebSiteJobs.dtDateUpdated = DateTime.Now;
 
-                                    dbInteraction.Update_SQL(_rec);
+                                    dbInteraction.Update_SQL(_rec.WebSiteJobs);
 
                                     oSystem.CloseDataConnection();
                                     #endregion
-                                    return RedirectToAction("WebSiteJobs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                    return RedirectToAction("WebSiteJobs_Details", new { id = _rec.WebSiteJobs.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
                                 }
                                 else
                                 {
@@ -71313,7 +71870,12729 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                 return RedirectToAction("Index");
             }
         }
-        #endregion        
+        #endregion
+
+        #region Form Affiliate_QuestAnswers
+
+        string sAffiliate_QuestAnswers_Details = "/views/Forms/Affiliate_QuestAnswers_Details.cshtml";
+        string sAffiliate_QuestAnswers_List = "/views/Forms/Affiliate_QuestAnswers_List.cshtml";
+
+
+        public ActionResult Affiliate_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Affiliate_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Affiliate_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Affiliate_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Affiliate_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Affiliate_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Affiliate_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Affiliate_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Affiliate_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Affiliate_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Affiliate_QuestAnswers.RecordObject recRecord = new DEF_Affiliate_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Affiliate_QuestAnswers_AddUpdate(DEF_Affiliate_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Affiliate_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Affiliate_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Affiliate_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Affiliate_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("Affiliate_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Affiliate_QuestAnswers dbInteraction = new DINT_Affiliate_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Affiliate_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Affiliate_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Affiliate_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteQuestionair
+
+        string sWebSiteQuestionair_Details = "/views/Forms/WebSiteQuestionair_Details.cshtml";
+        string sWebSiteQuestionair_List = "/views/Forms/WebSiteQuestionair_List.cshtml";
+
+
+        public ActionResult WebSiteQuestionair_List(FormCollection fc, string Search, int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteQuestionair");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuestionair_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteQuestionair.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteQuestionair.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteQuestionair_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteQuestionair");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuestionair_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+                        List<DEF_WebSiteQuestionair.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteQuestionair.RecordObject recRecord = dbSearch[0];
+
+                                ACMSDBView.WebSiteQuestionairViewModel recRecord = new WebSiteQuestionairViewModel();
+                                recRecord.WebSiteQuestionair = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                recRecord.Get_WebSitePageTemplates(oSystem.cnCon);
+
+
+                                if (recRecord.WebSiteQuestionair.iDefaultTemplateID > 0)
+                                {
+                                    recRecord.Get_WebSitePageTemplatesPage(oSystem.cnCon, recRecord.WebSiteQuestionair.iDefaultTemplateID);
+                                }
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+                        List<DEF_WebSiteQuestionair.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteQuestionair.RecordObject recRecord = dbSearch[0];
+
+                                ACMSDBView.WebSiteQuestionairViewModel recRecord = new WebSiteQuestionairViewModel();
+                                recRecord.WebSiteQuestionair = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                recRecord.Get_WebSitePageTemplates(oSystem.cnCon);
+
+
+                                if (recRecord.WebSiteQuestionair.iDefaultTemplateID > 0)
+                                {
+                                    recRecord.Get_WebSitePageTemplatesPage(oSystem.cnCon, recRecord.WebSiteQuestionair.iDefaultTemplateID);
+                                }
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteQuestionair_Create()
+
+        {
+            Set_Client_NavSettings("WebSiteQuestionair");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuestionair_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    //DEF_WebSiteQuestionair.RecordObject recRecord = new DEF_WebSiteQuestionair.RecordObject();
+
+                    ACMSDBView.WebSiteQuestionairViewModel recRecord = new WebSiteQuestionairViewModel();
+
+
+                    recRecord.Get_WebSitePageTemplates(oSystem.cnCon);
+
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult WebSiteQuestionair_AddUpdate(ACMSDBView.WebSiteQuestionairViewModel _rec)
+        {
+            Set_Client_NavSettings("WebSiteQuestionair");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuestionair_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.WebSiteQuestionair.ID == null) || (_rec.WebSiteQuestionair.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.WebSiteQuestionair.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+
+                                _rec.WebSiteQuestionair.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteQuestionair.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteQuestionair.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec.WebSiteQuestionair);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteQuestionair_Details", new { key = _rec.WebSiteQuestionair.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.WebSiteQuestionair.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+                                    _rec.WebSiteQuestionair.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec.WebSiteQuestionair);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteQuestionair_Details", new { id = _rec.WebSiteQuestionair.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteQuestionair_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteQuestionair");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteQuestionair dbInteraction = new DINT_WebSiteQuestionair(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteQuestionair.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteQuestionair.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteQuestionair_List");
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteQuestionair_List");
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteQuest_Questions
+
+        string sWebSiteQuest_Questions_Details = "/views/Forms/WebSiteQuest_Questions_Details.cshtml";
+        string sWebSiteQuest_Questions_List = "/views/Forms/WebSiteQuest_Questions_List.cshtml";
+
+
+        public ActionResult WebSiteQuest_Questions_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteQuest_Questions");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuest_Questions_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteQuest_Questions.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteQuest_Questions.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteQuest_Questions_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteQuest_Questions");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuest_Questions_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+                        List<DEF_WebSiteQuest_Questions.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteQuest_Questions.RecordObject recRecord = dbSearch[0];
+
+                                ACMSDBView.WebSiteQuest_QuestionsViewModel recRecord = new WebSiteQuest_QuestionsViewModel();
+                                recRecord.WebSiteQuest_Questions = dbSearch[0];
+
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.WebSiteQuest_Questions.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteQuest_Questions.sParentID;
+
+
+                                recRecord.Build_AnswerControlType();
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+                        List<DEF_WebSiteQuest_Questions.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteQuest_Questions.RecordObject recRecord = dbSearch[0];
+
+                                ACMSDBView.WebSiteQuest_QuestionsViewModel recRecord = new WebSiteQuest_QuestionsViewModel();
+                                recRecord.WebSiteQuest_Questions = dbSearch[0];
+
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.WebSiteQuest_Questions.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteQuest_Questions.sParentID;
+
+
+                                recRecord.Build_AnswerControlType();
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteQuest_Questions_Create(int _iParentID = 0, string _sParentID = "")
+        {
+            Set_Client_NavSettings("WebSiteQuest_Questions");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuest_Questions_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+
+                    ACMSDBView.WebSiteQuest_QuestionsViewModel recRecord = new WebSiteQuest_QuestionsViewModel();
+
+                    //DEF_WebSiteQuest_Questions.RecordObject recRecord = new DEF_WebSiteQuest_Questions.RecordObject();
+
+
+                    recRecord.WebSiteQuest_Questions.iParentID = _iParentID;
+                    recRecord.WebSiteQuest_Questions.sParentID = _sParentID;
+                    recRecord.Build_AnswerControlType();
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult WebSiteQuest_Questions_AddUpdate(ACMSDBView.WebSiteQuest_QuestionsViewModel _rec)
+        {
+            Set_Client_NavSettings("WebSiteQuest_Questions");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteQuest_Questions_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.WebSiteQuest_Questions.ID == null) || (_rec.WebSiteQuest_Questions.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.WebSiteQuest_Questions.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.WebSiteQuest_Questions.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteQuest_Questions.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+
+                                _rec.WebSiteQuest_Questions.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteQuest_Questions.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteQuest_Questions.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec.WebSiteQuest_Questions);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteQuest_Questions_Details", new { key = _rec.WebSiteQuest_Questions.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.WebSiteQuest_Questions.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+                                    _rec.WebSiteQuest_Questions.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec.WebSiteQuest_Questions);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteQuest_Questions_Details", new { id = _rec.WebSiteQuest_Questions.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteQuest_Questions_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteQuest_Questions");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteQuest_Questions dbInteraction = new DINT_WebSiteQuest_Questions(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteQuest_Questions.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteQuest_Questions.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteQuest_Questions_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteQuest_Questions_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form User_Questionairs
+
+        string sUser_Questionairs_Details = "/views/Forms/User_Questionairs_Details.cshtml";
+        string sUser_Questionairs_List = "/views/Forms/User_Questionairs_List.cshtml";
+
+
+        public ActionResult User_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("User_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_User_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_User_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult User_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("User_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+                        List<DEF_User_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+                        List<DEF_User_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult User_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("User_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_User_Questionairs.RecordObject recRecord = new DEF_User_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult User_Questionairs_AddUpdate(DEF_User_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("User_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("User_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("User_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult User_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("User_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_User_Questionairs dbInteraction = new DINT_User_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_User_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("User_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("User_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form User_QuestAnswers
+
+        string sUser_QuestAnswers_Details = "/views/Forms/User_QuestAnswers_Details.cshtml";
+        string sUser_QuestAnswers_List = "/views/Forms/User_QuestAnswers_List.cshtml";
+
+
+        public ActionResult User_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("User_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_User_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_User_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult User_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("User_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+                        List<DEF_User_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+                        List<DEF_User_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult User_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("User_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_User_QuestAnswers.RecordObject recRecord = new DEF_User_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult User_QuestAnswers_AddUpdate(DEF_User_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("User_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("User_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("User_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult User_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("User_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_User_QuestAnswers dbInteraction = new DINT_User_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_User_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_User_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("User_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("User_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Sponsor_Questionairs
+
+        string sSponsor_Questionairs_Details = "/views/Forms/Sponsor_Questionairs_Details.cshtml";
+        string sSponsor_Questionairs_List = "/views/Forms/Sponsor_Questionairs_List.cshtml";
+
+
+        public ActionResult Sponsor_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Sponsor_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Sponsor_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Sponsor_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Sponsor_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Sponsor_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+                        List<DEF_Sponsor_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+                        List<DEF_Sponsor_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Sponsor_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Sponsor_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Sponsor_Questionairs.RecordObject recRecord = new DEF_Sponsor_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Sponsor_Questionairs_AddUpdate(DEF_Sponsor_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Sponsor_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Sponsor_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Sponsor_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Sponsor_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("Sponsor_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Sponsor_Questionairs dbInteraction = new DINT_Sponsor_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Sponsor_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Sponsor_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Sponsor_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Sponsor_QuestAnswers
+
+        string sSponsor_QuestAnswers_Details = "/views/Forms/Sponsor_QuestAnswers_Details.cshtml";
+        string sSponsor_QuestAnswers_List = "/views/Forms/Sponsor_QuestAnswers_List.cshtml";
+
+
+        public ActionResult Sponsor_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Sponsor_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Sponsor_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Sponsor_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Sponsor_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Sponsor_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Sponsor_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Sponsor_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Sponsor_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Sponsor_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Sponsor_QuestAnswers.RecordObject recRecord = new DEF_Sponsor_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Sponsor_QuestAnswers_AddUpdate(DEF_Sponsor_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Sponsor_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sSponsor_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Sponsor_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Sponsor_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Sponsor_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("Sponsor_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Sponsor_QuestAnswers dbInteraction = new DINT_Sponsor_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Sponsor_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Sponsor_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Sponsor_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Sponsor_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Partner_Questionairs
+
+        string sPartner_Questionairs_Details = "/views/Forms/Partner_Questionairs_Details.cshtml";
+        string sPartner_Questionairs_List = "/views/Forms/Partner_Questionairs_List.cshtml";
+
+
+        public ActionResult Partner_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Partner_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Partner_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Partner_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Partner_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Partner_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+                        List<DEF_Partner_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+                        List<DEF_Partner_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Partner_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Partner_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Partner_Questionairs.RecordObject recRecord = new DEF_Partner_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Partner_Questionairs_AddUpdate(DEF_Partner_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Partner_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Partner_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Partner_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Partner_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("Partner_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Partner_Questionairs dbInteraction = new DINT_Partner_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Partner_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Partner_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Partner_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Partner_QuestAnswers
+
+        string sPartner_QuestAnswers_Details = "/views/Forms/Partner_QuestAnswers_Details.cshtml";
+        string sPartner_QuestAnswers_List = "/views/Forms/Partner_QuestAnswers_List.cshtml";
+
+
+        public ActionResult Partner_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Partner_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Partner_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Partner_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Partner_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Partner_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Partner_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Partner_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Partner_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Partner_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Partner_QuestAnswers.RecordObject recRecord = new DEF_Partner_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Partner_QuestAnswers_AddUpdate(DEF_Partner_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Partner_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sPartner_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Partner_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Partner_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Partner_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("Partner_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Partner_QuestAnswers dbInteraction = new DINT_Partner_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Partner_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Partner_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Partner_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Partner_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Member_Questionairs
+
+        string sMember_Questionairs_Details = "/views/Forms/Member_Questionairs_Details.cshtml";
+        string sMember_Questionairs_List = "/views/Forms/Member_Questionairs_List.cshtml";
+
+
+        public ActionResult Member_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Member_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Member_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Member_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Member_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Member_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+                        List<DEF_Member_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+                        List<DEF_Member_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Member_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Member_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Member_Questionairs.RecordObject recRecord = new DEF_Member_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Member_Questionairs_AddUpdate(DEF_Member_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Member_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Member_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Member_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Member_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("Member_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Member_Questionairs dbInteraction = new DINT_Member_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Member_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Member_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Member_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Member_QuestAnswers
+
+        string sMember_QuestAnswers_Details = "/views/Forms/Member_QuestAnswers_Details.cshtml";
+        string sMember_QuestAnswers_List = "/views/Forms/Member_QuestAnswers_List.cshtml";
+
+
+        public ActionResult Member_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Member_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Member_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Member_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Member_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Member_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Member_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Member_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Member_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Member_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Member_QuestAnswers.RecordObject recRecord = new DEF_Member_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Member_QuestAnswers_AddUpdate(DEF_Member_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Member_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sMember_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Member_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Member_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Member_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("Member_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Member_QuestAnswers dbInteraction = new DINT_Member_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Member_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Member_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Member_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Member_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Lead_Questionairs
+
+        string sLead_Questionairs_Details = "/views/Forms/Lead_Questionairs_Details.cshtml";
+        string sLead_Questionairs_List = "/views/Forms/Lead_Questionairs_List.cshtml";
+
+
+        public ActionResult Lead_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Lead_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Lead_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Lead_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Lead_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Lead_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+                        List<DEF_Lead_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+                        List<DEF_Lead_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Lead_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Lead_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Lead_Questionairs.RecordObject recRecord = new DEF_Lead_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Lead_Questionairs_AddUpdate(DEF_Lead_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Lead_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Lead_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Lead_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Lead_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("Lead_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Lead_Questionairs dbInteraction = new DINT_Lead_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Lead_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Lead_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Lead_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Lead_QuestAnswers
+
+        string sLead_QuestAnswers_Details = "/views/Forms/Lead_QuestAnswers_Details.cshtml";
+        string sLead_QuestAnswers_List = "/views/Forms/Lead_QuestAnswers_List.cshtml";
+
+
+        public ActionResult Lead_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Lead_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Lead_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Lead_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Lead_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Lead_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Lead_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+                        List<DEF_Lead_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Lead_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Lead_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Lead_QuestAnswers.RecordObject recRecord = new DEF_Lead_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Lead_QuestAnswers_AddUpdate(DEF_Lead_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Lead_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sLead_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Lead_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Lead_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Lead_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("Lead_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Lead_QuestAnswers dbInteraction = new DINT_Lead_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Lead_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Lead_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Lead_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Lead_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form Affiliate_Questionairs
+
+        string sAffiliate_Questionairs_Details = "/views/Forms/Affiliate_Questionairs_Details.cshtml";
+        string sAffiliate_Questionairs_List = "/views/Forms/Affiliate_Questionairs_List.cshtml";
+
+
+        public ActionResult Affiliate_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("Affiliate_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_Affiliate_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_Affiliate_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Affiliate_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("Affiliate_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+                        List<DEF_Affiliate_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+                        List<DEF_Affiliate_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult Affiliate_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("Affiliate_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_Affiliate_Questionairs.RecordObject recRecord = new DEF_Affiliate_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult Affiliate_Questionairs_AddUpdate(DEF_Affiliate_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("Affiliate_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sAffiliate_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("Affiliate_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("Affiliate_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult Affiliate_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("Affiliate_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_Affiliate_Questionairs dbInteraction = new DINT_Affiliate_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_Affiliate_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_Affiliate_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("Affiliate_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("Affiliate_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteEvCalUser_QuestAnswers
+
+        string sWebSiteEvCalUser_QuestAnswers_Details = "/views/Forms/WebSiteEvCalUser_QuestAnswers_Details.cshtml";
+        string sWebSiteEvCalUser_QuestAnswers_List = "/views/Forms/WebSiteEvCalUser_QuestAnswers_List.cshtml";
+
+
+        public ActionResult WebSiteEvCalUser_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteEvCalUser_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteEvCalUser_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteEvCalUser_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+                        List<DEF_WebSiteEvCalUser_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+                        List<DEF_WebSiteEvCalUser_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteEvCalUser_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_WebSiteEvCalUser_QuestAnswers.RecordObject recRecord = new DEF_WebSiteEvCalUser_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult WebSiteEvCalUser_QuestAnswers_AddUpdate(DEF_WebSiteEvCalUser_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteEvCalUser_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteEvCalUser_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteEvCalUser_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteEvCalUser_QuestAnswers dbInteraction = new DINT_WebSiteEvCalUser_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteEvCalUser_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteEvCalUser_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteEvCalUser_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteEvCalUser_Questionairs
+
+        string sWebSiteEvCalUser_Questionairs_Details = "/views/Forms/WebSiteEvCalUser_Questionairs_Details.cshtml";
+        string sWebSiteEvCalUser_Questionairs_List = "/views/Forms/WebSiteEvCalUser_Questionairs_List.cshtml";
+
+
+        public ActionResult WebSiteEvCalUser_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteEvCalUser_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteEvCalUser_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteEvCalUser_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+                        List<DEF_WebSiteEvCalUser_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+                        List<DEF_WebSiteEvCalUser_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteEvCalUser_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_WebSiteEvCalUser_Questionairs.RecordObject recRecord = new DEF_WebSiteEvCalUser_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult WebSiteEvCalUser_Questionairs_AddUpdate(DEF_WebSiteEvCalUser_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteEvCalUser_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteEvCalUser_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteEvCalUser_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteEvCalUser_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteEvCalUser_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteEvCalUser_Questionairs dbInteraction = new DINT_WebSiteEvCalUser_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteEvCalUser_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteEvCalUser_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteEvCalUser_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteEvCalUser_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteJApp_QuestAnswers
+
+        string sWebSiteJApp_QuestAnswers_Details = "/views/Forms/WebSiteJApp_QuestAnswers_Details.cshtml";
+        string sWebSiteJApp_QuestAnswers_List = "/views/Forms/WebSiteJApp_QuestAnswers_List.cshtml";
+
+
+        public ActionResult WebSiteJApp_QuestAnswers_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteJApp_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_QuestAnswers_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteJApp_QuestAnswers.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteJApp_QuestAnswers.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteJApp_QuestAnswers_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteJApp_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+                        List<DEF_WebSiteJApp_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+                        List<DEF_WebSiteJApp_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteJApp_QuestAnswers_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("WebSiteJApp_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_WebSiteJApp_QuestAnswers.RecordObject recRecord = new DEF_WebSiteJApp_QuestAnswers.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult WebSiteJApp_QuestAnswers_AddUpdate(DEF_WebSiteJApp_QuestAnswers.RecordObject _rec)
+        {
+            Set_Client_NavSettings("WebSiteJApp_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_QuestAnswers_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteJApp_QuestAnswers_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteJApp_QuestAnswers_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteJApp_QuestAnswers_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteJApp_QuestAnswers");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteJApp_QuestAnswers dbInteraction = new DINT_WebSiteJApp_QuestAnswers(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteJApp_QuestAnswers.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_QuestAnswers.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteJApp_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteJApp_QuestAnswers_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteJApp_Questionairs
+
+        string sWebSiteJApp_Questionairs_Details = "/views/Forms/WebSiteJApp_Questionairs_Details.cshtml";
+        string sWebSiteJApp_Questionairs_List = "/views/Forms/WebSiteJApp_Questionairs_List.cshtml";
+
+
+        public ActionResult WebSiteJApp_Questionairs_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteJApp_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_Questionairs_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteJApp_Questionairs.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteJApp_Questionairs.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteJApp_Questionairs_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteJApp_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+                        List<DEF_WebSiteJApp_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+                        List<DEF_WebSiteJApp_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.iParentID;
+                                ViewBag.sParentID = recRecord.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteJApp_Questionairs_Create(int _iParentID = 0, string _sParentID = "")
+
+        {
+            Set_Client_NavSettings("WebSiteJApp_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_WebSiteJApp_Questionairs.RecordObject recRecord = new DEF_WebSiteJApp_Questionairs.RecordObject();
+
+
+                    recRecord.iParentID = _iParentID;
+                    recRecord.sParentID = _sParentID;
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult WebSiteJApp_Questionairs_AddUpdate(DEF_WebSiteJApp_Questionairs.RecordObject _rec)
+        {
+            Set_Client_NavSettings("WebSiteJApp_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteJApp_Questionairs_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.iParentID;
+                            ViewBag.sParentID = _rec.sParentID;
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteJApp_Questionairs_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteJApp_Questionairs_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteJApp_Questionairs_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteJApp_Questionairs");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteJApp_Questionairs dbInteraction = new DINT_WebSiteJApp_Questionairs(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteJApp_Questionairs.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteJApp_Questionairs.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteJApp_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteJApp_Questionairs_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
         #endregion
 
     }

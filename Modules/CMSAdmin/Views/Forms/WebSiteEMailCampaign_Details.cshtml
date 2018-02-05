@@ -1,18 +1,17 @@
-@model AriesCMSDefinition.DEF_WebSiteEMailCampaign.RecordObject
-
-
+@model ACMSDBView.WebSiteEMailCampaignViewModel
+ 
+ 
 <script type="text/javascript">
-    
 
-    function on_Select_Changed() {
+    function on_WebSiteEMailCampaign_iQuestID_Changed() {
         try {
-        var cboControl = document.getElementById("WebSiteEMailCampaign_FIELDID");
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iQuestID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteEMailCampaign_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sQuestID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+
         }
         catch (e) {
             alert(e);
@@ -20,44 +19,185 @@
     }
 
 
-    function Buildcbo_SelectBasedOnParentID(_Id) {
+    function on_WebSiteEMailCampaign_iLink_BlogEntryID_Changed() {
         try {
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iLink_BlogEntryID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebSiteEMailCampaign_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
-            
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebSiteEMailCampaign_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sLink_BlogEntryID");
+            oHiddenField.value = selectedText;
 
         }
         catch (e) {
             alert(e);
-            $("#WebSiteEMailCampaign_FIELDID").html("error").show();
         }
     }
 
-</script>   
-                    
+    function on_WebSiteEMailCampaign_iLink_AnnouncementID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iLink_AnnouncementID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sLink_AnnouncementID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_WebSiteEMailCampaign_iLink_FrumAnnouncID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iLink_FrumAnnouncID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sLink_FrumAnnouncID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_WebSiteEMailCampaign_iLink_WebPgID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iLink_WebPgID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sLink_WebPgID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+    function on_WebSiteEMailCampaign_iLink_WebCalEvntID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteEMailCampaign_iLink_WebCalEvntID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteEMailCampaign_sLink_WebCalEvntID");
+            oHiddenField.value = selectedText;
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
 
 
 
 
+    function On_Show_SendTestEmail()
+    {
+        try {
+            $('#pnlSendTestEmail').show(200);
+        }
+        catch (e) {
+
+        }
+    }
+    function On_Hide_SendTestEmail()
+    {
+        try {
+            $('#pnlSendTestEmail').hide(200);
+
+        }
+        catch (e) {
+
+        }
+    }
+
+    function On_SendTestEmail_Click()
+    {
+        try
+        {
+
+            var sBaseURL = window.location.protocol + "//" + window.location.host + "/";
+            var iCampID = '@Model.WebSiteEMailCampaign.ID';
+            var sFName = $('#txt_Test_FName').val();
+            var sLName = $('#txt_Test_LName').val();
+            var sEMail = $('#txt_Test_EMail').val();
+            var sCellPhone = $('#txt_Test_CellPhone').val();
+
+
+            var _URL = sBaseURL + "admin/home/WebSiteEMailCampaign_TestSend";
+            var oMydata = { Id: iCampID, _ToEmail: sEMail, _ToCellPhone: sCellPhone, _ToFName: sFName, _ToLName: sLName };
+
+            $.when(
+                $.ajax({
+                    url: _URL,
+                    data: oMydata,
+                    cache: true,
+                    type: "POST",
+                    dataType: "json"
+                })
+            )
+                .then(
+                function (data) {
+                    if (data.RESPONSE === 'true') {
+
+                        alert("Message Sent!");
+                        $('#pnlSendTestEmail').hide(200);
+
+                    }
+                    else {
+
+                        alert(data.MESSAGE);
+                    }
+                }
+                );
+        }
+        catch (e) {
+
+        }
+    }
+</script>
+
+
+
+
+<div class="row borderGroved_solid_2x" id="pnlSendTestEmail" style="display:none;">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+        <h4 class="text-bold">Send Out Test Email</h4>
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+
+        <div class="form-group">
+            <label for="txt_Test_FName">First name :</label>
+            <input type="text" id="txt_Test_FName" name="txt_Test_FName" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="txt_Test_LName">Last name :</label>
+            <input type="text" id="txt_Test_LName" name="txt_Test_LName" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="txt_Test_EMail">Email :</label>
+            <input type="text" id="txt_Test_EMail" name="txt_Test_EMail" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="txt_Test_CellPhone">Cell Phone :</label>
+            <input type="text" id="txt_Test_CellPhone" name="txt_Test_CellPhone" class="form-control" />
+        </div>
+
+    </div>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-center text-md-center text-sm-center text-xs-center">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-center text-md-center text-sm-center text-xs-center">
+            <a href="javascript:On_Hide_SendTestEmail();" class="btn btn-blue">Cancel</a>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-center text-md-center text-sm-center text-xs-center">
+            <a href="javascript:On_SendTestEmail_Click();" class="btn btn-red">Send</a>
+        </div>
+    </div>
+</div>
 
 
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -65,14 +205,15 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
             @if (ViewBag.bAddNew)
             {
-                 <h2>You are ready to create a new E-Mail Campaign</h2>
+                <h2>You are ready to create a new E-Mail Campaign</h2>
             }
             else
             {
-                 <h2>You are editing - 
-                   @Model.sName
-                 </h2>
-            }   
+                <h2>
+                    You are editing -
+                    @Model.WebSiteEMailCampaign.sName
+                </h2>
+            }
         </div>
     </div>
     <div class="row">
@@ -81,24 +222,29 @@
         </div>
     </div>
     <div class="row">
-       @if (ViewBag.bError == true)
-       {
+        @if (ViewBag.bError == true)
+        {
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
                 <p> @Html.Raw(ViewBag.sErrorMessage)</p>
             </div>
-       }
-       else if (ViewBag.bSaved == true)
-       {               
+        }
+        else if (ViewBag.bSaved == true)
+        {
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
                 <p>Your request was processed successfully.</p>
             </div>
-       }
+        }
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                         <<  @Html.ActionLink("Return List View", "WebSiteEMailCampaign_List" )
- 
-       
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-left text-md-left text-sm-left text-xs-left">
+                <<  @Html.ActionLink("Return List View", "WebSiteEMailCampaign_List")
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-lg-right text-md-right text-sm-right text-xs-right">
+                <a href="javascript:On_Show_SendTestEmail();">Send Test Message</a>
+            </div>
+
         </div>
-        
+
     </div>
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -107,221 +253,351 @@
     </div>
     <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
-                    @using (Html.BeginForm("WebSiteEMailCampaign_AddUpdate", "", FormMethod.Post))
-                       {                             
-                                        @Html.ValidationSummary(true);
-                         @Html.HiddenFor(model => model.ID)  
-                         @Html.HiddenFor(model => model.sControl)  
-                         @Html.HiddenFor(model => model.sSync)  
-                         @Html.HiddenFor(model => model.iParentID)  
-                         @Html.HiddenFor(model => model.sParentID)  
-                         @Html.HiddenFor(model => model.dtDateCreated)  
-                         @Html.HiddenFor(model => model.dtLastUpdated)  
-                         @Html.HiddenFor(model => model.iCreatedByID)  
-                         @Html.HiddenFor(model => model.sCreatedByID)  
-                         @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID) 
+            @using (Html.BeginForm("WebSiteEMailCampaign_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.ID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sControl)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sSync)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iParentID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sParentID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sUpdatedByID)
 
-                         @Html.HiddenFor(model => model.sContent)  
-                         @Html.HiddenFor(model => model.sVersion)  
-                         @Html.HiddenFor(model => model.bRemoved)  
-                         @Html.HiddenFor(model => model.bAnswered)  
-                         @Html.HiddenFor(model => model.iAnsweredByID)  
-                         @Html.HiddenFor(model => model.sAnsweredByID)  
-                         @Html.HiddenFor(model => model.iAnsweredByResponseID)  
-                         @Html.HiddenFor(model => model.sAnsweredByResponseID)  
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sContent)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sVersion)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.bRemoved)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.bAnswered)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iAnsweredByID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sAnsweredByID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iAnsweredByResponseID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sAnsweredByResponseID)
 
-                         @Html.HiddenFor(model => model.bNegative)  
-                         @Html.HiddenFor(model => model.bHidden)  
-                         @Html.HiddenFor(model => model.iTypeID)  
-                         @Html.HiddenFor(model => model.sTypeID)  
-                         @Html.HiddenFor(model => model.sURL1)  
-                         @Html.HiddenFor(model => model.sURL2)  
-                         @Html.HiddenFor(model => model.sURL3)  
-                         @Html.HiddenFor(model => model.sImageURL)  
-                         @Html.HiddenFor(model => model.sImageURL2)  
-                         @Html.HiddenFor(model => model.sImageURL3)  
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.bNegative)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.bHidden)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.iTypeID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sTypeID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sURL1)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sURL2)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sURL3)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sImageURL)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sImageURL2)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sImageURL3)
 
-                         @Html.HiddenFor(model => model.dtSecondRunAt)  
-                         @Html.HiddenFor(model => model.sHTML2)  
-                         @Html.HiddenFor(model => model.sText2)
-                        
-                        @Html.HiddenFor(model => model.sSubjectLine2)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.dtSecondRunAt)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sHTML2)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sText2)
 
-                                        <fieldset> 
-                                            <legend></legend>
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sSubjectLine2)
 
 
-                                            <div class="form-group">
-                                                <label for="sFieldName">Name :</label>
-                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
-                                                }
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="sSubjectLine1">Subject :</label>
-                                                @Html.TextBoxFor(model => model.sSubjectLine1, new { @Class = "form-control" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.sSubjectLine1, "*Required!")
-                                                }
-                                            </div>
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sLink_BlogEntryID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sLink_AnnouncementID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sLink_FrumAnnouncID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sLink_WebPgID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sLink_WebCalEvntID)
+
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sQuestID)
+                @Html.HiddenFor(model => model.WebSiteEMailCampaign.sQuestAnswerArray)
+                <fieldset>
+                    <legend></legend>
+
+
+                    <div class="form-group">
+                        <label for="WebSiteEMailCampaign_sFieldName">Name :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEMailCampaign.sName, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sName, "*Required!")
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="WebSiteEMailCampaign_sSubjectLine1">Subject :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEMailCampaign.sSubjectLine1, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sSubjectLine1, "*Required!")
+                        }
+                    </div>
 
 
 
 
 
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
-                                                    <ul class="nav nav-tabs" role="tablist">
-                                                        <li class="nav-item">
-                                                            <a id="tabHTMLContent" class="nav-link active" href="#pnlHTMLContent" role="tab" data-toggle="tab">HTML Message</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a id="tabTextContent" class="nav-link" href="#pnlTextContent" role="tab" data-toggle="tab">Text Message</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a id="tabProperties" class="nav-link" href="#pnlProperties" role="tab" data-toggle="tab">Properties</a>
-                                                        </li>
-                                                        <li class="nav-item">
-                                                            <a id="tabCodeHelp" class="nav-link" href="#pnlCodeHelp" role="tab" data-toggle="tab">Code Help</a>
-                                                        </li>
-                                                    </ul>
-                                                    <div class="tab-content">
-                                                        <div role="tabpanel" class="tab-pane fadein active" id="pnlHTMLContent">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a id="tabHTMLContent" class="nav-link active" href="#pnlHTMLContent" role="tab" data-toggle="tab">HTML Message</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="tabTextContent" class="nav-link" href="#pnlTextContent" role="tab" data-toggle="tab">Text Message</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="tabProperties" class="nav-link" href="#pnlProperties" role="tab" data-toggle="tab">Properties</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="tabLinkedRecords" class="nav-link" href="#pnlLinkedRecords" role="tab" data-toggle="tab">Linked To</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="tabCodeHelp" class="nav-link" href="#pnlCodeHelp" role="tab" data-toggle="tab">Code Help</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane fadein active" id="pnlHTMLContent">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
 
-                                                                <div class="form-group">
-                                                                    @Html.TextAreaFor(model => model.sHTML1, new { @Class = "form-control textarea_admin" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.sHTML1, "*Required!")
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlTextContent">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
-
-                                                                <div class="form-group">
-                                                                    @Html.TextAreaFor(model => model.sText1, new { @Class = "form-control textarea_admin" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.sText1, "*Required!")
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlProperties">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
-
-                                                                <div class="form-group">
-                                                                    <label for="sFromName">From Name :</label>
-                                                                    @Html.TextBoxFor(model => model.sFromName, new { @Class = "form-control" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.sFromName, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="sFromEmail">From E-Mail :</label>
-                                                                    @Html.TextBoxFor(model => model.sFromEmail, new { @Class = "form-control" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.sFromEmail, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="sFromPhone">From Phone :</label>
-                                                                    @Html.TextBoxFor(model => model.sFromPhone, new { @Class = "form-control" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.dtRunAt, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="dtRunAt">Run at (Date &amp; Time eg. 01/01/2000 12:00 AM) :</label>
-                                                                    @Html.TextBoxFor(model => model.dtRunAt, new { @Class = "form-control" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.dtRunAt, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="sDescription">Description :</label>
-                                                                    @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control textarea_admin" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.sDescription, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="bDisabled">Disable :</label>
-                                                                    @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control  checkbox-inline" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="bSuspended">Suspend :</label>
-                                                                    @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
-                                                                    @if (ViewBag.bError == true)
-                                                                    {
-                                                                        @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
-                                                                    }
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                        <div role="tabpanel" class="tab-pane fadein fade" id="pnlCodeHelp">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
-                                                                <p>Person's First Name: 
-                                                                    <span class="CodeMirror-lines"><##sFName##></##sFName##></span>
-                                                                </p>
-                                                                <p>
-                                                                    Person's Last Name:
-                                                                    <span class="CodeMirror-lines"><##sLName##></##sLName##></span>
-                                                                </p>
-                                                                <p>
-                                                                    Person's E-Mail:
-                                                                    <span class="CodeMirror-lines"><##sEMail##></##sEMail##></span>
-                                                                </p>
-                                                                <p>
-                                                                    Person's Cell Phone:
-                                                                    <span class="CodeMirror-lines"><##sCellPhone##></##sCellPhone##></span>
-                                                                </p>
-                                                                <p>
-                                                                    Person's Avitar URL:
-                                                                    <span class="CodeMirror-lines"><##sAvitarURL##></##sAvitarURL##></span>
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </fieldset>
                                         <div class="form-group">
-                                           @if (ViewBag.bAddNew == true)
-                                           {
-                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
-                                           }
-                                           else
-                                           {
-                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
-                                           }
+                                            @Html.TextAreaFor(model => model.WebSiteEMailCampaign.sHTML1, new { @Class = "form-control textarea_admin" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sHTML1, "*Required!")
+                                            }
                                         </div>
-                                   } 
-         </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane fadein fade" id="pnlTextContent">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                                        <div class="form-group">
+                                            @Html.TextAreaFor(model => model.WebSiteEMailCampaign.sText1, new { @Class = "form-control textarea_admin" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sText1, "*Required!")
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane fadein active" id="pnlLinkedRecords">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iQuestID">Linked Questionair :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iQuestID, Model.WebSiteQuestionair, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iQuestID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iQuestID, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iLink_BlogEntryID">Blog Entry :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iLink_BlogEntryID, Model.WebSiteBlogEntry, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iLink_BlogEntryID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iLink_BlogEntryID, "*Required!")
+                                            }
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iLink_AnnouncementID">Announcement :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iLink_AnnouncementID, Model.WebSiteAnnouncements, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iLink_AnnouncementID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iLink_AnnouncementID, "*Required!")
+                                            }
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iLink_FrumAnnouncID">Forum Announcement :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iLink_FrumAnnouncID, Model.WebSiteForumiAnnouncements, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iLink_FrumAnnouncID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iLink_FrumAnnouncID, "*Required!")
+                                            }
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iLink_WebPgID">Web Page :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iLink_WebPgID, Model.WebSitePage, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iLink_WebPgID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iLink_WebPgID, "*Required!")
+                                            }
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_iLink_WebCalEvntID">Calendar Event :</label>
+                                            @Html.DropDownListFor(model => model.WebSiteEMailCampaign.iLink_WebCalEvntID, Model.WebSiteEventCalendar, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEMailCampaign_iLink_WebCalEvntID_Changed();" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.iLink_WebCalEvntID, "*Required!")
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane fadein fade" id="pnlProperties">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_sFromName">From Name :</label>
+                                            @Html.TextBoxFor(model => model.WebSiteEMailCampaign.sFromName, new { @Class = "form-control" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sFromName, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_sFromEmail">From E-Mail :</label>
+                                            @Html.TextBoxFor(model => model.WebSiteEMailCampaign.sFromEmail, new { @Class = "form-control" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sFromEmail, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_sFromPhone">From Phone :</label>
+                                            @Html.TextBoxFor(model => model.WebSiteEMailCampaign.sFromPhone, new { @Class = "form-control" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.dtRunAt, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_dtRunAt">Run at (Date &amp; Time eg. 01/01/2000 12:00 AM) :</label>
+                                            @Html.TextBoxFor(model => model.WebSiteEMailCampaign.dtRunAt, new { @Class = "form-control" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.dtRunAt, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_sDescription">Description :</label>
+                                            @Html.TextAreaFor(model => model.WebSiteEMailCampaign.sDescription, new { @Class = "form-control textarea_admin" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.sDescription, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_bDisabled">Disable :</label>
+                                            @Html.CheckBoxFor(model => model.WebSiteEMailCampaign.bDisabled, new { @Class = "form-control  checkbox-inline" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.bDisabled, "*Required!")
+                                            }
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="WebSiteEMailCampaign_bSuspended">Suspend :</label>
+                                            @Html.CheckBoxFor(model => model.WebSiteEMailCampaign.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                            @if (ViewBag.bError == true)
+                                            {
+                                                @Html.ValidationMessageFor(model => model.WebSiteEMailCampaign.bSuspended, "*Required!")
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane fadein fade" id="pnlCodeHelp">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                                        <p>
+                                            Person's First Name:
+                                            <span class="CodeMirror-lines">&lt;##sFName##&gt;&lt;/##sFName##&gt;</span>
+                                        </p>
+                                        <p>
+                                            Person's Last Name:
+                                            <span class="CodeMirror-lines">&lt;##sLName##&gt;&lt;/##sLName##&gt;</span>
+                                        </p>
+                                        <p>
+                                            Person's E-Mail:
+                                            <span class="CodeMirror-lines">&lt;##sEMail##&gt;&lt;/##sEMail##&gt;</span>
+                                        </p>
+                                        <p>
+                                            Person's Cell Phone:
+                                            <span class="CodeMirror-lines">&lt;##sCellPhone##&gt;&lt;/##sCellPhone##&gt;</span>
+                                        </p>
+                                        <p>
+                                            Person's Avitar URL:
+                                            <span class="CodeMirror-lines">&lt;##sAvitarURL##&gt;&lt;/##sAvitarURL##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            <h3>Event Properties</h3>
+                                        </p>
+
+                                        <p>
+                                            Event name:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.sName##&gt;&lt;/##CalendarEvent.sName##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event registration fee:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.EventCost##&gt;&lt;/##CalendarEvent.EventCost##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Early bird discount:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.EarlyBirdDiscount##&gt;&lt;/##CalendarEvent.EarlyBirdDiscount##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Date:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.DateOfEvent##&gt;&lt;/##CalendarEvent.DateOfEvent##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Time:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.TimeOfEvent##&gt;&lt;/##CalendarEvent.TimeOfEvent##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Day of Week:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.DayOfWeekOfEvent##&gt;&lt;/##CalendarEvent.DayOfWeekOfEvent##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Short (list) description:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.ShortDescription##&gt;&lt;/##CalendarEvent.ShortDescription##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Full description:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.FullDescription##&gt;&lt;/##CalendarEvent.FullDescription##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Location:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.Location##&gt;&lt;/##CalendarEvent.Location##&gt;</span>
+                                        </p>
+
+                                        <p>
+                                            Event Phone:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.EventPhone##&gt;&lt;/##CalendarEvent.EventPhone##&gt;</span>
+                                        </p>
+
+
+                                        <p>
+                                            Event ID:
+                                            <span class="CodeMirror-lines">&lt;##CalendarEvent.ID##&gt;&lt;/##CalendarEvent.ID##&gt;</span>
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+                <div class="form-group">
+                    @if (ViewBag.bAddNew == true)
+                    {
+                        <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
 

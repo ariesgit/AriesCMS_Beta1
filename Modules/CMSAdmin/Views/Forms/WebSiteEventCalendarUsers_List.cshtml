@@ -2,6 +2,46 @@
 
 
 
+                      <script type="text/javascript">
+        function On_Print_Attendee_List(_Id) {
+            try {
+
+                var sBaseURL = window.location.protocol + "//" + window.location.host + "/";
+
+                          var _URL = sBaseURL + "admin/home/WebSiteEventCalendar_DownLoadAttendeeList";
+                var oMydata = { Id: _Id };
+
+                $.when(
+                    $.ajax({
+                        url: _URL,
+                        data: oMydata,
+                        cache: true,
+                        type: "POST",
+                        dataType: "json"
+                    })
+                )
+                    .then(
+                    function (data) {
+                        if (data.RESPONSE === 'true') {
+
+                            window.location.href = sBaseURL + data.DOWNLOADURL;
+
+                        }
+                        else {
+
+                            alert(data.MESSAGE);
+                        }
+                    }
+                    );
+            }
+            catch (e) {
+                alert("On_Start_SendFor_Campaign Error: " + e);
+            }
+        }
+
+
+                      </script>
+
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
@@ -9,8 +49,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            &nbsp;
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
+            &nbsp;<a href="javascript:On_Print_Attendee_List(@ViewBag.iParentID);">Down Load List</a>
         </div>
     </div>
     <div class="row">

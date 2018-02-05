@@ -1,54 +1,21 @@
-@model AriesCMSDefinition.DEF_WebSiteJobs.RecordObject
+@model ACMSDBView.WebSiteJobsViewModel
 
 
 <script type="text/javascript">
-    
 
-    function on_Select_Changed() {
+
+    function on_WebSiteJobs_iQuestID_Changed() {
         try {
-        var cboControl = document.getElementById("WebSiteJobs_FIELDID");
+            var cboControl = document.getElementById("WebSiteJobs_iQuestID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteJobs_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteJobs_sQuestID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
-        }
-        catch (e) {
-            alert(e);
-        }
-    }
-
-
-    function Buildcbo_SelectBasedOnParentID(_Id) {
-        try {
-
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebSiteJobs_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
-            
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebSiteJobs_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
 
         }
         catch (e) {
             alert(e);
-            $("#WebSiteJobs_FIELDID").html("error").show();
         }
     }
 
@@ -69,7 +36,7 @@
             }
             else
             {
-                 <h2>You are editing - @Model.sTitle  </h2>
+                 <h2>You are editing - @Model.WebSiteJobs.sTitle  </h2>
             }   
         </div>
     </div>
@@ -107,122 +74,133 @@
                 {                             
                 
                           @Html.ValidationSummary(true);
-                         @Html.HiddenFor(model => model.ID)  
-                         @Html.HiddenFor(model => model.iParentID)  
-                         @Html.HiddenFor(model => model.sParentID)  
-                         @Html.HiddenFor(model => model.sControl)  
-                         @Html.HiddenFor(model => model.sSyncControl)  
-                         @Html.HiddenFor(model => model.dtDateCreated)  
-                         @Html.HiddenFor(model => model.dtDateUpdated)  
-                         @Html.HiddenFor(model => model.iCreatedByID)  
-                         @Html.HiddenFor(model => model.sCreatedByID)  
-                         @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID) 
-                         @Html.HiddenFor(model => model.iFilledByID)  
-                         @Html.HiddenFor(model => model.sFilledByID)  
-                         @Html.HiddenFor(model => model.sFilledByThumbURL)  
-                         @Html.HiddenFor(model => model.sReview)  
-                         @Html.HiddenFor(model => model.sProgrammerReview)  
-                         @Html.HiddenFor(model => model.dPrice)  
-                         @Html.HiddenFor(model => model.dBudget)  
-                         @Html.HiddenFor(model => model.iEmployerID)  
-                         @Html.HiddenFor(model => model.sEmployerID)  
-                         @Html.HiddenFor(model => model.sEmployerThumbURL)  
-                         @Html.HiddenFor(model => model.dNumApplicants) 
-                         @Html.HiddenFor(model => model.iJobTypeID)  
-                         @Html.HiddenFor(model => model.sJobTypeID)
+                         @Html.HiddenFor(model => model.WebSiteJobs.ID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sSyncControl)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.dtDateUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sUpdatedByID) 
+                         @Html.HiddenFor(model => model.WebSiteJobs.iFilledByID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sFilledByID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sFilledByThumbURL)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sReview)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sProgrammerReview)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.dPrice)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.dBudget)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.iEmployerID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sEmployerID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sEmployerThumbURL)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.dNumApplicants) 
+                         @Html.HiddenFor(model => model.WebSiteJobs.iJobTypeID)  
+                         @Html.HiddenFor(model => model.WebSiteJobs.sJobTypeID)
 
 
+                    @Html.HiddenFor(model => model.WebSiteJobs.sQuestID)
+                    @Html.HiddenFor(model => model.WebSiteJobs.sQuestAnswerArray)
 
                                         <fieldset> 
                                             <legend></legend>
 
                                             <div class="form-group">
-                                                <label for="sTitle">Title :</label>
-                                                @Html.TextBoxFor(model => model.sTitle, new { @Class = "form-control" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sTitle)</span>
+                                                <label for="WebSiteJobs_sTitle">Title :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteJobs.sTitle, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sTitle)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="bOpen">Is Open :</label>
-                                                @Html.CheckBoxFor(model => model.bOpen, new { @Class = "form-control" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.bOpen)</span>
+                                                <label for="WebSiteJobs_bOpen">Is Open :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bOpen, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.bOpen)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="bJobFilled">Filled :</label>
-                                                @Html.CheckBoxFor(model => model.bJobFilled, new { @Class = "form-control checkbox-inline" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.bJobFilled)</span>
+                                                <label for="WebSiteJobs_bJobFilled">Filled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bJobFilled, new { @Class = "form-control checkbox-inline" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.bJobFilled)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="bJobFilled">Salary / Pay (range ok) :</label>
-                                                @Html.TextBoxFor(model => model.sSalary, new { @Class = "form-control" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSalary)</span>
+                                                <label for="WebSiteJobs_bJobFilled">Salary / Pay (range ok) :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteJobs.sSalary, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sSalary)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="sDeadLine">Deadline :</label>
-                                                @Html.TextBoxFor(model => model.sDeadLine, new { @Class = "form-control" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDeadLine)</span>
+                                                <label for="WebSiteJobs_sDeadLine">Deadline :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteJobs.sDeadLine, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sDeadLine)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="sJobLocation">Location :</label>
-                                                @Html.TextBoxFor(model => model.sJobLocation, new { @Class = "form-control" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sJobLocation)</span>
+                                                <label for="WebSiteJobs_sJobLocation">Location :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteJobs.sJobLocation, new { @Class = "form-control" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sJobLocation)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="sJobDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sJobDescription, new { @Class = "form-control textarea_admin" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sJobDescription)</span>
+                                                <label for="WebSiteJobs_sJobDescription">Description :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteJobs.sJobDescription, new { @Class = "form-control textarea_admin" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sJobDescription)</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="sSkillRequirements">Skills required (separate by ',') :</label>
-                                                @Html.TextAreaFor(model => model.sSkillRequirements, new { @Class = "form-control textarea_admin" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillRequirements)</span>
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="sSkillsNeeded">Skills good to have (separate by ',') :</label>
-                                                @Html.TextAreaFor(model => model.sSkillsNeeded, new { @Class = "form-control textarea_admin" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sSkillsNeeded)</span>
+                                                <label for="WebSiteJobs_sSkillRequirements">Skills required (separate by ',') :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteJobs.sSkillRequirements, new { @Class = "form-control textarea_admin" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sSkillRequirements)</span>
                                             </div>
 
 
                                             <div class="form-group">
-                                                <label for="bDisabled">Is disabled :</label>
-                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                <label for="WebSiteJobs_sSkillsNeeded">Skills good to have (separate by ',') :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteJobs.sSkillsNeeded, new { @Class = "form-control textarea_admin" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteJobs.sSkillsNeeded)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteJobs_iQuestID">Linked Questionair :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteJobs.iQuestID, Model.WebSiteQuestionair, new { @Class = "form-control", @onchange = "javascript:on_WebSiteJobs_iQuestID_Changed();" })
                                                 @if (ViewBag.bError == true)
                                                 {
-                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
+                                                    @Html.ValidationMessageFor(model => model.WebSiteJobs.iQuestID, "*Required!")
+                                                }
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteJobs_bDisabled">Is disabled :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bDisabled, new { @Class = "form-control checkbox-inline" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteJobs.bDisabled, "*Required!")
                                                 }
                                             </div>
                                             <div class="form-group">
-                                                <label for="bSuspended">Is suspended :</label>
-                                                @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
+                                                <label for="WebSiteJobs_bSuspended">Is suspended :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bSuspended, new { @Class = "form-control checkbox-inline" })
                                                 @if (ViewBag.bError == true)
                                                 {
-                                                    @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
+                                                    @Html.ValidationMessageFor(model => model.WebSiteJobs.bSuspended, "*Required!")
                                                 }
                                             </div>
                                             <div class="form-group">
-                                                <label for="bNegative">Is negative item :</label>
-                                                @Html.CheckBoxFor(model => model.bNegative, new { @Class = "form-control checkbox-inline" })
+                                                <label for="WebSiteJobs_bNegative">Is negative item :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bNegative, new { @Class = "form-control checkbox-inline" })
                                                 @if (ViewBag.bError == true)
                                                 {
-                                                    @Html.ValidationMessageFor(model => model.bNegative, "*Required!")
+                                                    @Html.ValidationMessageFor(model => model.WebSiteJobs.bNegative, "*Required!")
                                                 }
                                             </div>
                                             <div class="form-group">
-                                                <label for="bHidden">Should be hidden :</label>
-                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
+                                                <label for="WebSiteJobs_bHidden">Should be hidden :</label>
+                                                @Html.CheckBoxFor(model => model.WebSiteJobs.bHidden, new { @Class = "form-control checkbox-inline" })
                                                 @if (ViewBag.bError == true)
                                                 {
-                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
+                                                    @Html.ValidationMessageFor(model => model.WebSiteJobs.bHidden, "*Required!")
                                                 }
                                             </div>
 

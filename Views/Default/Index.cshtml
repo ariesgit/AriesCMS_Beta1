@@ -71,79 +71,68 @@
 </script>
 
 
-@if (Model != null)
-{
-    if (Model.PageBody != null)
+@{
+    if (Model != null)
     {
-        @*if (Model.CanEditPages)
-            {
-                <div id="dseditbutton" style="float:left; width:100%;z-index:999999999999999999999; position: fixed; width:34px;  display:none;">
-                    <a href="javascript:EnableEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /></a>
-                </div>
-            }*@
-
-
-        @*if (Model.AuthenticatedUser == true)
-            {
-                <script type="text/javascript">
-                    SetUserIsLoggedIn('@Model.UserPortalURL');
-                </script>
-                <div id="dsUploadFile" style="float:right; width:100%;z-index:999999999999999999999; position: fixed; width:120px; right:0px; display:none;">
-                    <a href="javascript:ShowRUpload();"><img src="~/Themes/Upload1.png" border="0" alt="Click to Upload" /></a>
-                </div>
-            }
-            else
-            {
-                <div id="dsloggin" style="float:right; width:100%;z-index:999999999999999999999; position: fixed; width:120px; right:0px; display:none;">
-                    <a href="javascript:ShowLogIn();"><img src="~/Themes/Security.png" border="0" alt="Click to log in" /></a> or <a href="javascript:ShowRegistration();"><img src="~/Themes/Register1.png" border="0" alt="Click to Sign Up" /></a>
-                </div>
-            }*@
-
-
-
-foreach (CMSPartialPageBuilder.PageItems oPage in Model.PageContent)
-{
-    if (oPage.IsPartialView == false)
-    {
-        if (!String.IsNullOrEmpty(oPage.Conent))
+        if (Model.PageBody != null)
         {
-            @Html.Raw(oPage.Conent);
-        }
-    }
-    else if (!String.IsNullOrEmpty(oPage.PartialPageURI))
-    {
-        string sView = oPage.PartialPageURI;
 
-        <div>
-            @{
-                if (Model.DataModelsPrimary != null)
-                {
-                    Html.RenderPartial(sView.ToString(), Model.DataModelsPrimary);
-                }
-                else
-                {
-                    Html.RenderPartial(sView.ToString(), oPage);
-                }
+            if (Model.CanEditPages && Model.AuthenticatedUser)
+            {
+                <div id="dseditbutton" class="row background_dark1" style="position:absolute; top:0px; left:0px; z-index:999999999999999999999999999999;">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-lg-left text-md-left text-sm-left text-xs-left">
+                        
+                        <a href="javascript:EnableEditor();"><i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
             }
-        </div>
-                        }
-                    }
+            
 
-                }
-                else if (ViewBag.PartialPage != null)
+
+            foreach (CMSPartialPageBuilder.PageItems oPage in Model.PageContent)
+            {
+                if (oPage.IsPartialView == false)
                 {
-                    if (!String.IsNullOrEmpty(ViewBag.PartialPage))
+                    if (!String.IsNullOrEmpty(oPage.Conent))
                     {
-                        string sView = ViewBag.PartialPage;
+                        @Html.Raw(oPage.Conent);
+                    }
+                }
+                else if (!String.IsNullOrEmpty(oPage.PartialPageURI))
+                {
+                    string sView = oPage.PartialPageURI;
 
-                        <div>
-                            @{ Html.RenderPartial(sView.ToString()); }
-                        </div>
-                                        }
-                                    }
-                                }
+                    <div>
+                        @{
+                            if (Model.DataModelsPrimary != null)
+                            {
+                                Html.RenderPartial(sView.ToString(), Model.DataModelsPrimary);
+                            }
+                            else
+                            {
+                                Html.RenderPartial(sView.ToString(), oPage);
+                            }
+                        }
+                    </div>
+                 }
+              }
 
+         }
+         else if (ViewBag.PartialPage != null)
+         {
+            if (!String.IsNullOrEmpty(ViewBag.PartialPage))
+            {
+                 string sView = ViewBag.PartialPage;
 
+                 <div>
+                   @{ Html.RenderPartial(sView.ToString()); }
+                 </div>
+            }
+          }
+     }
+
+}
 
 
 
@@ -203,6 +192,6 @@ foreach (CMSPartialPageBuilder.PageItems oPage in Model.PageContent)
     }
     catch (e) {
     }
-</script>
+                </script>
 
 

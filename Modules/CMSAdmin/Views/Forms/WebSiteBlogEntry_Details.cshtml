@@ -1,9 +1,25 @@
-@model AriesCMSDefinition.DEF_WebSiteBlogEntry.RecordObject
+@model ACMSDBView.WebSiteBlogEntryViewModel
 
 
 
-
+ 
 <script>
+
+
+    function on_WebSiteBlogEntry_iQuestID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteBlogEntry_iQuestID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteBlogEntry_sQuestID");
+            oHiddenField.value = selectedText;
+
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
 
     function ViewFileManager() {
         try {
@@ -67,7 +83,7 @@
             }
             else
             {
-                <h2>You are editing - @Model.sSubject</h2>
+                <h2>You are editing - @Model.WebSiteBlogEntry.sSubject</h2>
             }
         </div>
     </div>
@@ -105,118 +121,134 @@
             {
                 @Html.ValidationSummary(true);
 
-                @Html.HiddenFor(model => model.ID)
-                @Html.HiddenFor(model => model.iParentID)
-                @Html.HiddenFor(model => model.sParentID)
-                @Html.HiddenFor(model => model.sControl)
-                @Html.HiddenFor(model => model.dtDateCreated)
-                @Html.HiddenFor(model => model.dtLastUpdated)
-                @Html.HiddenFor(model => model.iCreatedByID)
-                @Html.HiddenFor(model => model.sCreatedByID)
-                @Html.HiddenFor(model => model.iUpdatedByID)
-                @Html.HiddenFor(model => model.sUpdatedByID)
-                @Html.HiddenFor(model => model.sImageURL)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.ID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.iParentID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sParentID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sControl)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sImageURL)
 
+
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sQuestID)
+                @Html.HiddenFor(model => model.WebSiteBlogEntry.sQuestAnswerArray)
                 <fieldset>
                     <legend></legend>
                     
                     <div class="form-group">
-                        <label for="sTitle">Title :</label>
-                        @Html.TextBoxFor(model => model.sTitle, new { @Class = "form-control" })
+                        <label for="WebSiteBlogEntry_sTitle">Title :</label>
+                        @Html.TextBoxFor(model => model.WebSiteBlogEntry.sTitle, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.sTitle, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.sTitle, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="sImageURL">Live on (optional)  :</label>
-                        @Html.TextBoxFor(model => model.dtStart, new { @Class = "form-control" })
+                        <label for="WebSiteBlogEntry_dtStart">Live on (optional)  :</label>
+                        @Html.TextBoxFor(model => model.WebSiteBlogEntry.dtStart, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.dtStart, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.dtStart, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="sImageURL">Hidden as of (optional) :</label>
-                        @Html.TextBoxFor(model => model.dtEnd, new { @Class = "form-control" })
+                        <label for="WebSiteBlogEntry_dtEnd">Hidden as of (optional) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteBlogEntry.dtEnd, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.dtEnd, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.dtEnd, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="sSubject">Subject :</label>
-                        @Html.TextBoxFor(model => model.sSubject, new { @Class = "form-control" })
+                        <label for="WebSiteBlogEntry_sSubject">Subject :</label>
+                        @Html.TextBoxFor(model => model.WebSiteBlogEntry.sSubject, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.sSubject, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.sSubject, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="sImageURL">Image URL  :</label>
+                        <label for="WebSiteBlogEntry_sImageURL">Image URL  :</label>
                     </div>
                     <div class="form-group">
-                        <img src="~/@Model.User.sImageURL" alt="" class="img-fluid" />
+                        <img src="~/@Model.WebSiteBlogEntry.sImageURL" alt="" class="img-fluid" />
                     </div>
                     <div class="form-group">
                         <input type="file" name="UploadFiles1" id="UploadFiles1" class="form-control" />
                     </div>
 
                     <div class="form-group">
-                        <label for="sKeyWords">Key words :</label>
-                        @Html.TextAreaFor(model => model.sKeyWords, new { @Class = "form-control" })
+                        <label for="WebSiteBlogEntry_sKeyWords">Key words :</label>
+                        @Html.TextAreaFor(model => model.WebSiteBlogEntry.sKeyWords, new { @Class = "form-control" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.sKeyWords, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.sKeyWords, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="sContent"> Content :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
-                        @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control textarea_admin" })
+                        <label for="WebSiteBlogEntry_sContent"> Content :</label><a href="javascript:SwitchToEditor();"><img src="~/Themes/SymbolEdit.png" border="0" /> Switch to WYSIWYG</a>
+                        @Html.TextAreaFor(model => model.WebSiteBlogEntry.sContent, new { @Class = "form-control textarea_admin" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.sContent, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.sContent, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="bOpenToComments">Open to comments :</label>
-                        @Html.CheckBoxFor(model => model.bOpenToComments, new { @Class = "form-control checkbox-inline" })
+                        <label for="WebSiteBlogEntry_bOpenToComments">Open to comments :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteBlogEntry.bOpenToComments, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.bOpenToComments, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.bOpenToComments, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="bMustBeLoggedInToComment">Log in required to comment :</label>
-                        @Html.CheckBoxFor(model => model.bMustBeLoggedInToComment, new { @Class = "form-control checkbox-inline" })
+                        <label for="WebSiteBlogEntry_bMustBeLoggedInToComment">Log in required to comment :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteBlogEntry.bMustBeLoggedInToComment, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.bMustBeLoggedInToComment, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.bMustBeLoggedInToComment, "*Required!")
+                        }
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="WebSiteBlogEntry_iQuestID">Linked Questionair :</label>
+                        @Html.DropDownListFor(model => model.WebSiteBlogEntry.iQuestID, Model.WebSiteQuestionair, new { @Class = "form-control", @onchange = "javascript:on_WebSiteBlogEntry_iQuestID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.iQuestID, "*Required!")
+                        }
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="WebSiteBlogEntry_bIsLive">Is live :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteBlogEntry.bIsLive, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.bIsLive, "*Required!")
                         }
                     </div>
 
                     <div class="form-group">
-                        <label for="bIsLive">Is live :</label>
-                        @Html.CheckBoxFor(model => model.bIsLive, new { @Class = "form-control checkbox-inline" })
+                        <label for="WebSiteBlogEntry_bArchived">Archive :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteBlogEntry.bArchived, new { @Class = "form-control checkbox-inline" })
                         @if (ViewBag.bError == true)
                         {
-                            @Html.ValidationMessageFor(model => model.bIsLive, "*Required!")
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="bArchived">Archive :</label>
-                        @Html.CheckBoxFor(model => model.bArchived, new { @Class = "form-control checkbox-inline" })
-                        @if (ViewBag.bError == true)
-                        {
-                            @Html.ValidationMessageFor(model => model.bArchived, "*Required!")
+                            @Html.ValidationMessageFor(model => model.WebSiteBlogEntry.bArchived, "*Required!")
                         }
                     </div>
 

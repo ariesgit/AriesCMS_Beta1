@@ -569,12 +569,25 @@ function ViewFileManager() {
     }
 }
 
-function ShowAddNewPageDialog() {
+function ShowAddNewPageDialog()
+{
     try {
         GetTemplates();
         Get_Languages();
         //$("#acmAddNewPGDialog").dialog("open");
         $("#acmAddNewPGDialog").modal('show');
+
+
+    }
+    catch (e) {
+        alert(e);
+    }
+}
+
+function CloseAddNewPageDialog() {
+    try {
+
+        $("#acmAddNewPGDialog").modal('hide');
 
 
     }
@@ -764,7 +777,17 @@ function EnableEditor() {
 
 function ShowLogIn() {
     try {
-        $("#acmUserLogIn").dialog("open");
+        $("#acmUserLogIn").dialog("show");
+
+    }
+    catch (e) {
+
+    }
+}
+
+function CloseLogIn() {
+    try {
+        $("#acmUserLogIn").dialog("hide");
 
     }
     catch (e) {
@@ -773,10 +796,19 @@ function ShowLogIn() {
 }
 
 
-
 function ShowRegistration() {
     try {
-        $("#acmUserRegistration").dialog("open");
+        $("#acmUserRegistration").dialog("show");
+
+    }
+    catch (e) {
+        alert(e);
+    }
+}
+
+function CloseRegistration() {
+    try {
+        $("#acmUserRegistration").dialog("hide");
 
     }
     catch (e) {

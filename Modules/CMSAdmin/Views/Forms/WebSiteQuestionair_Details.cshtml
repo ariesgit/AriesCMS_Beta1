@@ -1,0 +1,266 @@
+@model ACMSDBView.WebSiteQuestionairViewModel
+
+
+<script type="text/javascript">
+
+
+
+
+    function on_WebSiteQuestionair_iDefaultTemplateID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteQuestionair_iDefaultTemplateID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteQuestionair_sDefaultTemplateID");
+            oHiddenField.value = selectedText;
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteQuestionair_iTempZoneID").html(procemessage).show();
+
+            Get_WebSiteQuestionair_SiteTemplatePage(cboControl[cboControl.selectedIndex].value);
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function on_WebSiteQuestionair_iTempZoneID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteQuestionair_iTempZoneID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteQuestionair_sTempZoneID");
+            oHiddenField.value = selectedText;
+
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+
+    function Get_WebSiteQuestionair_SiteTemplatePage(_Id) {
+        try {
+
+            var procemessage = "<option value='0'> Please wait...</option>";
+            $("#WebSiteQuestionair_iTempZoneID").html(procemessage).show();
+            var url = "@Url.Content("/admin/home/GetTemplatePage/")";
+
+            $.ajax({
+                url: url,
+                data: { _ParentID: _Id },
+                cache: false,
+                type: "POST",
+                success: function (data)
+                {
+                    var markup = "<option value='0'> </option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#WebSiteQuestionair_iTempZoneID").html(markup).show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+            });
+
+        }
+        catch (e) {
+            alert(e);
+            $("#WebSiteQuestionair_iTempZoneID").html("error").show();
+        }
+    }
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                 <h2>You are ready to create a new Questionair</h2>
+            }
+            else
+            {
+                 <h2>You are editing - 
+                   @Model.WebSiteQuestionair.sName
+                 </h2>
+            }   
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+       @if (ViewBag.bError == true)
+       {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+       }
+       else if (ViewBag.bSaved == true)
+       {               
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+       }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                         <<  @Html.ActionLink("Return List View", "WebSiteQuestionair_List" )
+ 
+       
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+@using (Html.BeginForm("WebSiteQuestionair_AddUpdate", "", FormMethod.Post))
+                                   {                             
+                                        @Html.ValidationSummary(true);
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.ID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sAccesskey)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.bSubScriptionBased)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iRequiredRoleID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sRequiredRoleID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultTemplateID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iDefaultBlogID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultBlogID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultMetaTags)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultClassification)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultDescription)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sDefaultKeyWords)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sSupportEmail)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sWebMasterEmail)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.dUniqueVisitors)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.dVisits)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.dPageViews)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.bRestrictAccess)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iNewRegMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sNewRegMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iNewsLetrRegMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sNewsLetrRegMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iContactConfMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sContactConfMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iLostPswdMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sLostPswdMessageID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.iSupportEmailRequestID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sSupportEmailRequestID)  
+                         @Html.HiddenFor(model => model.WebSiteQuestionair.sTempZoneID)  
+      
+      
+                                        <fieldset> 
+                                            <legend></legend>
+                                            
+                                            
+                                            <div class="form-group">
+                                                <label for="WebSiteQuestionair_sName">Name :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteQuestionair.sName, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteQuestionair.sName, "*Required!")
+                                                }
+                                            </div>
+
+
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteQuestionair_iSiteTemplateID">Theme :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteQuestionair.iDefaultTemplateID, Model.WebSitePageTemplates, new { @Class = "form-control", @onchange = "javascript:on_WebSiteQuestionair_iDefaultTemplateID_Changed();" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteQuestionair.iDefaultTemplateID, "*Required!")
+                                                }
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="WebSiteQuestionair_iTempZoneID">Theme Page :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteQuestionair.iTempZoneID, Model.WebSitePageTemplatesPage, new { @Class = "form-control", @onchange = "javascript:on_WebSiteQuestionair_iTempZoneID_Changed();" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteQuestionair.iTempZoneID, "*Required!")
+                                                }
+                                            </div>
+
+
+
+
+
+
+                                            
+
+
+
+                                            
+
+
+
+
+                                        </fieldset>
+                                        <div class="form-group">
+                                           @if (ViewBag.bAddNew == true)
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                           else
+                                           {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                           }
+                                        </div>
+                                   } 
+         </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

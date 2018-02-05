@@ -40,6 +40,9 @@ using AriesCMSInteractions;
 using AriesCMSDefinition;
 using ACMSDBView;
 
+using PayPal.PayPalAPIInterfaceService;
+using PayPal.PayPalAPIInterfaceService.Model;
+
 
 namespace AriesCMS.Helpers
 {
@@ -1309,9 +1312,6 @@ namespace AriesCMS.Helpers
         bool bResponse = false;
         public string sProcessError = "";
 
-        public string _sClientID = "info_api1.westonbar.org";
-        public string _sClientSecret = "AFcWxV21C7fd0v3bYYYRCpSSRl31AnXZyOImS8YfwKW.X5qxvHfDj1Yf";
-
         public string BaseURL { get; set; }
         public AriesCMS.Helpers.SiteCookieHelper UserCookie;
         public DataConnectionFactory ConnectionFactory = new DataConnectionFactory();
@@ -2030,6 +2030,104 @@ namespace AriesCMS.Helpers
                                     {
                                         if (lstWebSiteEMailCampaignLists.Count > 0)
                                         {
+                                            //Linked Calendar Event
+                                            DEF_WebSiteEventCalendar.RecordObject rec_WebSiteEventCalendar = null;
+                                            #region WebSiteEventCalendar
+                                            if (lstWebSiteEMailCampaign[0].iLink_WebCalEvntID > 0)
+                                            {
+                                                DINT_WebSiteEventCalendar dbWebSiteEventCalendar = new DINT_WebSiteEventCalendar(cnCon);
+
+                                                lstParameters = new List<DataParameter>();
+                                                pParameter = null;
+                                                pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_WebCalEvntID + "'", "int", 11, "ID", " = ", "");
+                                                lstParameters.Add(pParameter);
+
+                                                List<DEF_WebSiteEventCalendar.RecordObject> lstWebSiteEventCalendar = dbWebSiteEventCalendar.Get(lstParameters);
+                                                if(lstWebSiteEventCalendar != null)
+                                                {
+                                                    rec_WebSiteEventCalendar = lstWebSiteEventCalendar[0];
+                                                }
+                                            }
+                                            #endregion
+                                            
+                                            DEF_WebSiteBlogEntry.RecordObject rec_WebSiteBlogEntry = null;
+                                            #region WebSiteBlogEntry
+                                            if (lstWebSiteEMailCampaign[0].iLink_BlogEntryID > 0)
+                                            {
+                                                DINT_WebSiteBlogEntry dbWebSiteBlogEntry = new DINT_WebSiteBlogEntry(cnCon);
+
+                                                lstParameters = new List<DataParameter>();
+                                                pParameter = null;
+                                                pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_BlogEntryID + "'", "int", 11, "ID", " = ", "");
+                                                lstParameters.Add(pParameter);
+
+                                                List<DEF_WebSiteBlogEntry.RecordObject> lstWebSiteBlogEntry = dbWebSiteBlogEntry.Get(lstParameters);
+                                                if (rec_WebSiteBlogEntry != null)
+                                                {
+                                                    rec_WebSiteBlogEntry = lstWebSiteBlogEntry[0];
+                                                }
+                                            }
+                                            #endregion
+                                            
+                                            DEF_WebSiteAnnouncements.RecordObject rec_WebSiteAnnouncements = null;
+                                            #region WebSiteAnnouncements
+                                            if (lstWebSiteEMailCampaign[0].iLink_AnnouncementID > 0)
+                                            {
+                                                DINT_WebSiteAnnouncements dbWebSiteAnnouncements = new DINT_WebSiteAnnouncements(cnCon);
+
+                                                lstParameters = new List<DataParameter>();
+                                                pParameter = null;
+                                                pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_AnnouncementID + "'", "int", 11, "ID", " = ", "");
+                                                lstParameters.Add(pParameter);
+
+                                                List<DEF_WebSiteAnnouncements.RecordObject> lstWebSiteAnnouncements = dbWebSiteAnnouncements.Get(lstParameters);
+                                                if (rec_WebSiteAnnouncements != null)
+                                                {
+                                                    rec_WebSiteAnnouncements = lstWebSiteAnnouncements[0];
+                                                }
+                                            }
+                                                #endregion
+                                            
+                                            DEF_WebSiteForumiAnnouncements.RecordObject rec_WebSiteForumiAnnouncements = null;
+                                            #region WebSiteForumiAnnouncements
+                                            if (lstWebSiteEMailCampaign[0].iLink_FrumAnnouncID > 0)
+                                            {
+                                                DINT_WebSiteForumiAnnouncements dbWebSiteForumiAnnouncements = new DINT_WebSiteForumiAnnouncements(cnCon);
+
+                                                lstParameters = new List<DataParameter>();
+                                                pParameter = null;
+                                                pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_FrumAnnouncID + "'", "int", 11, "ID", " = ", "");
+                                                lstParameters.Add(pParameter);
+
+                                                List<DEF_WebSiteForumiAnnouncements.RecordObject> lstWebSiteForumiAnnouncements = dbWebSiteForumiAnnouncements.Get(lstParameters);
+                                                if (rec_WebSiteForumiAnnouncements != null)
+                                                {
+                                                    rec_WebSiteForumiAnnouncements = lstWebSiteForumiAnnouncements[0];
+                                                }
+                                            }
+                                            #endregion 
+                                            
+                                            DEF_WebSitePage.RecordObject rec_WebSitePage = null;
+                                            #region WebSitePage
+                                            if (lstWebSiteEMailCampaign[0].iLink_WebPgID > 0)
+                                            {
+                                                DINT_WebSitePage dbWebSitePage = new DINT_WebSitePage(cnCon);
+
+                                                lstParameters = new List<DataParameter>();
+                                                pParameter = null;
+                                                pParameter = new DataParameter("ID", "'" + lstWebSiteEMailCampaign[0].iLink_WebPgID + "'", "int", 11, "ID", " = ", "");
+                                                lstParameters.Add(pParameter);
+
+                                                List<DEF_WebSitePage.RecordObject> lstWebSitePage = dbWebSitePage.Get(lstParameters);
+                                                if (lstWebSitePage != null)
+                                                {
+                                                    rec_WebSitePage = lstWebSitePage[0];
+                                                }
+                                            }
+                                            #endregion 
+
+                                            
+
                                             foreach (DEF_WebSiteEMailCampaignLists.RecordObject oCampList in lstWebSiteEMailCampaignLists)
                                             {
                                                 if (oCampList.iListID > 0)
@@ -2072,8 +2170,8 @@ namespace AriesCMS.Helpers
                                                                                 {
                                                                                     if (oRecipient.bHidden == false)
                                                                                     {
-                                                                                        string sMessage = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
-                                                                                        string sSubject = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL);
+                                                                                        string sMessage = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sHTML1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL, rec_WebSiteEventCalendar, rec_WebSiteBlogEntry, rec_WebSiteAnnouncements, rec_WebSiteForumiAnnouncements, rec_WebSitePage);
+                                                                                        string sSubject = Parse_Marketing_Message(lstWebSiteEMailCampaign[0].sSubjectLine1, oRecipient.sFName, oRecipient.sLName, oRecipient.sEMail, oRecipient.sCellPhone, oRecipient.sAvitarURL, rec_WebSiteEventCalendar, rec_WebSiteBlogEntry, rec_WebSiteAnnouncements, rec_WebSiteForumiAnnouncements, rec_WebSitePage);
 
                                                                                         SendMessage(lstWebSiteEMailCampaign[0].sFromEmail, lstWebSiteEMailCampaign[0].sFromName, oRecipient.sEMail, oRecipient.sFName + " " + oRecipient.sLName, sSubject, sMessage);
                                                                                     }
@@ -2146,19 +2244,58 @@ namespace AriesCMS.Helpers
             {
             }
         }
-        public string Parse_Marketing_Message(string _RawMessage, string _sFName, string _sLName, string _sEMail, string _sCellPhone, string _sAvitarURL)
+        public string Parse_Marketing_Message(string _RawMessage, string _sFName, string _sLName, string _sEMail, string _sCellPhone, string _sAvitarURL,
+            DEF_WebSiteEventCalendar.RecordObject _rec_Event = null, DEF_WebSiteBlogEntry.RecordObject rec_WebSiteBlogEntry = null, 
+            DEF_WebSiteAnnouncements.RecordObject rec_WebSiteAnnouncements = null,
+            DEF_WebSiteForumiAnnouncements.RecordObject rec_WebSiteForumiAnnouncements = null, DEF_WebSitePage.RecordObject rec_WebSitePage = null)
         {
             try
             {
                 string sReturn = "";
                 sReturn = _RawMessage;
 
-                sReturn = sReturn.Replace("##sFName##", _sFName);
-                sReturn = sReturn.Replace("##sLName##", _sLName);
-                sReturn = sReturn.Replace("##sEMail##", _sEMail);
-                sReturn = sReturn.Replace("##sCellPhone##", _sCellPhone);
-                sReturn = sReturn.Replace("##sAvitarURL##", _sAvitarURL);
-                
+
+                sReturn = sReturn.Replace("<##sFName##></##sFName##>", _sFName);
+
+                sReturn = sReturn.Replace("<##sLName##></##sLName##>", _sLName);
+
+                sReturn = sReturn.Replace("<##sEMail##></##sEMail##>", _sEMail);
+
+                sReturn = sReturn.Replace("<##sCellPhone##></##sCellPhone##>", _sCellPhone);
+
+                sReturn = sReturn.Replace("<##sAvitarURL##></##sAvitarURL##>", _sAvitarURL);
+
+                if (_rec_Event != null)
+                {
+                    try
+                    {
+                        sReturn = sReturn.Replace("<##CalendarEvent.sName##></##CalendarEvent.sName##>", _rec_Event.sName);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.EventCost##></##CalendarEvent.EventCost##>", _rec_Event.dEventCost.ToString("#.00"));
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.EarlyBirdDiscount##></##CalendarEvent.EarlyBirdDiscount##>", _rec_Event.dEarlyBirdDiscount.ToString("#"));
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.DateOfEvent##></##CalendarEvent.DateOfEvent##>", _rec_Event.dtDateOfEvent.ToShortDateString());
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.TimeOfEvent##></##CalendarEvent.TimeOfEvent##>", _rec_Event.sTimeOfEvent);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.DayOfWeekOfEvent##></##CalendarEvent.DayOfWeekOfEvent##>", _rec_Event.dtDateOfEvent.DayOfWeek.ToString());
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.ShortDescription##></##CalendarEvent.ShortDescription##>", _rec_Event.sShortDescription);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.FullDescription##></##CalendarEvent.FullDescription##>", _rec_Event.sFullDescription);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.Location##></##CalendarEvent.Location##>", _rec_Event.sLocation);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.EventPhone##></##CalendarEvent.EventPhone##>", _rec_Event.sEventPhone);
+
+                        sReturn = sReturn.Replace("<##CalendarEvent.ID##></##CalendarEvent.ID##>", _rec_Event.ID.ToString());
+                    }
+                    catch { }
+                }
+
+
+
                 return sReturn;
             }
             catch
@@ -11651,11 +11788,14 @@ namespace AriesCMS.Helpers
         {
             public string ClientId;
             public string ClientSecret;
+            public string ClientPassword;
             public string AccessToken;
-            public PayPalProcess(string _ClientId, string _ClientSecret)
+            public string ProcessError;
+            public PayPalProcess(string _ClientId, string _ClientSecret, string _ClientPassword = "")
             {
                 ClientId = _ClientId;
                 ClientSecret = _ClientSecret;
+                ClientPassword = _ClientPassword;
             }
 
             private bool IsTestCard(AriesCMS.Models.ChargeRecord oCharge)
@@ -11826,6 +11966,182 @@ namespace AriesCMS.Helpers
                 }
                 return bResponse;
             }
+
+            public bool Authorize2(ref AriesCMS.Models.ChargeRecord oCharge)
+            {
+                bool bResponse = false;
+                if (!IsTestCard(oCharge))
+                {
+                    #region
+                    try
+                    {
+                        // Create request object
+                        DoDirectPaymentRequestType request = new DoDirectPaymentRequestType();
+                        DoDirectPaymentRequestDetailsType requestDetails = new DoDirectPaymentRequestDetailsType();
+                        request.DoDirectPaymentRequestDetails = requestDetails;
+
+                        // (Optional) How you want to obtain payment. It is one of the following values:
+                        // * Authorization – This payment is a basic authorization subject to settlement with PayPal Authorization and Capture.
+                        // * Sale – This is a final sale for which you are requesting payment (default).
+                        // Note: Order is not allowed for Direct Payment.
+
+                        //’https://www.paypal.com/wsdl/PayPalSvc.wsdl’,
+                        //array( ’location’ => ’https://api-3t.paypal.com/2.0/’,
+                        //          'soap_version' => SOAP_1_1)
+                        requestDetails.PaymentAction = PaymentActionCodeType.SALE;
+
+
+                        CreditCardDetailsType creditCard = new CreditCardDetailsType();
+                        requestDetails.CreditCard = creditCard;
+                        PayerInfoType payer = new PayerInfoType();
+                        // (Optional) First and last name of buyer.
+                        PersonNameType name = new PersonNameType();
+                        name.FirstName = oCharge.FirstName;
+                        name.LastName = oCharge.LastName;
+                        payer.PayerName = name;
+                        // (Required) Details about the owner of the credit card.
+                        creditCard.CardOwner = payer;
+
+                        // (Required) Credit card number.
+                        creditCard.CreditCardNumber = oCharge.CardNumber;
+                        // (Optional) Type of credit card. For UK, only Maestro, MasterCard, Discover, and Visa are allowable. For Canada, only MasterCard and Visa are allowable and Interac debit cards are not supported. It is one of the following values:
+                        #region We don't set card type
+                        //// * Visa
+                        //// * MasterCard
+                        //// * Discover
+                        //// * Amex
+                        //// * Maestro: See note.
+                        //// Note: If the credit card type is Maestro, you must set currencyId to GBP. In addition, you must specify either StartMonth and StartYear or IssueNumber.
+                        //creditCard.CreditCardType = (CreditCardTypeType)
+                        //    Enum.Parse(typeof(CreditCardTypeType), creditCardType.SelectedValue);
+                        #endregion
+                        // Card Verification Value, version 2. Your Merchant Account settings determine whether this field is required. To comply with credit card processing regulations, you must not store this value after a transaction has been completed.
+                        // Character length and limitations: For Visa, MasterCard, and Discover, the value is exactly 3 digits. For American Express, the value is exactly 4 digits.
+                        creditCard.CVV2 = oCharge.CVV;
+
+                        // (Required) Information about the credit card to be charged.
+                        // (Required) Credit card expiration month.
+                        creditCard.ExpMonth = Convert.ToInt32(oCharge.Month);
+                        // (Required) Credit card expiration year.
+                        creditCard.ExpYear = Convert.ToInt32(oCharge.Year);
+
+                        requestDetails.PaymentDetails = new PaymentDetailsType();
+                        #region This is for off site/page and redirect back to payment results notification
+                        //// (Optional) Your URL for receiving Instant Payment Notification (IPN) about this transaction. If you do not specify this value in the request, the notification URL from your Merchant Profile is used, if one exists.
+                        //// Important: The notify URL applies only to DoExpressCheckoutPayment. This value is ignored when set in SetExpressCheckout or GetExpressCheckoutDetails.
+                        //requestDetails.PaymentDetails.NotifyURL = ipnNotificationUrl.Value.Trim();
+                        #endregion
+
+                        // (Optional) Buyer's shipping address information. 
+                        AddressType billingAddr = new AddressType();
+                        billingAddr.Name = oCharge.FirstName + " " + oCharge.LastName;
+                        //// (Required) First street address.
+                        billingAddr.Street1 = oCharge.Address;
+                        //// (Optional) Second street address.
+                        //billingAddr.Street2 = street2.Value;
+                        //// (Required) Name of city.
+                        billingAddr.CityName = oCharge.City;
+                        //// (Required) State or province.
+                        billingAddr.StateOrProvince = oCharge.State;
+                        // (Required) Country code.
+                        billingAddr.Country = CountryCodeType.US;
+                        // (Required) U.S. ZIP code or other country-specific postal code.
+                        billingAddr.PostalCode = oCharge.PostalCode;
+
+                        // (Optional) Phone number.
+                        billingAddr.Phone = oCharge.PhoneNumber;
+
+                        payer.Address = billingAddr;
+
+                        // (Required) The total cost of the transaction to the buyer. If shipping cost and tax charges are known, include them in this value. If not, this value should be the current subtotal of the order. If the transaction includes one or more one-time purchases, this field must be equal to the sum of the purchases. This field must be set to a value greater than 0.
+                        // Note: You must set the currencyID attribute to one of the 3-character currency codes for any of the supported PayPal currencies.
+                        CurrencyCodeType currency = CurrencyCodeType.USD;
+                        BasicAmountType paymentAmount = new BasicAmountType(currency, oCharge.ChargeAmount);
+                        requestDetails.PaymentDetails.OrderTotal = paymentAmount;
+
+                        // Invoke the API
+                        DoDirectPaymentReq wrapper = new DoDirectPaymentReq();
+
+                        wrapper.DoDirectPaymentRequest = request;
+
+                        // Configuration map containing signature credentials and other required configuration.
+                        // For a full list of configuration parameters refer in wiki page 
+                        // [https://github.com/paypal/sdk-core-dotnet/wiki/SDK-Configuration-Parameters]
+                        Dictionary<string, string> oConfig = new Dictionary<string, string>();
+
+                        // Signature Credential
+                        // Endpoints are varied depending on whether sandbox OR live is chosen for mode
+
+                        //oConfig.Add("mode", "sandbox");
+                        oConfig.Add("mode", "live");
+
+
+                        oConfig.Add("connectionTimeout", "30000");
+                        oConfig.Add("requestRetries", "1");
+                        oConfig.Add("IPAddress", "127.0.0.1");
+                        oConfig.Add("account1.apiUsername", ClientId);
+                        oConfig.Add("account1.apiPassword", ClientPassword);
+                        oConfig.Add("account1.apiSignature", ClientSecret);
+                        //oConfig.Add("account1.applicationId", "app id here");
+                        //oConfig.Add("account1.signatureSubject", "");
+                        //oConfig.Add("account1.certificateSubject", "");
+
+
+
+                        // Create the PayPalAPIInterfaceServiceService service object to make the API call
+                        PayPalAPIInterfaceServiceService service = new PayPalAPIInterfaceServiceService(oConfig);
+
+
+                        // # API call 
+                        // Invoke the DoDirectPayment method in service wrapper object  
+                        DoDirectPaymentResponseType response = service.DoDirectPayment(wrapper);
+
+
+                        ProcessError += "Response_requestPayload: " + service.getLastRequest() + "\n\r";
+                        ProcessError += "Response_responsePayload: " + service.getLastResponse() + "\n\r";
+                        ProcessError += "Correlation Id: " + response.CorrelationID + "\n\r";
+                        ProcessError += "API Result: " + response.Ack.ToString() + "\n\r";
+
+
+                        if (response.Ack.Equals(AckCodeType.FAILURE) ||
+                            (response.Errors != null && response.Errors.Count > 0))
+                        {
+                            ProcessError += "Response_error: " + response.Errors + "\n\r";
+                            bResponse = false;
+                        }
+                        else
+                        {
+                            ProcessError += "Transaction Id: " + response.TransactionID + "\n\r";
+                            ProcessError += "Payment status: " + response.PaymentStatus.ToString() + "\n\r";
+                            oCharge.PaymentID = response.TransactionID;
+                            oCharge.ChargeResponse = response.PaymentStatus.ToString();
+
+
+                            if (response.PendingReason != null)
+                            {
+                                ProcessError += "Pending reason: " + response.PendingReason.ToString() + "\n\r";
+                            }
+                            bResponse = true;
+                        }
+
+
+                    }
+                    catch (Exception ss1)
+                    {
+                        ProcessError += "System Error: " + ss1.ToString() + "\n\r";
+                    }
+
+
+                    oCharge.ChargeResponse += ProcessError;
+                    #endregion
+                }
+                else
+                {
+                    bResponse = true;
+                }
+                return bResponse;
+            }
+
 
         }
 

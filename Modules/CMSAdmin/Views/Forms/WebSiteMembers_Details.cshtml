@@ -123,6 +123,22 @@
                                                     @Html.ValidationMessageFor(model => model.WebSiteMembers.sName, "*Required!")
                                                 }
                                             </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sFName">Frist name :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sFName, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.sFName, "*Required!")
+                                                }
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="WebSiteMembers_sLName">Last name :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteMembers.sLName, new { @Class = "form-control" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteMembers.sLName, "*Required!")
+                                                }
+                                            </div>
                                             
                                             <div class="form-group">
                                                 <label for="WebSiteMembers_iMemberShipTypeID">Membership :</label>

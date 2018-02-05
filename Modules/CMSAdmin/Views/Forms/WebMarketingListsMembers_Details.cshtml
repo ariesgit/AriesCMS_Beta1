@@ -90,18 +90,20 @@
                             sContent += "                        </td>" + "\n\r";
                             sContent += "                        <td>" + "\n\r";
                             sContent += "                           " + oListOfUserSearch[i].Phone + "\n\r";
+                            sContent += "                        </td>" + "\n\r";
+                            sContent += "                        <td>" + "\n\r";
 
                             if (oListOfUserSearch[i].SourceID == 1)
                             {
-                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "UAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + ">ADD</a> " + "\n\r";
-                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "URemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Users_click(" + oListOfUserSearch[i].ID + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
-                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "URemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</a> " + "\n\r";
+                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "UAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Users_click(" + oListOfUserSearch[i].Id + ");" + "\"" + ">ADD</a> " + "\n\r";
+                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "URemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Users_click(" + oListOfUserSearch[i].Id + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
+                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "URemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</a> " + "\n\r";
                             }
                             else if (oListOfUserSearch[i].SourceID == 2)
                             {
-                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + ">ADD</a> " + "\n\r";
-                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LRemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Lead_click(" + oListOfUserSearch[i].ID + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
-                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].ID + "LRemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</span> " + "\n\r";
+                                sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "LAdd" + "\"" + " href=" + "\"" + "javascript:On_Add_Lead_click(" + oListOfUserSearch[i].Id + ");" + "\"" + ">ADD</a> " + "\n\r";
+                                //sContent += "                           <a id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "LRemove" + "\"" + " href=" + "\"" + "javascript:On_Remove_Lead_click(" + oListOfUserSearch[i].Id + ");" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">REMOVE</a> " + "\n\r";
+                                sContent += "                           <span id=" + "\"" + "btn" + oListOfUserSearch[i].Id + "LRemove" + "\"" + " style=" + "\"" + "display:none;" + "\"" + ">ADDED</span> " + "\n\r";
                             }
                             sContent += "                        </td>" + "\n\r";
                             sContent += "                    </tr>" + "\n\r";
@@ -304,7 +306,7 @@
 
 
             var _URL = sBaseURL + "admin/home/WebMarketingListsMembers_AddNewUser";
-            var oMydata = { _ID: iListID, _LeadID: _Id, _UserID:0  };
+            var oMydata = { _ID: iListID, _LeadID: _Id, _UserID: 0  };
 
             $.when(
                 $.ajax({
@@ -499,7 +501,7 @@
         @if (ViewBag.bAddNew)
         {
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-lg-right text-md-right text-sm-right text-xs-right">
-                <p>You can, <a href="javascript:">Add All Leads</a> or <a href="javascript:">Add All Users</a></p>
+                <p>You can, <a href="javascript:On_AddAll_Leads_click();">Add All Leads</a> or <a href="javascript:On_AddAll_Leads_click();">Add All Users</a></p>
             </div>
         }
         
@@ -569,7 +571,7 @@
     else
     {
         <div class="row">
-            <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1" style="display:none;">
+            <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
                 @using (Html.BeginForm("WebMarketingListsMembers_AddUpdate", "", FormMethod.Post))
                 {
                     @Html.ValidationSummary(true);

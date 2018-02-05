@@ -430,7 +430,11 @@
                             }
 
                             var ctx = document.getElementById("chart_SV").getContext("2d");
-                            var myPageViews = new Chart(ctx).Line(oChartData, { responsive: true });
+                            if (oChartData != null) {
+                                if (oChartData.length > 0) {
+                                    var myPageViews = new Chart(ctx).Line(oChartData, { responsive: true });
+                                }
+                            }
                         }
                         else{
 

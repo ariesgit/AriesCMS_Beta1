@@ -159,9 +159,6 @@
                         <h6><a href="~/admin/home/Roles_List?_iParentID=1">Security Roles</a></h6>
                     </li>
                     <li>
-                        <h6><a href="~/admin/home/WebSite_Messaging_List">Messaging</a></h6>
-                    </li>
-                    <li>
                         @if ((ViewBag.iSiteID != null) && (ViewBag.iStieID > 0))
                         {
                             <h6><a href="~/admin/home/WebSite_Details?id=@ViewBag.iSiteID">Site Settings</a></h6>
@@ -251,6 +248,9 @@
                         <h6><a href="~/admin/home/WebSiteEMailCampaign_List">E-Mail Campaigns</a></h6>
                     </li>
                     <li>
+                        <h6><a href="~/admin/home/WebSiteQuestionair_List">Questionairs</a></h6>
+                    </li>
+                    <li>
                         <h6><a href="~/admin/home/WebMarketingLists_List">Marketing Lists</a></h6>
                     </li>
                     <li>
@@ -264,6 +264,9 @@
                     </li>
                     <li>
                         <h6><a href="~/admin/home/WebSitePartners_List">Partners</a></h6>
+                    </li>
+                    <li>
+                        <h6><a href="~/admin/home/PaymentProcessing">Process Payment</a></h6>
                     </li>
                 </ul>
             </div>

@@ -79,6 +79,8 @@
                                 <th scope="row">@Html.DisplayFor(modelItem => objRec.sListID)</th>
                                 <td>@Html.DisplayFor(modelItem => objRec.dtDateCreated)</td>
                             <td>
+                                @Html.ActionLink("Edit", "WebSiteEMailCampaignLists_Details", new { id = objRec.ID })
+                                @Html.Raw("|")
                                 @Html.ActionLink("Delete", "WebSiteEMailCampaignLists_Delete", new { id=objRec.ID}, new { onclick = "return confirm('Are you sure you wish to delete this record?');" }) 
                             </td>                                              
                             </tr>
@@ -88,7 +90,7 @@
                     {
                             <tr>
                             
-                          <td colspan="1">
+                          <td colspan="3">
 
                             
                             
@@ -108,7 +110,7 @@
                     {     
                     <tr>
                             
-                    <td scope="row" colspan="1" class="backgrounddark text-lg-center text-md-center text-xs-center">
+                    <td scope="row" colspan="3" class="backgrounddark text-lg-center text-md-center text-xs-center">
 
                           
                       

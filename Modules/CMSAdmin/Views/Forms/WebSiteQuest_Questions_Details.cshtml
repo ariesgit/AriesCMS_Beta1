@@ -1,0 +1,251 @@
+@model ACMSDBView.WebSiteQuest_QuestionsViewModel
+
+
+<script type="text/javascript">
+
+    function on_WebSiteQuest_Questions_iAnswerControlTypeID_Changed() {
+        try {
+            var cboControl = document.getElementById("WebSiteQuest_Questions_iAnswerControlTypeID");
+            var selectedText = cboControl[cboControl.selectedIndex].text;
+
+            var oHiddenField = document.getElementById("WebSiteQuest_Questions_sAnswerControlTypeID");
+            oHiddenField.value = selectedText;
+
+
+        }
+        catch (e) {
+            alert(e);
+        }
+    }
+
+
+</script>   
+                    
+
+
+
+
+
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
+            @if (ViewBag.bAddNew)
+            {
+                <h2>You are ready to create a new Question</h2>
+            }
+            else
+            {
+                <h2>
+                    You are editing -
+                    @Model.WebSiteQuest_Questions.sQuestion
+                </h2>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        @if (ViewBag.bError == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
+                <p> @Html.Raw(ViewBag.sErrorMessage)</p>
+            </div>
+        }
+        else if (ViewBag.bSaved == true)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
+                <p>Your request was processed successfully.</p>
+            </div>
+        }
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <<  @Html.ActionLink("Return List View", "WebSiteQuest_Questions_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
+
+
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            &nbsp;
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
+            @using (Html.BeginForm("WebSiteQuest_Questions_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.ID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.iParentID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.sParentID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.sControl)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.sUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteQuest_Questions.sAnswerControlTypeID)
+
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_sQuestion">Question :</label>
+                        @Html.TextAreaFor(model => model.WebSiteQuest_Questions.sQuestion, new { @Class = "form-control textarea_admin" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.sQuestion, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_iAnswerControlTypeID">UI Control Types :</label>
+                        @Html.DropDownListFor(model => model.WebSiteQuest_Questions.iAnswerControlTypeID, Model.AnswerControlType, new { @Class = "form-control", @onchange = "javascript:on_WebSiteQuest_Questions_iAnswerControlTypeID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.iAnswerControlTypeID, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_sMultipleChoiceArray">Multiple Choice Data Array :</label>
+                        @Html.TextAreaFor(model => model.WebSiteQuest_Questions.sMultipleChoiceArray, new { @Class = "form-control textarea_admin" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.sMultipleChoiceArray, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_sCorrectAnswer">Correct Answer :</label>
+                        @Html.TextAreaFor(model => model.WebSiteQuest_Questions.sCorrectAnswer, new { @Class = "form-control textarea_admin" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.sCorrectAnswer, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_dPossiblePoints">Possible Points :</label>
+                        @Html.TextBoxFor(model => model.WebSiteQuest_Questions.dPossiblePoints, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.dPossiblePoints, "*Required!")
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_dMinPoints">Min Points :</label>
+                        @Html.TextBoxFor(model => model.WebSiteQuest_Questions.dMinPoints, new { @Class = "form-control" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.dMinPoints, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_dViews"># Views :</label>
+                        @Html.TextBoxFor(model => model.WebSiteQuest_Questions.dViews, new { @Class = "form-control", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.dViews, "*Required!")
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_dAnswers"># Answers :</label>
+                        @Html.TextBoxFor(model => model.WebSiteQuest_Questions.dAnswers, new { @Class = "form-control", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.dAnswers, "*Required!")
+                        }
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="WebSiteQuest_Questions_dCorrectAnswers"># Correct Answers :</label>
+                        @Html.TextBoxFor(model => model.WebSiteQuest_Questions.dCorrectAnswers, new { @Class = "form-control", @readonly = "readonly" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteQuest_Questions.dCorrectAnswers, "*Required!")
+                        }
+                    </div>
+
+                </fieldset>
+                                        <div class="form-group">
+                                            @if (ViewBag.bAddNew == true)
+                                            {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                            }
+                                            else
+                                            {
+                                                <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
+                                            }
+                                        </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -837,7 +837,7 @@ namespace AriesCMS.Models
         }
 
     }
-
+   
     [Serializable]
     public partial class UserBillingInfo
     {
@@ -1036,6 +1036,10 @@ namespace AriesCMS.Models
 
         public UserAddressInfo AddressInfo { get; set; }
 
+        public double ChargeAmount { get; set; }
+        public double ChargeAmount2 { get; set; }
+        public double ChargeAmount3 { get; set; }
+
 
         //This will hold any error message from the server side process
         public string ErrorMessage { get; set; }
@@ -1084,12 +1088,15 @@ namespace AriesCMS.Models
         public string City { get; set; }
         public bool CityError { get; set; }
 
+
+        public List<SelectListItem> States { get; set; }
         public string State { get; set; }
         public bool StateError { get; set; }
 
         public int StateID { get; set; }
         public bool StateIDError { get; set; }
 
+        public List<SelectListItem> Countries { get; set; }
         public string Country { get; set; }
         public bool CountryError { get; set; }
 
@@ -2220,6 +2227,54 @@ namespace AriesCMS.Models
 
 
 
+        public List<DEF_WebSiteQuestionair.RecordObject> lstWebSiteQuestionair { get; set; }
+        public List<SelectListItem> WebSiteQuestionair { get; set; }
+        public void Build_WebSiteQuestionair(IEnumerable<DEF_WebSiteQuestionair.RecordObject> _lsrWebSiteQuestionair)
+        {
+            WebSiteQuestionair = new List<SelectListItem>();
+            WebSiteQuestionair.Add(new SelectListItem { Selected = false, Text = " ", Value = "0" });
+            if (_lsrWebSiteQuestionair != null)
+            {
+                if (_lsrWebSiteQuestionair != null)
+                {
+                    foreach (DEF_WebSiteQuestionair.RecordObject oV in _lsrWebSiteQuestionair)
+                    {
+                        WebSiteQuestionair.Add(new SelectListItem { Selected = false, Text = oV.sName, Value = oV.ID.ToString() });
+                    }
+                }
+            }
+        }
+        public bool Get_WebSiteQuestionair(IDataConnection _cnCon)
+        {
+            try
+            {
+                bool bResponse = false;
+                if (_cnCon != null)
+                {
+
+                    if (_cnCon.ConnectionStatus == ConnectionStatusTypes.Open)
+                    {
+                        DINT_WebSiteQuestionair dbWebSiteQuestionair = new DINT_WebSiteQuestionair(_cnCon);
+                        List<DataParameter> lspParameters = new List<DataParameter>();
+                        DataParameter pParameter = null;
+                        lspParameters = null;
+
+                        lstWebSiteQuestionair = dbWebSiteQuestionair.Get(lspParameters);
+                        Build_WebSiteQuestionair(lstWebSiteQuestionair);
+                        bResponse = true;
+                    }
+                }
+                return bResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+
+
         public bool GetView(IDataConnection _cnCon, int _Id = 0)
         {
             try
@@ -2267,6 +2322,7 @@ namespace AriesCMS.Models
         {
             WebSiteAnnouncements = new DEF_WebSiteAnnouncements.RecordObject();
             Build_WebSiteAnnouncementsType(null);
+            Build_WebSiteQuestionair(null);
         }
 
     }

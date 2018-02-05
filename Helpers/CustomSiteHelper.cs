@@ -67,6 +67,11 @@ namespace AriesCMS.Helpers
 
     public partial class SiteCoreHelper
     {
+        public string _sClientID = "";
+        public string _sClientSecret = "";
+        public string _sClientPassword = "";
+
+
         public void BuildCustomUserExtendedData()
         {
 

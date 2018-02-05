@@ -180,8 +180,18 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PayPal">
-      <HintPath>..\..\AriesPlatform\Support\PayPal\PayPal.dll</HintPath>
+    <Reference Include="PayPal, Version=1.7.3.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\AriesCMSDistributionSite\CMSSite\packages\PayPal.SDK.NETCore.1.9.1.2\lib\netstandard2.0\PayPal.dll</HintPath>
+    </Reference>
+    <Reference Include="PayPalCoreSDK">
+      <HintPath>..\..\..\AriesCMSDistributionSite\CMSSite\packages\Aries.Web.v3\PayPalCoreSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="PayPalMerchantSDK">
+      <HintPath>..\..\..\AriesCMSDistributionSite\CMSSite\packages\Aries.Web.v3\PayPalMerchantSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="PayPalPermissionsSDK">
+      <HintPath>..\..\..\AriesCMSDistributionSite\CMSSite\packages\Aries.Web.v3\PayPalPermissionsSDK.dll</HintPath>
     </Reference>
     <Reference Include="RazorEngine, Version=3.4.1.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

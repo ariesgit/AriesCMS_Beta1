@@ -1,54 +1,22 @@
-@model AriesCMSDefinition.DEF_WebSiteForumTopiAnnouncements.RecordObject
+@model ACMSDBView.WebSiteForumTopiAnnouncementsViewModel
 
 
 <script type="text/javascript">
-    
 
-    function on_Select_Changed() {
+
+
+    function on_WebSiteForumTopiAnnouncements_iQuestID_Changed() {
         try {
-        var cboControl = document.getElementById("WebSiteForumTopiAnnouncements_FIELDID");
+            var cboControl = document.getElementById("WebSiteForumTopiAnnouncements_iQuestID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteForumTopiAnnouncements_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteForumTopiAnnouncements_sQuestID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
-        }
-        catch (e) {
-            alert(e);
-        }
-    }
-
-
-    function Buildcbo_SelectBasedOnParentID(_Id) {
-        try {
-
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebSiteForumTopiAnnouncements_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
-            
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebSiteForumTopiAnnouncements_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
 
         }
         catch (e) {
             alert(e);
-            $("#WebSiteForumTopiAnnouncements_FIELDID").html("error").show();
         }
     }
 
@@ -70,7 +38,7 @@
             else
             {
                  <h2>You are editing - 
-                   @Model.sName
+                   @Model.WebSiteForumTopiAnnouncements.sName
                  </h2>
             }   
         </div>
@@ -110,48 +78,62 @@
 @using (Html.BeginForm("WebSiteForumTopiAnnouncements_AddUpdate", "", FormMethod.Post))
                                    {                             
                                         @Html.ValidationSummary(true);
-                         @Html.HiddenFor(model => model.ID)  
-                         @Html.HiddenFor(model => model.sControl)  
-                         @Html.HiddenFor(model => model.sSync)  
-                         @Html.HiddenFor(model => model.iParentID)  
-                         @Html.HiddenFor(model => model.sParentID)  
-                         @Html.HiddenFor(model => model.dtDateCreated)  
-                         @Html.HiddenFor(model => model.dtLastUpdated)  
-                         @Html.HiddenFor(model => model.iCreatedByID)  
-                         @Html.HiddenFor(model => model.sCreatedByID)  
-                         @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID) 
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.ID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sControl)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sSync)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.iParentID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sParentID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.dtDateCreated)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.dtLastUpdated)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.iCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sCreatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.iUpdatedByID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sUpdatedByID) 
 
-                         @Html.HiddenFor(model => model.sVersion)  
-                         @Html.HiddenFor(model => model.bRemoved)  
-                         @Html.HiddenFor(model => model.bAnswered)  
-                         @Html.HiddenFor(model => model.iAnsweredByID)  
-                         @Html.HiddenFor(model => model.sAnsweredByID)  
-                         @Html.HiddenFor(model => model.iAnsweredByResponseID)  
-                         @Html.HiddenFor(model => model.sAnsweredByResponseID)  
-      
-      
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sVersion)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.bRemoved)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.bAnswered)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.iAnsweredByID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sAnsweredByID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.iAnsweredByResponseID)  
+                         @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sAnsweredByResponseID)
+
+
+    @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sQuestID)
+    @Html.HiddenFor(model => model.WebSiteForumTopiAnnouncements.sQuestAnswerArray)
                                         <fieldset> 
                                             <legend></legend>
 
                                             <div class="form-group">
-                                                <label for="sName">Title :</label>
-                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sName)</span>
+                                                <label for="WebSiteForumTopiAnnouncements_sName">Title :</label>
+                                                @Html.TextBoxFor(model => model.WebSiteForumTopiAnnouncements.sName, new { @Class = "form-control", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteForumTopiAnnouncements.sName)</span>
                                             </div>
                                             <div class="form-group">
-                                                <label for="sDescription">Description :</label>
-                                                @Html.TextAreaFor(model => model.sDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sDescription)</span>
+                                                <label for="WebSiteForumTopiAnnouncements_sDescription">Description :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteForumTopiAnnouncements.sDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteForumTopiAnnouncements.sDescription)</span>
                                             </div>
                                             <div class="form-group">
-                                                <label for="sContent">HTML :</label>
-                                                @Html.TextAreaFor(model => model.sContent, new { @Class = "form-control textarea_admin", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sContent)</span>
+                                                <label for="WebSiteForumTopiAnnouncements_sContent">HTML :</label>
+                                                @Html.TextAreaFor(model => model.WebSiteForumTopiAnnouncements.sContent, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteForumTopiAnnouncements.sContent)</span>
                                             </div>
 
 
 
+
+
+                                            <div class="form-group">
+                                                <label for="WebSiteForumTopiAnnouncements_iQuestID">Linked Questionair :</label>
+                                                @Html.DropDownListFor(model => model.WebSiteForumTopiAnnouncements.iQuestID, Model.WebSiteQuestionair, new { @Class = "form-control", @onchange = "javascript:on_WebSiteForumTopiAnnouncements_iQuestID_Changed();" })
+                                                @if (ViewBag.bError == true)
+                                                {
+                                                    @Html.ValidationMessageFor(model => model.WebSiteForumTopiAnnouncements.iQuestID, "*Required!")
+                                                }
+                                            </div>
+
+                                             
 
                                         </fieldset>
                                         <div class="form-group">

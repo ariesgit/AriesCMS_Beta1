@@ -6,13 +6,13 @@
 
     function on_Select_WebSiteEMailCampaignLists_iListID_Changed() {
         try {
-            var cboControl = document.getElementById("WebSiteEMailCampaignLists_FIELDID");
+            var cboControl = document.getElementById("WebSiteEMailCampaignLists_iListID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteEMailCampaignLists_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteEMailCampaignLists_sListID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+            //Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
         }
         catch (e) {
             alert(e);
@@ -147,11 +147,11 @@
 
 
                                             <div class="form-group">
-                                                <label for="sFieldName">Select Marketing List :</label>
+                                                <label for="WebSiteEMailCampaignLists_iListID">Select Marketing List :</label>
                                                 @Html.DropDownListFor(model => model.WebSiteEMailCampaignLists.iListID, Model.WebMarketingLists, new { @Class = "form-control", @onchange = "javascript:on_Select_WebSiteEMailCampaignLists_iListID_Changed();" })
                                                 @if (ViewBag.bError == true)
                                                 {
-                                                    @Html.ValidationMessageFor(model => model.sName, "*Required!")
+                                                    @Html.ValidationMessageFor(model => model.WebSiteEMailCampaignLists.iListID, "*Required!")
                                                 }
                                             </div>
 

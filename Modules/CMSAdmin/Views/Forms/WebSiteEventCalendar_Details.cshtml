@@ -1,59 +1,27 @@
-@model AriesCMSDefinition.DEF_WebSiteEventCalendar.RecordObject
+@model ACMSDBView.WebSiteEventCalendarViewModel
 
 
 <script type="text/javascript">
-    
 
-    function on_Select_Changed() {
+
+
+    function on_WebSiteEventCalendar_iQuestID_Changed() {
         try {
-        var cboControl = document.getElementById("WebSiteEventCalendar_FIELDID");
+            var cboControl = document.getElementById("WebSiteEventCalendar_iQuestID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebSiteEventCalendar_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebSiteEventCalendar_sQuestID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
+
         }
         catch (e) {
             alert(e);
         }
     }
 
+</script>
 
-    function Buildcbo_SelectBasedOnParentID(_Id) {
-        try {
-
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebSiteEventCalendar_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
-            
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebSiteEventCalendar_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
-
-        }
-        catch (e) {
-            alert(e);
-            $("#WebSiteEventCalendar_FIELDID").html("error").show();
-        }
-    }
-
-</script>   
-                    
 
 
 
@@ -65,14 +33,15 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border_bottom_solid_1x">
             @if (ViewBag.bAddNew)
             {
-                 <h2>You are ready to create a new Calendar Event</h2>
+                <h2>You are ready to create a new Calendar Event</h2>
             }
             else
             {
-                 <h2>You are editing - 
-                   @Model.sName
-                 </h2>
-            }   
+                <h2>
+                    You are editing -
+                    @Model.WebSiteEventCalendar.sName
+                </h2>
+            }
         </div>
     </div>
     <div class="row">
@@ -81,24 +50,24 @@
         </div>
     </div>
     <div class="row">
-       @if (ViewBag.bError == true)
-       {
+        @if (ViewBag.bError == true)
+        {
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-danger">
                 <p> @Html.Raw(ViewBag.sErrorMessage)</p>
             </div>
-       }
-       else if (ViewBag.bSaved == true)
-       {               
+        }
+        else if (ViewBag.bSaved == true)
+        {
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 alert-success">
                 <p>Your request was processed successfully.</p>
             </div>
-       }
+        }
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <<  @Html.ActionLink("Return List View", "WebSiteEventCalendar_List", new { _iParentID = ViewBag.iParentID, _sParentID = ViewBag.sParentID })
- 
-       
+
+
         </div>
-        
+
     </div>
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -107,152 +76,200 @@
     </div>
     <div class="row">
         <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 offset-lg-1 offset-md-1">
-@using (Html.BeginForm("WebSiteEventCalendar_AddUpdate", "", FormMethod.Post))
-                                   {                             
-                                        @Html.ValidationSummary(true);
-                         @Html.HiddenFor(model => model.ID)  
-                         @Html.HiddenFor(model => model.sControl)  
-                         @Html.HiddenFor(model => model.sSync)  
-                         @Html.HiddenFor(model => model.iParentID)  
-                         @Html.HiddenFor(model => model.sParentID)  
-                         @Html.HiddenFor(model => model.dtDateCreated)  
-                         @Html.HiddenFor(model => model.dtLastUpdated)  
-                         @Html.HiddenFor(model => model.iCreatedByID)  
-                         @Html.HiddenFor(model => model.sCreatedByID)  
-                         @Html.HiddenFor(model => model.iUpdatedByID)  
-                         @Html.HiddenFor(model => model.sUpdatedByID)  
-    
-                         @Html.HiddenFor(model => model.sContact)
-            
+            @using (Html.BeginForm("WebSiteEventCalendar_AddUpdate", "", FormMethod.Post))
+            {
+                @Html.ValidationSummary(true);
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.ID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sControl)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sSync)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.iParentID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sParentID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.dtDateCreated)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.dtLastUpdated)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.iCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sCreatedByID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.iUpdatedByID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sUpdatedByID)
 
-                                        <fieldset> 
-                                            <legend></legend>
-
-                                            <div class="form-group">
-                                                <label for="sName">Event name :</label>
-                                                @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sName)</span>
-                                            </div>
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sContact)
 
 
-                                            <div class="form-group">
-                                                <label for="dEventCost">Event registration fee:</label>
-                                                @Html.TextBoxFor(model => model.dEventCost, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dEventCost)</span>
-                                            </div>
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sQuestID)
+                @Html.HiddenFor(model => model.WebSiteEventCalendar.sQuestAnswerArray)
+
+                <fieldset>
+                    <legend></legend>
+
+                    <div class="form-group">
+                        <label for="sName">Event name :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.sName, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sName)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtDateOfEvent">Date :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dtDateOfEvent, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dtDateOfEvent)</span>
+                    </div>
 
 
-                                            <div class="form-group">
-                                                <label for="dEarlyBirdDiscount">Early bird discount:</label>
-                                                @Html.TextBoxFor(model => model.dEarlyBirdDiscount, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dEarlyBirdDiscount)</span>
-                                            </div>
+                    <div class="form-group">
+                        <label for="sTimeOfEvent">Start Time of Event:</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.sTimeOfEvent, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sTimeOfEvent)</span>
+                    </div>
 
 
-                                            <div class="form-group">
-                                                <label for="sMoreInfoEmail">Contact Email (if needed):</label>
-                                                @Html.TextBoxFor(model => model.sMoreInfoEmail, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sMoreInfoEmail)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtDateOfEvent">Date :</label>
-                                                @Html.TextBoxFor(model => model.dtDateOfEvent, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtDateOfEvent)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtFirstDateOfRegistrations">Registration open on (if needed) :</label>
-                                                @Html.TextBoxFor(model => model.dtFirstDateOfRegistrations, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtFirstDateOfRegistrations)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtLastDateOfRegistrations">Registration closes on (if needed) :</label>
-                                                @Html.TextBoxFor(model => model.dtLastDateOfRegistrations, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtLastDateOfRegistrations)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
-                                                @Html.TextBoxFor(model => model.dtEarlyBirdRegistrations, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dtEarlyBirdRegistrations)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
-                                                @Html.TextBoxFor(model => model.dEventCost, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dEventCost)</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
-                                                @Html.TextBoxFor(model => model.dEarlyBirdDiscount, new { @Class = "form-control", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.dEarlyBirdDiscount)</span>
-                                            </div>
+                    <div class="form-group">
+                        <label for="sLocation">End Time of Event:</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.sEndOfTime, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sEndOfTime)</span>
+                    </div>
 
 
-                                            <div class="form-group">
-                                                <label for="sShortDescription">Short (list) description:</label>
-                                                @Html.TextAreaFor(model => model.sShortDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sShortDescription)</span>
-                                            </div>
+                    <div class="form-group">
+                        <label for="sMoreInfoEmail">Contact Email (if needed):</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.sMoreInfoEmail, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sMoreInfoEmail)</span>
+                    </div>
 
 
-                                            <div class="form-group">
-                                                <label for="sFullDescription">Full description:</label>
-                                                @Html.TextAreaFor(model => model.sFullDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
-                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sFullDescription)</span>
-                                            </div>
+                    <div class="form-group">
+                        <label for="sLocation">Location:</label>
+                        @Html.TextAreaFor(model => model.WebSiteEventCalendar.sLocation, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sLocation)</span>
+                    </div>
 
 
-                                            <div class="form-group">
-                                                <label for="bDisabled">Is disabled :</label>
-                                                @Html.CheckBoxFor(model => model.bDisabled, new { @Class = "form-control checkbox-inline" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.bDisabled, "*Required!")
-                                                }
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bSuspended">Is suspended :</label>
-                                                @Html.CheckBoxFor(model => model.bSuspended, new { @Class = "form-control checkbox-inline" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.bSuspended, "*Required!")
-                                                }
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bNegative">Is negative item :</label>
-                                                @Html.CheckBoxFor(model => model.bNegative, new { @Class = "form-control checkbox-inline" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.bNegative, "*Required!")
-                                                }
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bHidden">Should be hidden :</label>
-                                                @Html.CheckBoxFor(model => model.bHidden, new { @Class = "form-control checkbox-inline" })
-                                                @if (ViewBag.bError == true)
-                                                {
-                                                    @Html.ValidationMessageFor(model => model.bHidden, "*Required!")
-                                                }
-                                            </div>
+                    <div class="form-group">
+                        <label for="sEventPhone">Contact Phone:</label>
+                        @Html.TextAreaFor(model => model.WebSiteEventCalendar.sEventPhone, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sEventPhone)</span>
+                    </div>
 
 
-                                        </fieldset>
+                    <div class="form-group">
+                        <label for="sContactPerson">Contact Person:</label>
+                        @Html.TextAreaFor(model => model.WebSiteEventCalendar.sContactPerson, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sContactPerson)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dEventCost">Event registration fee:</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dEventCost, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dEventCost)</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="dEarlyBirdDiscount">Early bird discount:</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dEarlyBirdDiscount, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dEarlyBirdDiscount)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtFirstDateOfRegistrations">Registration open on (if needed) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dtFirstDateOfRegistrations, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dtFirstDateOfRegistrations)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtLastDateOfRegistrations">Registration closes on (if needed) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dtLastDateOfRegistrations, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dtLastDateOfRegistrations)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dtEarlyBirdRegistrations, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dtEarlyBirdRegistrations)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dEventCost, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dEventCost)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtEarlyBirdRegistrations">Early Bird Registration closes on (if needed) :</label>
+                        @Html.TextBoxFor(model => model.WebSiteEventCalendar.dEarlyBirdDiscount, new { @Class = "form-control", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.dEarlyBirdDiscount)</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="sShortDescription">Short (list) description:</label>
+                        @Html.TextAreaFor(model => model.WebSiteEventCalendar.sShortDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sShortDescription)</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="sFullDescription">Full description:</label>
+                        @Html.TextAreaFor(model => model.WebSiteEventCalendar.sFullDescription, new { @Class = "form-control textarea_admin", @placeholder = "" })
+                        <span class="alert-danger">@Html.ValidationMessageFor(model => model.WebSiteEventCalendar.sFullDescription)</span>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="WebSiteEventCalendar_iQuestID">Linked Questionair :</label>
+                        @Html.DropDownListFor(model => model.WebSiteEventCalendar.iQuestID, Model.WebSiteQuestionair, new { @Class = "form-control", @onchange = "javascript:on_WebSiteEventCalendar_iQuestID_Changed();" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEventCalendar.iQuestID, "*Required!")
+                        }
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="bDisabled">Is disabled :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteEventCalendar.bDisabled, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEventCalendar.bDisabled, "*Required!")
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="bSuspended">Is suspended :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteEventCalendar.bSuspended, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEventCalendar.bSuspended, "*Required!")
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="bNegative">Is negative item :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteEventCalendar.bNegative, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEventCalendar.bNegative, "*Required!")
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="bHidden">Should be hidden :</label>
+                        @Html.CheckBoxFor(model => model.WebSiteEventCalendar.bHidden, new { @Class = "form-control checkbox-inline" })
+                        @if (ViewBag.bError == true)
+                        {
+                            @Html.ValidationMessageFor(model => model.WebSiteEventCalendar.bHidden, "*Required!")
+                        }
+                    </div>
+                     
+
+                </fieldset>
                                         <div class="form-group">
-                                           @if (ViewBag.bAddNew == true)
-                                           {
+                                            @if (ViewBag.bAddNew == true)
+                                            {
                                                 <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
-                                           }
-                                           else
-                                           {
+                                            }
+                                            else
+                                            {
                                                 <input type="submit" value="Save" name="submit" class="btn btn-block btn-outline-primary" />
-                                           }
+                                            }
                                         </div>
-                                   } 
-         </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -274,7 +291,7 @@
             $('#dtEarlyBirdRegistrations').datetimepicker();
 
         });
-        
+
     }
     catch (e) {
         //alert(e);

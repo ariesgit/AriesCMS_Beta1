@@ -2,53 +2,21 @@
 
 
 <script type="text/javascript">
-    
 
-    function on_Select_Changed() {
+
+
+    function on_WebMarketingLists_iQuestID_Changed() {
         try {
-        var cboControl = document.getElementById("WebMarketingLists_FIELDID");
+            var cboControl = document.getElementById("WebMarketingLists_iQuestID");
             var selectedText = cboControl[cboControl.selectedIndex].text;
 
-            var oHiddenField = document.getElementById("WebMarketingLists_FIELDHIDDEN");
+            var oHiddenField = document.getElementById("WebMarketingLists_sQuestID");
             oHiddenField.value = selectedText;
 
-            Buildcbo_SelectBasedOnParentID(cboControl[cboControl.selectedIndex].value);
-        }
-        catch (e) {
-            alert(e);
-        }
-    }
-
-
-    function Buildcbo_SelectBasedOnParentID(_Id) {
-        try {
-
-            //alert(_Id);
-            var procemessage = "<option value='0'> Please wait...</option>";
-            $("#WebMarketingLists_FIELDID").html(procemessage).show();
-            var url = "@Url.Content("/portal/home/GetCBO_JSONFUNTION/")";
-            
-            $.ajax({
-                url: url,
-                data: { _iParentID: _Id },
-                cache: false,
-                type: "POST",
-                success: function (data) {
-                    var markup = "<option value='0'> </option>";
-                    for (var x = 0; x < data.length; x++) {
-                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
-                    }
-                    $("#WebMarketingLists_FIELDID").html(markup).show();
-                },
-                error: function (reponse) {
-                    alert("error : " + reponse);
-                }
-            });
 
         }
         catch (e) {
             alert(e);
-            $("#WebMarketingLists_FIELDID").html("error").show();
         }
     }
 
