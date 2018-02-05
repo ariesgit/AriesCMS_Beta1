@@ -15888,6 +15888,398 @@ ELSE
     END    
     
 GO
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers')
+    BEGIN
+        PRINT N'Creating Table WebSiteEvCalUser_QuestAnswers';
+        CREATE TABLE WebSiteEvCalUser_QuestAnswers
+        (
+             [ID] Int PRIMARY KEY IDENTITY(1,1),
+             iParentID Int,
+             sParentID nvarchar(MAX),
+             sControl nvarchar(MAX),
+             dtDateCreated datetime,
+             dtLastUpdated datetime,
+             iCreatedByID Int,
+             sCreatedByID nvarchar(MAX),
+             iUpdatedByID Int,
+             sUpdatedByID nvarchar(MAX),
+             iQuestID Int,
+             sQuestID nvarchar(MAX),
+             dtLastView datetime,
+             dtLastAnswer datetime,
+             sAnswer nvarchar(MAX),
+             dScore float,
+        );
+    END    
+ELSE    
+    BEGIN    
+
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'iParentID')
+            BEGIN        
+              PRINT N'Adding Column iParentID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD iParentID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sParentID')
+            BEGIN        
+              PRINT N'Adding Column sParentID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sParentID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sControl')
+            BEGIN        
+              PRINT N'Adding Column sControl to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sControl nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'dtDateCreated')
+            BEGIN        
+              PRINT N'Adding Column dtDateCreated to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD dtDateCreated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'dtLastUpdated')
+            BEGIN        
+              PRINT N'Adding Column dtLastUpdated to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD dtLastUpdated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'iCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column iCreatedByID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD iCreatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column sCreatedByID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sCreatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'iUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column iUpdatedByID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD iUpdatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column sUpdatedByID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sUpdatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'iQuestID')
+            BEGIN        
+              PRINT N'Adding Column iQuestID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD iQuestID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sQuestID')
+            BEGIN        
+              PRINT N'Adding Column sQuestID to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sQuestID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'dtLastView')
+            BEGIN        
+              PRINT N'Adding Column dtLastView to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD dtLastView datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'dtLastAnswer')
+            BEGIN        
+              PRINT N'Adding Column dtLastAnswer to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD dtLastAnswer datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'sAnswer')
+            BEGIN        
+              PRINT N'Adding Column sAnswer to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD sAnswer nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_QuestAnswers' AND COLUMN_NAME = 'dScore')
+            BEGIN        
+              PRINT N'Adding Column dScore to Table WebSiteEvCalUser_QuestAnswers';
+              ALTER TABLE WebSiteEvCalUser_QuestAnswers ADD dScore float;
+            END     
+    END    
+    
+GO
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs')
+    BEGIN
+        PRINT N'Creating Table WebSiteEvCalUser_Questionairs';
+        CREATE TABLE WebSiteEvCalUser_Questionairs
+        (
+             [ID] Int PRIMARY KEY IDENTITY(1,1),
+             iParentID Int,
+             sParentID nvarchar(MAX),
+             sControl nvarchar(MAX),
+             dtDateCreated datetime,
+             dtLastUpdated datetime,
+             iCreatedByID Int,
+             sCreatedByID nvarchar(MAX),
+             iUpdatedByID Int,
+             sUpdatedByID nvarchar(MAX),
+             iQuestID Int,
+             sQuestID nvarchar(MAX),
+             dtLastView datetime,
+             dtLastAnswer datetime,
+        );
+    END    
+ELSE    
+    BEGIN    
+
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'iParentID')
+            BEGIN        
+              PRINT N'Adding Column iParentID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD iParentID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'sParentID')
+            BEGIN        
+              PRINT N'Adding Column sParentID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD sParentID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'sControl')
+            BEGIN        
+              PRINT N'Adding Column sControl to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD sControl nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'dtDateCreated')
+            BEGIN        
+              PRINT N'Adding Column dtDateCreated to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD dtDateCreated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'dtLastUpdated')
+            BEGIN        
+              PRINT N'Adding Column dtLastUpdated to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD dtLastUpdated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'iCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column iCreatedByID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD iCreatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'sCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column sCreatedByID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD sCreatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'iUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column iUpdatedByID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD iUpdatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'sUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column sUpdatedByID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD sUpdatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'iQuestID')
+            BEGIN        
+              PRINT N'Adding Column iQuestID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD iQuestID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'sQuestID')
+            BEGIN        
+              PRINT N'Adding Column sQuestID to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD sQuestID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'dtLastView')
+            BEGIN        
+              PRINT N'Adding Column dtLastView to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD dtLastView datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteEvCalUser_Questionairs' AND COLUMN_NAME = 'dtLastAnswer')
+            BEGIN        
+              PRINT N'Adding Column dtLastAnswer to Table WebSiteEvCalUser_Questionairs';
+              ALTER TABLE WebSiteEvCalUser_Questionairs ADD dtLastAnswer datetime;
+            END     
+    END    
+    
+GO
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers')
+    BEGIN
+        PRINT N'Creating Table WebSiteJApp_QuestAnswers';
+        CREATE TABLE WebSiteJApp_QuestAnswers
+        (
+             [ID] Int PRIMARY KEY IDENTITY(1,1),
+             iParentID Int,
+             sParentID nvarchar(MAX),
+             sControl nvarchar(MAX),
+             dtDateCreated datetime,
+             dtLastUpdated datetime,
+             iCreatedByID Int,
+             sCreatedByID nvarchar(MAX),
+             iUpdatedByID Int,
+             sUpdatedByID nvarchar(MAX),
+             iQuestID Int,
+             sQuestID nvarchar(MAX),
+             dtLastView datetime,
+             dtLastAnswer datetime,
+             sAnswer nvarchar(MAX),
+             dScore float,
+        );
+    END    
+ELSE    
+    BEGIN    
+
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'iParentID')
+            BEGIN        
+              PRINT N'Adding Column iParentID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD iParentID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sParentID')
+            BEGIN        
+              PRINT N'Adding Column sParentID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sParentID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sControl')
+            BEGIN        
+              PRINT N'Adding Column sControl to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sControl nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'dtDateCreated')
+            BEGIN        
+              PRINT N'Adding Column dtDateCreated to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD dtDateCreated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'dtLastUpdated')
+            BEGIN        
+              PRINT N'Adding Column dtLastUpdated to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD dtLastUpdated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'iCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column iCreatedByID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD iCreatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column sCreatedByID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sCreatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'iUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column iUpdatedByID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD iUpdatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column sUpdatedByID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sUpdatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'iQuestID')
+            BEGIN        
+              PRINT N'Adding Column iQuestID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD iQuestID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sQuestID')
+            BEGIN        
+              PRINT N'Adding Column sQuestID to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sQuestID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'dtLastView')
+            BEGIN        
+              PRINT N'Adding Column dtLastView to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD dtLastView datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'dtLastAnswer')
+            BEGIN        
+              PRINT N'Adding Column dtLastAnswer to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD dtLastAnswer datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'sAnswer')
+            BEGIN        
+              PRINT N'Adding Column sAnswer to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD sAnswer nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_QuestAnswers' AND COLUMN_NAME = 'dScore')
+            BEGIN        
+              PRINT N'Adding Column dScore to Table WebSiteJApp_QuestAnswers';
+              ALTER TABLE WebSiteJApp_QuestAnswers ADD dScore float;
+            END     
+    END    
+    
+GO
+IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs')
+    BEGIN
+        PRINT N'Creating Table WebSiteJApp_Questionairs';
+        CREATE TABLE WebSiteJApp_Questionairs
+        (
+             [ID] Int PRIMARY KEY IDENTITY(1,1),
+             iParentID Int,
+             sParentID nvarchar(MAX),
+             sControl nvarchar(MAX),
+             dtDateCreated datetime,
+             dtLastUpdated datetime,
+             iCreatedByID Int,
+             sCreatedByID nvarchar(MAX),
+             iUpdatedByID Int,
+             sUpdatedByID nvarchar(MAX),
+             iQuestID Int,
+             sQuestID nvarchar(MAX),
+             dtLastView datetime,
+             dtLastAnswer datetime,
+        );
+    END    
+ELSE    
+    BEGIN    
+
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'iParentID')
+            BEGIN        
+              PRINT N'Adding Column iParentID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD iParentID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'sParentID')
+            BEGIN        
+              PRINT N'Adding Column sParentID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD sParentID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'sControl')
+            BEGIN        
+              PRINT N'Adding Column sControl to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD sControl nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'dtDateCreated')
+            BEGIN        
+              PRINT N'Adding Column dtDateCreated to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD dtDateCreated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'dtLastUpdated')
+            BEGIN        
+              PRINT N'Adding Column dtLastUpdated to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD dtLastUpdated datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'iCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column iCreatedByID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD iCreatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'sCreatedByID')
+            BEGIN        
+              PRINT N'Adding Column sCreatedByID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD sCreatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'iUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column iUpdatedByID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD iUpdatedByID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'sUpdatedByID')
+            BEGIN        
+              PRINT N'Adding Column sUpdatedByID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD sUpdatedByID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'iQuestID')
+            BEGIN        
+              PRINT N'Adding Column iQuestID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD iQuestID Int;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'sQuestID')
+            BEGIN        
+              PRINT N'Adding Column sQuestID to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD sQuestID nvarchar(MAX);
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'dtLastView')
+            BEGIN        
+              PRINT N'Adding Column dtLastView to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD dtLastView datetime;
+            END     
+        IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'WebSiteJApp_Questionairs' AND COLUMN_NAME = 'dtLastAnswer')
+            BEGIN        
+              PRINT N'Adding Column dtLastAnswer to Table WebSiteJApp_Questionairs';
+              ALTER TABLE WebSiteJApp_Questionairs ADD dtLastAnswer datetime;
+            END     
+    END    
+    
+GO
 
 
 
@@ -16260,6 +16652,35 @@ GO
      /* * CASCADE DELETES TO 'iParentID' */
      DELETE Sponsor_QuestAnswers FROM deleted, Sponsor_QuestAnswers WHERE deleted.ID = Sponsor_QuestAnswers.iParentID
 GO
+
+
+ CREATE TRIGGER T_WebSiteEventCalendarUsers_DTrig ON [WebSiteEventCalendarUsers] FOR DELETE AS
+ SET NOCOUNT ON
+     /* * CASCADE DELETES TO 'iParentID' */
+     DELETE WebSiteEvCalUser_Questionairs FROM deleted, WebSiteEvCalUser_Questionairs WHERE deleted.ID = WebSiteEvCalUser_Questionairs.iParentID
+GO
+
+
+ CREATE TRIGGER T_WebSiteJobApplicant_DTrig ON [WebSiteJobApplicant] FOR DELETE AS
+ SET NOCOUNT ON
+     /* * CASCADE DELETES TO 'iParentID' */
+     DELETE WebSiteJApp_Questionairs FROM deleted, WebSiteJApp_Questionairs WHERE deleted.ID = WebSiteJApp_Questionairs.iParentID
+GO
+
+
+ CREATE TRIGGER T_WebSiteEvCalUser_Questionairs_DTrig ON [WebSiteEvCalUser_Questionairs] FOR DELETE AS
+ SET NOCOUNT ON
+     /* * CASCADE DELETES TO 'iParentID' */
+     DELETE WebSiteEvCalUser_QuestAnswers FROM deleted, WebSiteEvCalUser_QuestAnswers WHERE deleted.ID = WebSiteEvCalUser_QuestAnswers.iParentID
+GO
+
+
+ CREATE TRIGGER T_WebSiteJApp_Questionairs_DTrig ON [WebSiteJApp_Questionairs] FOR DELETE AS
+ SET NOCOUNT ON
+     /* * CASCADE DELETES TO 'iParentID' */
+     DELETE WebSiteJApp_QuestAnswers FROM deleted, WebSiteJApp_QuestAnswers WHERE deleted.ID = WebSiteJApp_QuestAnswers.iParentID
+GO
+
 
 
 
