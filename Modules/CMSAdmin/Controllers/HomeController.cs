@@ -439,6 +439,14 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                             Session["_NavNodeIndex"] = sPanel_SystemManagement;
                             ViewBag.iActiveNode = sPanel_SystemManagement;
                             break;
+                        case "WebSiteAlbums":
+                            Session["_NavNodeIndex"] = sPanel_ContentManagement;
+                            ViewBag.iActiveNode = sPanel_ContentManagement;
+                            break;
+                        case "WebSiteAlbumContent":
+                            Session["_NavNodeIndex"] = sPanel_ContentManagement;
+                            ViewBag.iActiveNode = sPanel_ContentManagement;
+                            break;
                         case "WebSite_List":
                             Session["_NavNodeIndex"] = sPanel_SystemManagement;
                             ViewBag.iActiveNode = sPanel_SystemManagement;
@@ -19967,6 +19975,1480 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     {
                         oSystem.CloseDataConnection();
                         return RedirectToAction("WebSiteAnnouncementsType_List");
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteAlbums
+
+        string sWebSiteAlbums_Details = "/views/Forms/WebSiteAlbums_Details.cshtml";
+        string sWebSiteAlbums_List = "/views/Forms/WebSiteAlbums_List.cshtml";
+
+
+        public ActionResult WebSiteAlbums_List(FormCollection fc, string Search, int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteAlbums");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbums_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteAlbums.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteAlbums.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteAlbums_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteAlbums");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbums_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+                        List<DEF_WebSiteAlbums.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteAlbums.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+                        List<DEF_WebSiteAlbums.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteAlbums.RecordObject recRecord = dbSearch[0];
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+
+        public ActionResult WebSiteAlbums_Create()
+
+        {
+            Set_Client_NavSettings("WebSiteAlbums");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbums_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    DEF_WebSiteAlbums.RecordObject recRecord = new DEF_WebSiteAlbums.RecordObject();
+
+
+                    recRecord.dtLastPhotosAdded = DateTime.Parse("01/01/1901");
+                    recRecord.dtDateOfAlbum = DateTime.Parse("01/01/1901");
+
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult WebSiteAlbums_AddUpdate(DEF_WebSiteAlbums.RecordObject _rec)
+        {
+            Set_Client_NavSettings("WebSiteAlbums");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbums_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.ID == null) || (_rec.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+
+
+
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+
+                                _rec.sControl = Guid.NewGuid().ToString();
+                                _rec.dtDateCreated = DateTime.Now;
+                                _rec.dtLastUpdated = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteAlbums_Details", new { key = _rec.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+                                    _rec.dtLastUpdated = DateTime.Now;
+
+                                    dbInteraction.Update_SQL(_rec);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteAlbums_Details", new { id = _rec.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteAlbums_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteAlbums");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteAlbums dbInteraction = new DINT_WebSiteAlbums(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteAlbums.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteAlbums.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteAlbums_List");
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteAlbums_List");
+
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+        #endregion
+
+        #region Form WebSiteAlbumContent
+
+        string sWebSiteAlbumContent_Details = "/views/Forms/WebSiteAlbumContent_Details.cshtml";
+        string sWebSiteAlbumContent_List = "/views/Forms/WebSiteAlbumContent_List.cshtml";
+
+
+        public ActionResult WebSiteAlbumContent_List(FormCollection fc, string Search, int _iParentID = 0, string _sParentID = "", int page = 1)
+
+        {
+            Set_Client_NavSettings("WebSiteAlbumContent");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    Set_ViewBag_Global();
+                    Set_ViewBag_UserInfo();
+                    #region Process
+                    if (_iParentID <= 0)
+                    {
+                        #region if ParentID is less than or equal to zero see if it was included in the form
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                _iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                _sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                        #endregion
+                    }
+
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbumContent_List;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sView"] != null)
+                        {
+                            _sViewToLoad = Session["_sView"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+
+                    if (fc.AllKeys.Length > 0)
+                    {
+                        Search = fc["Search"].ToString();
+                    }
+                    oSystem.OpenDataConnection();
+                    DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+                    int iTotalRows = 0;
+
+                    List<DEF_WebSiteAlbumContent.RecordObject> dbSearch = null;
+                    List<DataParameter> lstParameters = new List<DataParameter>();
+                    DataParameter pParameter = null;
+                    bool bParameterSet = false;
+                    string sPRelationsToOthers = "";
+                    //if (_iParentID > 0)
+                    //{
+                    pParameter = new DataParameter("iParentID", "'" + _iParentID + "'", "int", 1, "iParentID", " = ", "");
+                    lstParameters.Add(pParameter);
+                    bParameterSet = true;
+                    //}
+
+
+
+                    if (!String.IsNullOrEmpty(Search))
+                    {
+                        Search = Search.TrimEnd();
+                        Search = Search.TrimStart();
+                        ViewBag.bSearched = true;
+
+
+                        bool bIsNumber = false;
+                        bool bIsDate = false;
+                        bool bIsBool = false;
+                        #region Test For Number
+                        try
+                        {
+                            int iTest = System.Convert.ToInt32(Search);
+                            bIsNumber = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Date
+                        try
+                        {
+                            DateTime dtTest = System.Convert.ToDateTime(Search);
+                            bIsDate = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+                        #region Test For Boolean
+                        try
+                        {
+                            bool bTest = System.Convert.ToBoolean(Search);
+                            bIsBool = true;
+                        }
+                        catch
+                        {
+                        }
+                        #endregion
+
+
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+                        //if (_iParentID > 0)
+                        //{
+                        //if (bIsNumber == true)
+                        //{
+                        //}
+                        //}
+                        if (bParameterSet == true)
+                        {
+                            sPRelationsToOthers = " AND ";
+                        }
+                        else
+                        {
+                            sPRelationsToOthers = "";
+                        }
+
+                    }
+
+                    iTotalRows = dbInteraction.GetRowCount(lstParameters);
+
+                    ViewBag.iTotalRecordCount = iTotalRows;
+                    int iMaxRows = 10;
+                    if (iTotalRows > 0)
+                    {
+                        #region Page Management Calculation
+                        if (page <= 0)
+                        {
+                            page = 1;
+                        }
+
+                        int iRow = 0;
+                        int iNextTop = 0;
+                        int iNumberOfPages = 0;
+                        if (iTotalRows > iMaxRows)
+                        {
+                            iNumberOfPages = (iTotalRows / iMaxRows) + 1;
+                        }
+                        else
+                        {
+                            iNumberOfPages = 1;
+                        }
+                        ViewBag.iNumberOfPages = iNumberOfPages;
+                        if (page <= iNumberOfPages)
+                        {
+                            if (page > 1)
+                            {
+                                iRow = ((page - 1) * iMaxRows) + 1;
+                                ViewBag.iCurrentPage = page;
+                                iNextTop = (page * iMaxRows);
+                            }
+                            else
+                            {
+                                iRow = 0;
+                                ViewBag.iCurrentPage = 1;
+                                iNextTop = page * iMaxRows;
+                            }
+                        }
+                        else
+                        {
+                            page = iNumberOfPages;
+                            iRow = ((page - 1) * iMaxRows) + 1;
+                            ViewBag.iCurrentPage = iNumberOfPages;
+                            iNextTop = iNumberOfPages * iMaxRows;
+                        }
+                        #endregion
+                        dbSearch = dbInteraction.Get(lstParameters, iRow, iNextTop);
+
+
+                        var dbres = dbSearch.OrderBy(s => s.ID);
+                        oPage.DataModelsPrimary = dbres.ToList();
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    else
+                    {
+                        ViewBag.iNumberOfPages = 0;
+                        dbSearch = new List<DEF_WebSiteAlbumContent.RecordObject>();
+                        oPage.DataModelsPrimary = dbSearch;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteAlbumContent_Details(int id = 0, string key = "", bool _UseParameterResults = false, bool _AddNew = false, bool _Saved = false)
+        {
+            Set_Client_NavSettings("WebSiteAlbumContent");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbumContent_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (id > 0)
+                    {
+                        #region ID Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+                        List<DEF_WebSiteAlbumContent.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteAlbumContent.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteAlbumContentViewModel recRecord = new WebSiteAlbumContentViewModel();
+                                recRecord.WebSiteAlbumContent = dbSearch[0];
+
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.WebSiteAlbumContent.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteAlbumContent.sParentID;
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else if (!String.IsNullOrEmpty(key))
+                    {
+                        #region key Based pull
+                        oSystem.OpenDataConnection();
+                        ViewBag.bError = false;
+                        ViewBag.bAddNew = false;
+                        ViewBag.bSaved = false;
+                        ViewBag.sErrorMessage = "";
+
+                        if (_UseParameterResults == true)
+                        {
+                            ViewBag.bAddNew = _AddNew;
+                            ViewBag.bSaved = _Saved;
+                        }
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("sControl", "'" + key + "'", "string", 3, "sControl", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+                        List<DEF_WebSiteAlbumContent.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                //DEF_WebSiteAlbumContent.RecordObject recRecord = dbSearch[0];
+                                ACMSDBView.WebSiteAlbumContentViewModel recRecord = new WebSiteAlbumContentViewModel();
+                                recRecord.WebSiteAlbumContent = dbSearch[0];
+
+                                if (recRecord == null)
+                                {
+                                    return HttpNotFound();
+                                }
+                                ViewBag.iParentID = recRecord.WebSiteAlbumContent.iParentID;
+                                ViewBag.sParentID = recRecord.WebSiteAlbumContent.sParentID;
+
+
+
+
+                                oPage.DataModelsPrimary = recRecord;
+                                oPage.DataModelsSub.Add(oSystem);
+                                oPage.AuthenticatedUser = true;
+                                oPage.PartialViewToLoad = _sViewToLoad;
+                                oSystem.CloseDataConnection();
+                                return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                            }
+                            else
+                            {
+                                oSystem.CloseDataConnection();
+                                return HttpNotFound();
+                            }
+                        }
+                        else
+                        {
+                            oSystem.CloseDataConnection();
+                            return HttpNotFound();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return HttpNotFound();
+                    }
+
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteAlbumContent_Create(int _iParentID = 0, string _sParentID = "")
+        {
+            Set_Client_NavSettings("WebSiteAlbumContent");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.iParentID = _iParentID;
+                    ViewBag.sParentID = _sParentID;
+
+
+
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbumContent_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    ViewBag.bError = false;
+                    ViewBag.bAddNew = true;
+                    ViewBag.bSaved = false;
+                    ViewBag.sErrorMessage = "";
+                    //DEF_WebSiteAlbumContent.RecordObject recRecord = new DEF_WebSiteAlbumContent.RecordObject();
+                    ACMSDBView.WebSiteAlbumContentViewModel recRecord = new WebSiteAlbumContentViewModel();
+
+
+                    recRecord.WebSiteAlbumContent.iParentID = _iParentID;
+                    recRecord.WebSiteAlbumContent.sParentID = _sParentID;
+
+                    recRecord.WebSiteAlbumContent.dtDateOfPhoto = DateTime.Parse("01/01/1901");
+
+
+
+
+                    oPage.DataModelsPrimary = recRecord;
+                    oPage.DataModelsSub.Add(oSystem);
+                    oPage.AuthenticatedUser = true;
+                    oPage.PartialViewToLoad = _sViewToLoad;
+                    oSystem.CloseDataConnection();
+                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult WebSiteAlbumContent_AddUpdate(FormCollection fc, HttpPostedFileBase UploadFiles1, ACMSDBView.WebSiteAlbumContentViewModel _rec)
+        {
+            Set_Client_NavSettings("WebSiteAlbumContent");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+
+
+            string sBaseULR = Request.Url.Scheme + "://" + Request.Url.Authority + "/";
+            string sRootPath = Request.PhysicalApplicationPath.ToString();
+            string sRefURL = Request.UrlReferrer.AbsoluteUri.ToString();
+            string sFileUploadResults = "";
+
+            bool bFileUploadError1 = false;
+            string sImageURL1 = "";
+            string sPrefix = "";
+
+
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    string sLocalDefaultView = sModuleBase + sWebSiteAlbumContent_Details;
+                    #region If View is not set try to get it
+                    if (String.IsNullOrEmpty(_sViewToLoad))
+                    {
+                        if (Session["_sViewDetails"] != null)
+                        {
+                            _sViewToLoad = Session["_sViewDetails"].ToString();
+                        }
+                        else
+                        {
+                            _sViewToLoad = sLocalDefaultView;
+                        }
+                    }
+                    #endregion
+                    if (_rec != null)
+                    {
+                        if ((_rec.WebSiteAlbumContent.ID == null) || (_rec.WebSiteAlbumContent.ID == 0))
+                        {
+                            ViewBag.bAddNew = true;
+                            _rec.WebSiteAlbumContent.ID = -1;
+                            ModelState.Remove("ID");
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            ViewBag.iParentID = _rec.WebSiteAlbumContent.iParentID;
+                            ViewBag.sParentID = _rec.WebSiteAlbumContent.sParentID;
+
+                            if (ViewBag.bAddNew == true)
+                            {
+                                #region
+                                ViewBag.bError = false;
+                                ViewBag.bAddNew = false;
+                                ViewBag.bSaved = true;
+                                ViewBag.sErrorMessage = "";
+                                oSystem.OpenDataConnection();
+
+                                DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+
+                                #region Upload file - Image Thumbnail
+                                try
+                                {
+                                    if (UploadFiles1 != null)
+                                    {
+                                        if (UploadFiles1.ContentLength > 0)
+                                        {
+                                            if (!String.IsNullOrEmpty(UploadFiles1.FileName))
+                                            {
+                                                string sOriginalfileName1 = Path.GetFileName(UploadFiles1.FileName);
+                                                FileInfo oFLCheck = new FileInfo(sRootPath + "Uploads\\" + sOriginalfileName1);
+                                                if (!oFLCheck.Exists)
+                                                {
+                                                    UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sOriginalfileName1);
+                                                    sImageURL1 = "Uploads/" + sOriginalfileName1;
+                                                    sFileUploadResults = "File Uploaded! - " + "Themes\\" + sOriginalfileName1;
+                                                    _rec.WebSiteAlbumContent.sContent = sImageURL1;
+                                                    _rec.WebSiteAlbumContent.sThumbNail = sImageURL1;
+                                                    bFileUploadError1 = false;
+                                                }
+                                                else
+                                                {
+                                                    sPrefix = "";
+                                                    sPrefix = DateTime.Now.ToShortTimeString() + DateTime.Now.ToShortDateString();
+                                                    sPrefix = sPrefix.Replace("/", "").Replace(" ", "").Replace(":", "");
+                                                    sImageURL1 = "Uploads/" + sPrefix + sOriginalfileName1;
+                                                    UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sPrefix + sOriginalfileName1);
+                                                    sFileUploadResults = "File Uploaded! - " + "Themes\\" + sPrefix + sOriginalfileName1;
+                                                    _rec.WebSiteAlbumContent.sContent = sImageURL1;
+                                                    _rec.WebSiteAlbumContent.sThumbNail = sImageURL1;
+                                                    bFileUploadError1 = false;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                    ViewBag.sErrorMessage += "Sorry something went wrong in attempting to upload your Image Thumbnail file";
+                                    bFileUploadError1 = false;
+                                }
+                                #endregion
+
+                                _rec.WebSiteAlbumContent.sControl = Guid.NewGuid().ToString();
+                                _rec.WebSiteAlbumContent.dtDateCreated = DateTime.Now;
+                                _rec.WebSiteAlbumContent.dtLastUpdated = DateTime.Now;
+                                _rec.WebSiteAlbumContent.dtLastAnswer = DateTime.Now;
+                                _rec.WebSiteAlbumContent.dtLastView = DateTime.Now;
+
+                                dbInteraction.Insert_SQL(_rec.WebSiteAlbumContent);
+
+
+
+                                oSystem.CloseDataConnection();
+                                #endregion
+                                return RedirectToAction("WebSiteAlbumContent_Details", new { key = _rec.WebSiteAlbumContent.sControl, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                            }
+                            else
+                            {
+                                if (_rec.WebSiteAlbumContent.ID > 0)
+                                {
+                                    #region
+                                    ViewBag.bError = false;
+                                    ViewBag.bAddNew = false;
+                                    ViewBag.bSaved = true;
+                                    ViewBag.sErrorMessage = "";
+                                    oSystem.OpenDataConnection();
+
+
+                                    DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+                                    _rec.WebSiteAlbumContent.dtLastUpdated = DateTime.Now;
+
+                                    #region Upload file - Image Thumbnail
+                                    try
+                                    {
+                                        if (UploadFiles1 != null)
+                                        {
+                                            if (UploadFiles1.ContentLength > 0)
+                                            {
+                                                if (!String.IsNullOrEmpty(UploadFiles1.FileName))
+                                                {
+                                                    string sOriginalfileName1 = Path.GetFileName(UploadFiles1.FileName);
+                                                    FileInfo oFLCheck = new FileInfo(sRootPath + "Uploads\\" + sOriginalfileName1);
+                                                    if (!oFLCheck.Exists)
+                                                    {
+                                                        UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sOriginalfileName1);
+                                                        sImageURL1 = "Uploads/" + sOriginalfileName1;
+                                                        sFileUploadResults = "File Uploaded! - " + "Themes\\" + sOriginalfileName1;
+                                                        _rec.WebSiteAlbumContent.sContent = sImageURL1;
+                                                        _rec.WebSiteAlbumContent.sThumbNail = sImageURL1;
+                                                        bFileUploadError1 = false;
+                                                    }
+                                                    else
+                                                    {
+                                                        sPrefix = "";
+                                                        sPrefix = DateTime.Now.ToShortTimeString() + DateTime.Now.ToShortDateString();
+                                                        sPrefix = sPrefix.Replace("/", "").Replace(" ", "").Replace(":", "");
+                                                        sImageURL1 = "Uploads/" + sPrefix + sOriginalfileName1;
+                                                        UploadFiles1.SaveAs(sRootPath + "Uploads\\" + sPrefix + sOriginalfileName1);
+                                                        sFileUploadResults = "File Uploaded! - " + "Themes\\" + sPrefix + sOriginalfileName1;
+                                                        _rec.WebSiteAlbumContent.sContent = sImageURL1;
+                                                        _rec.WebSiteAlbumContent.sThumbNail = sImageURL1;
+                                                        bFileUploadError1 = false;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        ViewBag.sErrorMessage += "Sorry something went wrong in attempting to upload your Image Thumbnail file";
+                                        bFileUploadError1 = false;
+                                    }
+                                    #endregion
+
+                                    dbInteraction.Update_SQL(_rec.WebSiteAlbumContent);
+
+                                    oSystem.CloseDataConnection();
+                                    #endregion
+                                    return RedirectToAction("WebSiteAlbumContent_Details", new { id = _rec.WebSiteAlbumContent.ID, _UseParameterResults = true, _AddNew = false, _Saved = true });
+                                }
+                                else
+                                {
+                                    ViewBag.bError = true;
+                                    ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                                    oPage.DataModelsPrimary = _rec;
+                                    oPage.DataModelsSub.Add(oSystem);
+                                    oPage.AuthenticatedUser = true;
+                                    oPage.PartialViewToLoad = _sViewToLoad;
+                                    oSystem.CloseDataConnection();
+                                    return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ViewBag.bError = true;
+                            ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                            oPage.DataModelsPrimary = _rec;
+                            oPage.DataModelsSub.Add(oSystem);
+                            oPage.AuthenticatedUser = true;
+                            oPage.PartialViewToLoad = _sViewToLoad;
+                            oSystem.CloseDataConnection();
+                            return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.bError = true;
+                        ViewBag.sErrorMessage = "Please fill out the form completely, before re-submitting it.";
+
+                        oPage.DataModelsPrimary = _rec;
+                        oPage.DataModelsSub.Add(oSystem);
+                        oPage.AuthenticatedUser = true;
+                        oPage.PartialViewToLoad = _sViewToLoad;
+                        oSystem.CloseDataConnection();
+                        return View(sModuleBase + "/Views/Screens/Index.cshtml", oPage);
+                    }
+                    #endregion
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    //User does not have access to this area of the system
+                    return Redirect("~/");
+                }
+            }
+            else
+            {
+                oSystem.CloseDataConnection();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult WebSiteAlbumContent_Delete(int id)
+        {
+            Set_Client_NavSettings("WebSiteAlbumContent");
+            Set_ViewBag_Global_Defaults();
+            Set_ViewBag_UserInfo_Defaults();
+            if (oSystem.GetCurrentUser())
+            {
+                Set_ViewBag_Global();
+                Set_ViewBag_UserInfo();
+                if (oSystem.CheckScreenAccessRights(iAccessRolesAllowed))
+                {
+
+                    int iParentID = 0;
+                    string sParentID = "";
+
+                    #region if ParentID is less than or equal to zero see if it was included in the form
+                    try
+                    {
+                        if (Request.Form["_iParentID"] != null)
+                        {
+                            try
+                            {
+                                iParentID = System.Convert.ToInt32(Request.Form["_iParentID"].ToString());
+                                sParentID = Request.Form["_sParentID"].ToString();
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+
+                    #region Process
+                    ViewBag.bLoggedIn = true;
+                    ViewBag.bAddNew = false;
+                    if (id > 0)
+                    {
+                        oSystem.OpenDataConnection();
+
+                        DINT_WebSiteAlbumContent dbInteraction = new DINT_WebSiteAlbumContent(oSystem.cnCon);
+
+                        List<DataParameter> lstParameters = new List<DataParameter>();
+                        DataParameter pParameter = new DataParameter("ID", id.ToString(), "int", 0, "ID", " = ", "");
+                        lstParameters.Add(pParameter);
+
+                        List<DEF_WebSiteAlbumContent.RecordObject> dbSearch;
+                        dbSearch = dbInteraction.Get(lstParameters);
+                        if (dbSearch != null)
+                        {
+                            if (dbSearch.Count > 0)
+                            {
+                                DEF_WebSiteAlbumContent.RecordObject recRecord = dbSearch[0];
+                                if (recRecord != null)
+                                {
+                                    if (recRecord.ID == id)
+                                    {
+
+                                        ViewBag.iParentID = recRecord.iParentID;
+                                        ViewBag.sParentID = recRecord.sParentID;
+                                        iParentID = recRecord.iParentID;
+                                        sParentID = recRecord.sParentID;
+
+
+                                        dbInteraction.Delete_SQL(recRecord);
+                                    }
+                                }
+                            }
+                        }
+                        oSystem.CloseDataConnection();
+
+                        return RedirectToAction("WebSiteAlbumContent_List", new { _iParentID = iParentID, _sParentID = sParentID });
+
+
+                    }
+                    else
+                    {
+                        oSystem.CloseDataConnection();
+                        return RedirectToAction("WebSiteAlbumContent_List", new { _iParentID = iParentID, _sParentID = sParentID });
 
                     }
 
@@ -48333,6 +49815,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                     recRecord.WebSiteEventCalendar.iParentID = _iParentID;
                     recRecord.WebSiteEventCalendar.sParentID = _sParentID;
 
+
                     recRecord.WebSiteEventCalendar.dtDateOfEvent = DateTime.Parse("01/01/1901");
                     recRecord.WebSiteEventCalendar.dtFirstDateOfRegistrations = DateTime.Parse("01/01/1901");
                     recRecord.WebSiteEventCalendar.dtLastDateOfRegistrations = DateTime.Parse("01/01/1901");
@@ -49956,6 +51439,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                     recRecord.WebSiteEventCalendarSponsors.iParentID = _iParentID;
                     recRecord.WebSiteEventCalendarSponsors.sParentID = _sParentID;
+                    recRecord.WebSiteEventCalendarSponsors.dtLastUpdated = DateTime.Parse("01/01/1901");
 
 
 
@@ -50698,7 +52182,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
 
                     recRecord.iParentID = _iParentID;
                     recRecord.sParentID = _sParentID;
-
+                    recRecord.dtLastUpdated = DateTime.Parse("01/01/1901");
 
 
 
@@ -53528,6 +55012,7 @@ namespace AriesCMS.Modules.CMSAdmin.Controllers
                         {
 
                             oSystem.SendMarketing_Campiag(Id);
+                            sRESPONSE = "true";
 
                         }
                         catch

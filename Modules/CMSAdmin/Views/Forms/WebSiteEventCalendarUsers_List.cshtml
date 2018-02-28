@@ -106,6 +106,8 @@
                     <tr class="blue_background text-lg-center text-md-center text-xs-center whitetype">
                         <th>User</th>
                         <th>Lead</th>
+                        <th>Paid</th>
+                        <th>Payment Status</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -117,6 +119,8 @@
                             <tr>
                                 <th scope="row">@Html.DisplayFor(modelItem => objRec.sUserID)</th>
                                 <td>@Html.DisplayFor(modelItem => objRec.sLeadID)</td>
+                                <td>@Html.DisplayFor(modelItem => objRec.bIsPaid)</td>
+                                <td>@Html.DisplayFor(modelItem => objRec.sPayMentStatusID)</td>
                             <td>
                                 @Html.ActionLink("Edit", "WebSiteEventCalendarUsers_Details", new { id=objRec.ID}) 
                                 @Html.Raw("|")

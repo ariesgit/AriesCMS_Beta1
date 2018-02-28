@@ -323,30 +323,88 @@
 
     <script src="@Url.Content("~/Scripts/ariesglobal.js")" type="text/javascript"></script>
     <script type="text/javascript">
-        try
-        {
-            $(function ()
-            {
-                Ini_Page();
+    try
+    {
+	    //$('#lblScreenSize').html($(window).width());
+	    // get the value of the bottom of the #main element by adding the offset of that element plus its height, set it as a variable
+	    var mainbottom = 1200;
+	    var oNavBarHeight = 0;
+	    var navoffset = 70;
+	    var oMinHeight = 1200;
+	    var oMinWidth = 1200;
+
+
+	    $(document).ready(function()
+	    {
+
+		    //$('#bgvid').get(0).play();
+		    //mainbottom = $('#pnlMain1').offset().top;
+
+		    oNavBarHeight = $('#navbar1').height();
+		    oMinHeight = $(window).height();
+		    oMinWidth = $(window).width();
+
+		    //If nav bar is not fixed to top  navbar-fixed-top
+		    oMinHeight = oMinHeight - oNavBarHeight;
+		    $('.rwHeight').each(function() {
+			    $(this).css('min-height', oMinHeight);
+			    //$(this).css('height', oMinHeight);
+		    });
+
+		    //if(oMinWidth > 560)
+		    //{
+			    oNavBarHeight = oNavBarHeight + navoffset;
+		    //}
+		    //else
+		    //{
+		    //	oNavBarHeight = oNavBarHeight;
+		    //}
+		    $('.toppadding').each(function() {
+			    $(this).height(oNavBarHeight + "px");
+                });
+
+
+            $('.pnlPosTop').each(function () {
+                $(this).height(oNavBarHeight + "px");
             });
 
 
-            $(document).ready(function () {
-                //$(".rwHeight").height($(document).height());
-                // $(".rwHeight").height($(window).height() - 120);
-                var oMinHeight = $(window).height() + "px";
-                $(".rwHeight").css('min-height', oMinHeight);
+        
+
+	    });
+
+	    // on scroll,
+	    $(window).on('scroll',function()
+	    {
+		    // we round here to reduce a little workload
+		    var stop = Math.round($(window).scrollTop());
+
+		    if (stop > mainbottom)
+		    {
+			    //$('.navbar').addClass('navbar-background3', 600);
+			    //$('#pnlBetaText1').addClass('whitetype');
+			    //$('#logoimg_Light').hide();
+			    //$('#logoimg_Dark').show();
+
+			    ////$('#pnlTopLogo1').removeClass('col-lg-2');;
+			    ////$('#pnlTopLogo1').addClass('col-lg-1');
+		    }
+		    else
+		    {
+			    //$('.navbar').removeClass('navbar-background3', 600);
+			    //$('#pnlBetaText1').removeClass('whitetype');
+			    //$('#logoimg_Light').show();
+			    //$('#logoimg_Dark').hide();
+			    ////$('#pnlTopLogo1').removeClass('col-lg-1');
+		    }
+	    });
 
 
-                var oHeightT = $('.navbar').height();
-                $('.toppadding').height(oHeightT + 20);
-
-            });
-        }
-        catch(e)
-        {
-	        alert(e);
-        }
+    }
+    catch(e)
+    {
+	    alert(e);
+    }
     </script>
 </body>
 </html>

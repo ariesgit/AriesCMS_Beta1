@@ -8149,6 +8149,50 @@ namespace AriesCMS.Controllers
         //AriesCMS.Helpers.SiteCoreHelper oSystem = new Helpers.SiteCoreHelper();
         //// GET: Unsubscribe
 
+        string _sViewToLoad = "~/Views/SharedForms/Unsubscribe.cshtml";
+        public ActionResult Index(string Id)
+        {
+            try
+            {
+                if (!String.IsNullOrEmpty(Id))
+                {
+
+                    oSystem.SendMessage("info@yourdomain.com", "YOUR Site", "support@yourdomain.com", "YOURDOMAIN Support", "YOURSITE Unsubscribe email please", "Request to unsubscribe email:" + Id);
+                    try
+                    {
+                        if (oSystem.OpenDataConnection())
+                        {
+                            int iRowsAffected = 0;
+                            string sProcessError = "";
+                            string sSQL = "Update Users set bOptInMarketing = 'False' Where sPrimaryEMail = '" + Id + "'";
+                            oSystem.cnCon.ExecQuery(sSQL, out iRowsAffected, out sProcessError);
+                            sSQL = "";
+                            sSQL = "Update WebSite_Leads set bOptInMarketing = 'False' Where sPrimaryEMail = '" + Id + "'";
+                            oSystem.cnCon.ExecQuery(sSQL, out iRowsAffected, out sProcessError);
+                            sSQL = "";
+                            sSQL = "Update WebMarketingListsMembers set bDisabled = 'True' Where sEMail = '" + Id + "'";
+                            oSystem.cnCon.ExecQuery(sSQL, out iRowsAffected, out sProcessError);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                    oSystem.CloseDataConnection();
+                    return View(_sViewToLoad);
+                }
+                else
+                {
+                    oSystem.CloseDataConnection();
+                    return Redirect("/ErrorPage");
+                }
+            }
+            catch
+            {
+                oSystem.CloseDataConnection();
+                return Redirect("/ErrorPage");
+            }
+        }
     }
 
 

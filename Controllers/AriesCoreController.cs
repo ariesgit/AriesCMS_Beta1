@@ -42,7 +42,7 @@ using AriesDBManager;
 using AriesCMSInteractions;
 using AriesCMSDefinition;
 using ACMSDBView;
-
+using AriesCMS.Helpers;
 
 namespace AriesCMS.Controllers
 {
@@ -546,7 +546,8 @@ namespace AriesCMS.Controllers
         }
 
     }
-    
+
+    [AllowCrossSiteJsonAttribute]
     public partial class RestServiceController : Controller
     {
         string _sViewToLoad = "";
@@ -6528,160 +6529,6 @@ namespace AriesCMS.Controllers
         int _igBaseTemplatePageZoneID = 2;
         int[] iAccessRolesAllowed = new int[5] { 1, 2, 3, 4, 5 };
 
-        string _sViewToLoad = "~/Views/SharedForms/Unsubscribe.cshtml";
-        public ActionResult Index(string Id)
-        {
-            try
-            {
-                if (!String.IsNullOrEmpty(Id))
-                {
-                    #region Send out email to admin to remove this email
-                    //new Thread(() =>
-                    //{
-                    //    try
-                    //    {
-                    //        #region Send process
-                    //        string sSMTPUserName = "";
-                    //        string sSMTPPassword = "";
-                    //        string sSMTPPort = "";
-                    //        string sSMTPUseSSL = "";
-                    //        string sSMTPServer = "";
-                    //        string sBcc = "";
-                    //        string sFromEmail = "site@ariestco.com";
-                    //        string sFromName = "User Request";
-
-                    //        #region Get Settings
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["SMTPUserName"] != null)
-                    //            {
-                    //                sSMTPUserName = WebConfigurationManager.AppSettings["SMTPUserName"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["SMTPPassword"] != null)
-                    //            {
-                    //                sSMTPPassword = WebConfigurationManager.AppSettings["SMTPPassword"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["SMTPPort"] != null)
-                    //            {
-                    //                sSMTPPort = WebConfigurationManager.AppSettings["SMTPPort"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["SMTPUseSSL"] != null)
-                    //            {
-                    //                sSMTPUseSSL = WebConfigurationManager.AppSettings["SMTPUseSSL"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["SMTPServer"] != null)
-                    //            {
-                    //                sSMTPServer = WebConfigurationManager.AppSettings["SMTPServer"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-
-                    //        try
-                    //        {
-                    //            if (WebConfigurationManager.AppSettings["Bcc"] != null)
-                    //            {
-                    //                sBcc = WebConfigurationManager.AppSettings["Bcc"].ToString();
-                    //            }
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-                    //        #endregion
-                    //        sFromEmail = "site@ariestco.com";
-                    //        sFromName = "Aries User Request";
-
-                    //        bool bIsHtml = true;
-                    //        int iPort = 25;
-                    //        try
-                    //        {
-                    //            iPort = System.Convert.ToInt32(sSMTPPort);
-                    //        }
-                    //        catch
-                    //        {
-                    //            iPort = 25;
-                    //        }
-
-                    //        bool bSSL = false;
-                    //        try
-                    //        {
-                    //            bSSL = System.Convert.ToBoolean(sSMTPUseSSL);
-                    //        }
-                    //        catch
-                    //        {
-                    //        }
-                    //        string sMessage = "";
-                    //        string sSubject = "Email Subscriber requested to be removed";
-                    //        string sTo = "info@ariestco.com";
-                    //        sMessage += "Contact requesting to be removed from email list: " + "<br/>";
-                    //        sMessage += "EMail: " + Id + "\r\n" + "<br/>";
-
-
-                    //        MailMessage mail = new MailMessage();
-                    //        SmtpClient SmtpMail = new SmtpClient(sSMTPServer);
-                    //        SmtpMail.Credentials = new NetworkCredential(sSMTPUserName, sSMTPPassword);
-                    //        SmtpMail.Port = iPort;
-                    //        SmtpMail.EnableSsl = bSSL;
-
-                    //        MailAddress MailFrom = new MailAddress(sFromEmail, sFromName);
-                    //        mail.From = MailFrom;
-
-                    //        mail.Body = sMessage;
-
-                    //        mail.To.Add("support@ariestco.com");
-                    //        mail.Subject = sSubject;
-                    //        mail.IsBodyHtml = true;
-
-
-                    //        SmtpMail.Send(mail);
-                    //        #endregion
-                    //    }
-                    //    catch { }
-                    //}).Start();
-                    #endregion
-                    return View(_sViewToLoad);
-                }
-                else
-                {
-                    oSystem.CloseDataConnection();
-                    return Redirect("/ErrorPage");
-                }
-            }
-            catch
-            {
-                oSystem.CloseDataConnection();
-                return Redirect("/ErrorPage");
-            }
-        }
     }
 
 }

@@ -126,7 +126,14 @@
                          @Html.HiddenFor(model => model.iLeadID)  
                          @Html.HiddenFor(model => model.sLeadID)
 
+    @Html.HiddenFor(model => model.iPayMentStatusID)
 
+    @Html.HiddenFor(model => model.sGroupID)
+    @Html.HiddenFor(model => model.iGroupPayerID)
+    @Html.HiddenFor(model => model.sGroupPayerID)
+    @Html.HiddenFor(model => model.sDataArray1)
+    @Html.HiddenFor(model => model.sDataArray2)
+    @Html.HiddenFor(model => model.sDataArray3)
 
                                         <fieldset> 
                                             <legend></legend>
@@ -140,6 +147,18 @@
                                                 <label for="sLeadID">Lead :</label>
                                                 @Html.TextBoxFor(model => model.sName, new { @Class = "form-control", @readonly = "readonly" })
                                                 <span class="alert-danger">@Html.ValidationMessageFor(model => model.sLeadID)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="bIsPaid">Paid :</label>
+                                                @Html.CheckBoxFor(model => model.bIsPaid, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.bIsPaid)</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="sPayMentStatusID">Payment status :</label>
+                                                @Html.TextBoxFor(model => model.sPayMentStatusID, new { @Class = "form-control", @readonly = "readonly" })
+                                                <span class="alert-danger">@Html.ValidationMessageFor(model => model.sPayMentStatusID)</span>
                                             </div>
 
                                             <div class="form-group">
